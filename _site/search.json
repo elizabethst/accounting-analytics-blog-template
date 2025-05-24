@@ -1,0 +1,58 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Welcome to My Accounting Analytics Site",
+    "section": "",
+    "text": "Welcome! I’m a student in Sonoma State University’s accounting program, exploring the intersection of accounting and data analytics. This website showcases my work:\n\nData analysis projects using R and accounting datasets\nCourse reflections on key concepts and applications\nProfessional development in accounting technology"
+  },
+  {
+    "objectID": "index.html#about-this-site",
+    "href": "index.html#about-this-site",
+    "title": "Welcome to My Accounting Analytics Site",
+    "section": "",
+    "text": "Welcome! I’m a student in Sonoma State University’s accounting program, exploring the intersection of accounting and data analytics. This website showcases my work:\n\nData analysis projects using R and accounting datasets\nCourse reflections on key concepts and applications\nProfessional development in accounting technology"
+  },
+  {
+    "objectID": "index.html#latest-posts",
+    "href": "index.html#latest-posts",
+    "title": "Welcome to My Accounting Analytics Site",
+    "section": "Latest Posts",
+    "text": "Latest Posts"
+  },
+  {
+    "objectID": "index.html#skills-im-developing",
+    "href": "index.html#skills-im-developing",
+    "title": "Welcome to My Accounting Analytics Site",
+    "section": "Skills I’m Developing",
+    "text": "Skills I’m Developing\n\nFinancial data analysis with R\nData visualization for accounting insights\nStatistical modeling for audit analytics\nDatabase management for accounting systems"
+  },
+  {
+    "objectID": "index.html#contact",
+    "href": "index.html#contact",
+    "title": "Welcome to My Accounting Analytics Site",
+    "section": "Contact",
+    "text": "Contact\nFeel free to connect with me:\n\nEmail: your.email@university.edu\nLinkedIn: Your Profile\nGitHub: Your Repositories"
+  },
+  {
+    "objectID": "posts/welcome/index.html",
+    "href": "posts/welcome/index.html",
+    "title": "Welcome To My Blog",
+    "section": "",
+    "text": "This is the first post in a Quarto blog. Welcome!\n\nSince this post doesn’t specify an explicit image, the first image in the post will be used in the listing page of posts."
+  },
+  {
+    "objectID": "posts/post-with-code/index.html",
+    "href": "posts/post-with-code/index.html",
+    "title": "Post With Code",
+    "section": "",
+    "text": "This is a post with executable code."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this blog"
+  }
+]

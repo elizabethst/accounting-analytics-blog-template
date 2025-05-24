@@ -1,0 +1,33 @@
+---
+title: "Welcome to My Accounting Analytics Site"
+listing:
+  contents: posts
+  sort: "date desc"
+  type: default
+  categories: true
+  sort-ui: false
+  filter-ui: false
+page-layout: full
+title-block-banner: true
+---
+
+
+## About This Site
+
+Welcome! I'm a student in Sonoma State University's accounting program, exploring the intersection of accounting and data analytics. This website showcases my work:
+
+- **Data analysis projects** using R and accounting datasets
+- **Course reflections** on key concepts and applications
+- **Professional development** in accounting technology
+
+
+## Skills I'm Developing
+
+- Financial data analysis with R
+- Data visualization for accounting insights
+- Statistical modeling for audit analytics
+- Database management for accounting systems
+
+
+## Posts
+
