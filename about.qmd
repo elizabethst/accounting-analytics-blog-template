@@ -4,16 +4,26 @@ image: profile.jpg
 about:
   template: jolla
   links:
-    - icon: twitter
-      text: Twitter
-      href: https://twitter.com
     - icon: linkedin
       text: LinkedIn
       href: https://linkedin.com
-    - icon: github
-      text: Github
-      href: https://github.com
+    - icon: mailbox
+      text: Email
+      href: mailto:yourname@sonoma.edu
 
 ---
 
-About this blog
+Your name is a student at Sonoma State University.  Her concentration is accounting, and she plans to become a certified public accountant (CPA).
+
+
+## Education
+
+Sonoma State University | Rohnert Park, CA
+BS in Business | start date - grad date
+
+
+## Experience
+
+Accounting Firm | Accounting Intern | June 2025 - August 2025
+
+Another Firm | Customer Service | Jan 2025 - June 2025

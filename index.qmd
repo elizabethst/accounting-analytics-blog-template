@@ -14,7 +14,7 @@ title-block-banner: true
 
 ## About This Site
 
-Welcome! I'm a student in Sonoma State University's accounting program, exploring the intersection of accounting and data analytics. This website showcases my work:
+Welcome! I'm a student in Sonoma State University's accounting program, exploring data analytics in accounting. This website showcases my work:
 
 - **Data analysis projects** using R and accounting datasets
 - **Course reflections** on key concepts and applications

@@ -1,0 +1,232 @@
+---
+title: "2 - Introduction to Accounting Analytics"
+date: "`r Sys.Date()`"
+execute: 
+  eval: false #set to true
+  message: false
+  warning: false
+---
+
+## Executive Summary
+
+*Write a 2-3 sentence summary of what you learned about using R for accounting calculations after completing this assignment.*
+
+---
+
+## Introduction
+
+R offers powerful advantages:
+
+- **Reproducibility**: Every calculation is documented in code
+- **Scalability**: Handle thousands of transactions effortlessly  
+- **Automation**: Repeat analyses with new data instantly
+
+In this blog post, I'll demonstrate how to:
+- Use R as a financial calculator
+- Create organized data structures for accounting information
+- Build depreciation schedules
+- Analyze financial performance
+
+---
+
+## Setup and Load Libraries
+
+### Required Libraries
+
+```{r}
+#| label: setup
+ 
+# Load required packages
+library(tidyverse)  # For data manipulation
+library(scales)     # For formatting numbers as currency and percentages
+```
+
+## R as Your Financial Calculator
+### Present Value Calculation
+
+Let's start with a fundamental finance calculation - present value. If you expect to receive $25,000 in 3 years and the annual interest rate is 4.5%, what is that worth today?
+
+```{r}
+# Set up the variables
+future_value <- 25000  
+annual_rate <- 0.045   
+years <- 3             
+
+# Calculate present value using the formula: PV = FV / (1 + r)^n
+present_value <- _____ / (1 + _____)^_____
+
+# Display the result
+present_value
+
+# Display with currency formatting
+dollar(present_value)
+```
+
+
+### Financial Ratios
+
+Now let's calculate some key financial ratios that help assess company health:
+
+
+```{r}
+# Current Ratio = Current Assets / Current Liabilities
+current_assets <- 120000
+current_liabilities <- 80000
+current_ratio <- _____ / _____
+
+# Display the current ratio
+current_ratio
+
+# Check if it meets the benchmark of 2.0
+meets_benchmark <- current_ratio >= _____
+meets_benchmark
+
+# Quick Ratio = (Current Assets - Inventory) / Current Liabilities
+inventory <- 35000
+quick_ratio <- (_____ - _____) / _____
+quick_ratio
+```
+
+## Creating Financial Data Structures
+**Chart of Accounts**
+Let's create a simple chart of accounts using a data frame:
+
+```{r}
+# Create chart of accounts using tribble (an easy way to create small data frames)
+chart_of_accounts <- tribble(
+  ~account_code, ~account_name,         ~account_type, ~balance,
+  1001,          "Cash",                "Asset",        25000,
+  1002,          "Accounts Receivable", "Asset",        18500,
+  1003,          "Inventory",           "Asset",        32000,
+  2001,          "Accounts Payable",    "_____",        15000,  # Fill in account type
+  3001,          "Owner's Equity",      "_____",        60500   # Fill in account type
+)
+
+# View the chart of accounts
+chart_of_accounts
+```
+
+## Verify the Accounting Equation
+
+Let's check if our accounting equation balances (Assets = Liabilities + Equity):
+
+```{r}
+# Calculate totals by account type
+account_summary <- chart_of_accounts |>
+  group_by(_____) |>  # Group by account_type
+  summarise(total = sum(_____))  # Sum the balances
+
+# View the summary
+account_summary
+
+# Check if Assets = Liabilities + Equity
+# Hint: You'll need to extract the totals for each account type
+
+
+
+```
+
+
+
+## Monthly Financial Analysis
+
+**Creating Monthly P&L Data**
+
+Let's create and analyze profit & loss data for the first quarter:
+
+```{r}
+# Create monthly P&L data
+monthly_pnl <- tribble(
+  ~month,      ~revenue, ~expenses,
+  "January",    65000,    48000,
+  "February",   72000,    52000,
+  "March",      68000,    49000
+)
+
+# Add calculated columns
+monthly_analysis <- monthly_pnl |>
+  mutate(
+    net_income = _____ - _____,  # Calculate net income
+    profit_margin = _____ / _____  # Calculate profit margin
+  )
+
+# View the analysis
+monthly_analysis
+```
+
+### Quarterly Summary
+
+Now let's create a quarterly summary:
+
+```{r}
+# Calculate quarterly totals
+quarterly_summary <- monthly_analysis |>
+  summarise(
+    total_revenue = sum(_____),
+    total_expenses = sum(_____),
+    total_net_income = sum(_____),
+    avg_profit_margin = mean(_____)
+  )
+
+# View quarterly summary
+quarterly_summary
+
+# Format the profit margin as a percentage
+percent(quarterly_summary$avg_profit_margin)
+```
+
+
+## Depreciation Schedule
+### Straight-Line Depreciation
+Let's create a depreciation schedule for equipment:
+
+```{r}
+# Equipment details
+equipment_cost <- 75000
+salvage_value <- 5000
+useful_life <- 7
+
+# Calculate annual depreciation
+annual_depreciation <- (_____ - _____) / _____
+annual_depreciation
+```
+
+
+### Complete Depreciation Schedule
+
+```{r}
+# Create the full depreciation schedule
+depreciation_schedule <- tibble(
+  year = 1:_____  # Create years 1 through useful_life
+) |>
+  mutate(
+    annual_depreciation = _____,  # Same amount each year for straight-line
+    accumulated_depreciation = _____ * year,  # Cumulative depreciation
+    book_value = _____ - _____  # Cost minus accumulated depreciation
+  )
+
+# View the schedule
+depreciation_schedule
+
+# What's the book value at the end of year 5?
+year_5_value <- depreciation_schedule |>
+  filter(year == 5) |>
+  pull(book_value)
+
+dollar(year_5_value)
+```
+
+## Key Findings and Reflections
+
+**Summary of Calculations**
+Based on the analyses above:
+
+- **Present Value**: $25,000 received in 3 years at 4.5% interest is worth $_____ today
+- **Liquidity Ratios**:
+  - Current Ratio: _____ (does/doesn't meet the 2.0 benchmark)
+  - Quick Ratio: _____ (indicates the company can/cannot pay short-term debts without selling inventory)
+
+
+- **Profitability**: The company achieved an average profit margin of _____% in Q1
+- **Asset Management**: The equipment will have a book value of $_____ after 5 years
+

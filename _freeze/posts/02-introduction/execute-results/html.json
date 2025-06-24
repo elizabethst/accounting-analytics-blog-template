@@ -1,0 +1,15 @@
+{
+  "hash": "b88db6b62398d0a3f1e08f5c8c787605",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"2 - Introduction to Accounting Analytics\"\ndate: \"2025-06-17\"\nexecute: \n  eval: false #set to true\n  message: false\n  warning: false\n---\n\n## Load libraries\n\n\n::: {.cell}\n\n```{.r .cell-code}\nlibrary(tidyverse)\nlibrary(scales)\n```\n:::\n\n\n## Quarterly P&L Metrics\n\n**Task**: Fill in the blanks, inspect the output, then answer the question.\n\n\n::: {.cell}\n\n```{.r .cell-code}\n# Step 1: Build the monthly P&L table\nmonthly_pnl <- tribble(\n  ~month,     ~revenue, ~expenses,\n  \"January\",    50000,     40000,\n  \"February\",   55000,     42000,\n  \"March\",      60000,     45000\n)\n# Show the raw monthly data\nmonthly_pnl\n```\n:::\n\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\n# Step 2: Compute net income\nmonthly_pnl <- monthly_pnl |>\n  mutate(\n    net_income = _______   # Fill in: revenue - expenses\n  )\n# Inspect the net income column\nmonthly_pnl\n```\n:::\n\n\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\n# Step 3: Summarise quarterly totals\nquarterly_totals <- monthly_pnl |>\n  summarise(\n    quarterly_revenue    = sum(_______),    # Fill in: revenue\n    quarterly_net_income = sum(_______)     # Fill in: net_income\n  )\n# View the quarterly totals\nquarterly_totals\n```\n:::\n\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\n# Step 4: Calculate profit margin\nquarterly_totals <- quarterly_totals |>\n  mutate(\n    quarterly_profit_margin = _______ / _______   # Fill in: quarterly_net_income, quarterly_revenue\n  )\n# Final quarterly summary with profit margin\nquarterly_totals\n```\n:::\n\n\n\n**Questions:** \n\n- Based on quarterly_totals, what is the profit margin for the quarter?\n\n- What does that percentage tell you about the company’s profitability this quarter?\n\n\n## Expense Category Breakdown\n\n**Task:** Create a one-month expense tribble, compute each category’s share of total spending, and answer the question.\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\n# Step 1: Create your expense table\nmonthly_expenses <- tribble(\n  ~category,        ~amount,\n  \"Travel\",           _______,   # Fill in an amount\n  \"Meals\",            _______,  \n  \"Supplies\",         _______\n)\nmonthly_expenses\n```\n:::\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\n# Step 1: Create your expense table\n\nmonthly_expenses <- tribble(\n  ~category,        ~amount,\n  \"Travel\",           10,   # Fill in an amount\n  \"Meals\",            20,  \n  \"Supplies\",         30\n)\nmonthly_expenses\n```\n:::\n\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\n# Step 2: Compute percentage of total expenses\nexpense_pct <- monthly_expenses |>\n  mutate(\n    pct_of_total = percent(amount / sum(amount))  # share of total\n  )\nexpense_pct\n```\n:::\n\n\n\n**Question**\n- Which expense category represents the largest share of spending? ",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

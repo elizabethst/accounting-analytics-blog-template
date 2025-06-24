@@ -4,14 +4,14 @@
     "href": "index.html",
     "title": "Welcome to My Accounting Analytics Site",
     "section": "",
-    "text": "Welcome! I’m a student in Sonoma State University’s accounting program, exploring the intersection of accounting and data analytics. This website showcases my work:\n\nData analysis projects using R and accounting datasets\nCourse reflections on key concepts and applications\nProfessional development in accounting technology"
+    "text": "Welcome! I’m a student in Sonoma State University’s accounting program, exploring data analytics in accounting. This website showcases my work:\n\nData analysis projects using R and accounting datasets\nCourse reflections on key concepts and applications\nProfessional development in accounting technology"
   },
   {
     "objectID": "index.html#about-this-site",
     "href": "index.html#about-this-site",
     "title": "Welcome to My Accounting Analytics Site",
     "section": "",
-    "text": "Welcome! I’m a student in Sonoma State University’s accounting program, exploring the intersection of accounting and data analytics. This website showcases my work:\n\nData analysis projects using R and accounting datasets\nCourse reflections on key concepts and applications\nProfessional development in accounting technology"
+    "text": "Welcome! I’m a student in Sonoma State University’s accounting program, exploring data analytics in accounting. This website showcases my work:\n\nData analysis projects using R and accounting datasets\nCourse reflections on key concepts and applications\nProfessional development in accounting technology"
   },
   {
     "objectID": "index.html#latest-posts",
@@ -53,6 +53,97 @@
     "href": "about.html",
     "title": "About",
     "section": "",
-    "text": "About this blog"
+    "text": "Your name is a student at Sonoma State University. Her concentration is accounting, and she plans to become a certified public accountant (CPA)."
+  },
+  {
+    "objectID": "index.html#posts",
+    "href": "index.html#posts",
+    "title": "Welcome to My Accounting Analytics Site",
+    "section": "Posts",
+    "text": "Posts"
+  },
+  {
+    "objectID": "posts/01-introduction/index.html",
+    "href": "posts/01-introduction/index.html",
+    "title": "1 - Introduction to Accounting Analytics",
+    "section": "",
+    "text": "This week we learned about the fundamentals of accounting analytics and how data science is transforming the accounting profession.\n\n\nSome real-world applications include:\n\nFraud detection using statistical models\nAutomated financial reporting\nPredictive analytics for cash flow"
+  },
+  {
+    "objectID": "posts/01-introduction/index.html#overview",
+    "href": "posts/01-introduction/index.html#overview",
+    "title": "1 - Introduction to Accounting Analytics",
+    "section": "",
+    "text": "This week we learned about the fundamentals of accounting analytics and how data science is transforming the accounting profession.\n\n\nSome real-world applications include:\n\nFraud detection using statistical models\nAutomated financial reporting\nPredictive analytics for cash flow"
+  },
+  {
+    "objectID": "posts/01-introduction/index.html#key-concepts",
+    "href": "posts/01-introduction/index.html#key-concepts",
+    "title": "Week 1: Introduction to Accounting Analytics",
+    "section": "Key Concepts",
+    "text": "Key Concepts\n\n1. What is Accounting Analytics?\nAccounting analytics is…\n\n\n2. Applications in Practice\nSome real-world applications include:\n\nFraud detection using statistical models\nAutomated financial reporting\nPredictive analytics for cash flow"
+  },
+  {
+    "objectID": "posts/01-introduction/index.html#my-reflection",
+    "href": "posts/01-introduction/index.html#my-reflection",
+    "title": "Week 1: Introduction to Accounting Analytics",
+    "section": "My Reflection",
+    "text": "My Reflection\nWhat surprised me most this week was…"
+  },
+  {
+    "objectID": "posts/01-introduction/index.html#code-example",
+    "href": "posts/01-introduction/index.html#code-example",
+    "title": "1 - Introduction to Accounting Analytics",
+    "section": "Code Example",
+    "text": "Code Example\nHere’s an example of loading and exploring accounting data:\n\nlibrary(tidyverse)\n\n# Create sample accounting data\ntransactions &lt;- tribble(\n  ~date,        ~account,      ~amount,\n  \"2027-01-01\", \"Cash\",        5000,\n  \"2027-01-02\", \"Revenue\",     -3000,\n  \"2027-01-03\", \"Expenses\",    1500\n)\n\ntransactions\n\n# A tibble: 3 × 3\n  date       account  amount\n  &lt;chr&gt;      &lt;chr&gt;     &lt;dbl&gt;\n1 2027-01-01 Cash       5000\n2 2027-01-02 Revenue   -3000\n3 2027-01-03 Expenses   1500\n\n# Basic summary\ntransactions |&gt;\n  summarise(\n    total_transactions = n(),\n    net_amount = sum(amount)\n  )\n\n# A tibble: 1 × 2\n  total_transactions net_amount\n               &lt;int&gt;      &lt;dbl&gt;\n1                  3       3500"
+  },
+  {
+    "objectID": "about.html#education",
+    "href": "about.html#education",
+    "title": "About",
+    "section": "Education",
+    "text": "Education\nSonoma State University | Rohnert Park, CA BS in Business | start date - grad date"
+  },
+  {
+    "objectID": "about.html#experience",
+    "href": "about.html#experience",
+    "title": "About",
+    "section": "Experience",
+    "text": "Experience\nAccounting Firm | Accounting Intern | June 2025 - August 2025\nAnother Firm | Customer Service | Jan 2025 - June 2025"
+  },
+  {
+    "objectID": "posts/01-introduction/index.html#reflections",
+    "href": "posts/01-introduction/index.html#reflections",
+    "title": "1 - Introduction to Accounting Analytics",
+    "section": "Reflections",
+    "text": "Reflections\n\nWhat would you like to automate or improve in your future accounting work?\n\n\nHow might data analytics skills help in your target career path (audit, tax, corporate accounting, consulting)?\n\n\nWhat specific skills do you hope to gain from this course?"
+  },
+  {
+    "objectID": "posts/02-introduction.html",
+    "href": "posts/02-introduction.html",
+    "title": "2 - Introduction to Accounting Analytics",
+    "section": "",
+    "text": "library(tidyverse)\nlibrary(scales)"
+  },
+  {
+    "objectID": "posts/02-introduction.html#load-libraries",
+    "href": "posts/02-introduction.html#load-libraries",
+    "title": "2 - Introduction to Accounting Analytics",
+    "section": "",
+    "text": "library(tidyverse)\nlibrary(scales)"
+  },
+  {
+    "objectID": "posts/02-introduction.html#quarterly-pl-metrics",
+    "href": "posts/02-introduction.html#quarterly-pl-metrics",
+    "title": "2 - Introduction to Accounting Analytics",
+    "section": "Quarterly P&L Metrics",
+    "text": "Quarterly P&L Metrics\nTask: Fill in the blanks, inspect the output, then answer the question.\n\n# Step 1: Build the monthly P&L table\nmonthly_pnl &lt;- tribble(\n  ~month,     ~revenue, ~expenses,\n  \"January\",    50000,     40000,\n  \"February\",   55000,     42000,\n  \"March\",      60000,     45000\n)\n# Show the raw monthly data\nmonthly_pnl\n\n\n# Step 2: Compute net income\nmonthly_pnl &lt;- monthly_pnl |&gt;\n  mutate(\n    net_income = _______   # Fill in: revenue - expenses\n  )\n# Inspect the net income column\nmonthly_pnl\n\n\n# Step 3: Summarise quarterly totals\nquarterly_totals &lt;- monthly_pnl |&gt;\n  summarise(\n    quarterly_revenue    = sum(_______),    # Fill in: revenue\n    quarterly_net_income = sum(_______)     # Fill in: net_income\n  )\n# View the quarterly totals\nquarterly_totals\n\n\n# Step 4: Calculate profit margin\nquarterly_totals &lt;- quarterly_totals |&gt;\n  mutate(\n    quarterly_profit_margin = _______ / _______   # Fill in: quarterly_net_income, quarterly_revenue\n  )\n# Final quarterly summary with profit margin\nquarterly_totals\n\nQuestions:\n\nBased on quarterly_totals, what is the profit margin for the quarter?\nWhat does that percentage tell you about the company’s profitability this quarter?"
+  },
+  {
+    "objectID": "posts/02-introduction.html#expense-category-breakdown",
+    "href": "posts/02-introduction.html#expense-category-breakdown",
+    "title": "2 - Introduction to Accounting Analytics",
+    "section": "Expense Category Breakdown",
+    "text": "Expense Category Breakdown\nTask: Create a one-month expense tribble, compute each category’s share of total spending, and answer the question.\n\n# Step 1: Create your expense table\nmonthly_expenses &lt;- tribble(\n  ~category,        ~amount,\n  \"Travel\",           _______,   # Fill in an amount\n  \"Meals\",            _______,  \n  \"Supplies\",         _______\n)\nmonthly_expenses\n\n\n# Step 1: Create your expense table\n\nmonthly_expenses &lt;- tribble(\n  ~category,        ~amount,\n  \"Travel\",           10,   # Fill in an amount\n  \"Meals\",            20,  \n  \"Supplies\",         30\n)\nmonthly_expenses\n\n\n# Step 2: Compute percentage of total expenses\nexpense_pct &lt;- monthly_expenses |&gt;\n  mutate(\n    pct_of_total = percent(amount / sum(amount))  # share of total\n  )\nexpense_pct\n\nQuestion - Which expense category represents the largest share of spending?"
   }
 ]
