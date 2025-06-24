@@ -6,9 +6,8 @@ execute:
 ---
 
 
-## Your Turn: Final Case Study
 
-**Task**: Complete the clustering analysis for expense reimbursement data.
+Complete the clustering analysis for expense reimbursement data.
 
 ```{r}
 #| eval: false
@@ -75,20 +74,5 @@ print(_______)                                      # Fill in: high_risk_employe
 20-22. Bind cluster assignments: `_____, _____, _____`
 23-25. Cluster labels: `_____, _____, _____, _____`
 
-## Assignment: Clustering Blog Post
 
-**For your course blog, complete the following assignment:**
 
-### Part 1: Clustering Analysis (60 points)
-Using the expense reimbursement data from the final case study:
-1. Implement k-means clustering with appropriate data preparation
-2. Determine optimal number of clusters using the elbow method
-3. Analyze and interpret cluster characteristics
-4. Create visualizations showing cluster results
-
-### Part 2: Audit Memo (40 points)
-Write a professional audit memo that includes:
-1. Executive summary of findings
-2. Methodology explanation (non-technical)
-3. Specific control recommendations
-4. Implementation timeline and responsibilities
