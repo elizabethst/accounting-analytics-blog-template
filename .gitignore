@@ -1,1 +1,51 @@
+# Quarto output (Netlify will build this)
+_site/
+
+# Quarto caching and temporary files
 /.quarto/
+.quarto/
+
+# R data and history files
+*.RData
+*.Rds
+*.rda
+.Rhistory
+.RData
+.Ruserdata
+
+# R package development
+*.tar.gz
+*.Rcheck/
+
+# RStudio/Positron project files
+.Rproj.user/
+*.Rproj
+
+# Positron/VS Code specific
+.vscode/
+*.code-workspace
+
+# Temporary files
+*~
+*.tmp
+*.temp
+*.log
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Environment files
+.env
+.Renviron
+
+# Node modules (if using any npm packages)
+node_modules/
+
+# Netlify specific
+.netlify/
