@@ -1,6 +1,6 @@
 ---
 title: "2 - Introduction to Accounting Analytics"
-date: "`r Sys.Date()`"
+date: today 
 execute: 
   eval: false #set to true
   message: false

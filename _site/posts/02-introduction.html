@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2025-06-17">
+<meta name="dcterms.date" content="2025-06-24">
 
 <title>2 - Introduction to Accounting Analytics – Your Name - Accounting Analytics</title>
 <style>
@@ -155,7 +155,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">June 17, 2025</p>
+        <p class="date">June 24, 2025</p>
       </div>
     </div>
     
@@ -171,9 +171,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#load-libraries" id="toc-load-libraries" class="nav-link active" data-scroll-target="#load-libraries">Load libraries</a></li>
-  <li><a href="#quarterly-pl-metrics" id="toc-quarterly-pl-metrics" class="nav-link" data-scroll-target="#quarterly-pl-metrics">Quarterly P&amp;L Metrics</a></li>
-  <li><a href="#expense-category-breakdown" id="toc-expense-category-breakdown" class="nav-link" data-scroll-target="#expense-category-breakdown">Expense Category Breakdown</a></li>
+  <li><a href="#executive-summary" id="toc-executive-summary" class="nav-link active" data-scroll-target="#executive-summary">Executive Summary</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#setup-and-load-libraries" id="toc-setup-and-load-libraries" class="nav-link" data-scroll-target="#setup-and-load-libraries">Setup and Load Libraries</a>
+  <ul class="collapse">
+  <li><a href="#required-libraries" id="toc-required-libraries" class="nav-link" data-scroll-target="#required-libraries">Required Libraries</a></li>
+  </ul></li>
+  <li><a href="#r-as-your-financial-calculator" id="toc-r-as-your-financial-calculator" class="nav-link" data-scroll-target="#r-as-your-financial-calculator">R as Your Financial Calculator</a>
+  <ul class="collapse">
+  <li><a href="#present-value-calculation" id="toc-present-value-calculation" class="nav-link" data-scroll-target="#present-value-calculation">Present Value Calculation</a></li>
+  <li><a href="#financial-ratios" id="toc-financial-ratios" class="nav-link" data-scroll-target="#financial-ratios">Financial Ratios</a></li>
+  </ul></li>
+  <li><a href="#creating-financial-data-structures" id="toc-creating-financial-data-structures" class="nav-link" data-scroll-target="#creating-financial-data-structures">Creating Financial Data Structures</a></li>
+  <li><a href="#verify-the-accounting-equation" id="toc-verify-the-accounting-equation" class="nav-link" data-scroll-target="#verify-the-accounting-equation">Verify the Accounting Equation</a></li>
+  <li><a href="#monthly-financial-analysis" id="toc-monthly-financial-analysis" class="nav-link" data-scroll-target="#monthly-financial-analysis">Monthly Financial Analysis</a>
+  <ul class="collapse">
+  <li><a href="#quarterly-summary" id="toc-quarterly-summary" class="nav-link" data-scroll-target="#quarterly-summary">Quarterly Summary</a></li>
+  </ul></li>
+  <li><a href="#depreciation-schedule" id="toc-depreciation-schedule" class="nav-link" data-scroll-target="#depreciation-schedule">Depreciation Schedule</a>
+  <ul class="collapse">
+  <li><a href="#straight-line-depreciation" id="toc-straight-line-depreciation" class="nav-link" data-scroll-target="#straight-line-depreciation">Straight-Line Depreciation</a></li>
+  <li><a href="#complete-depreciation-schedule" id="toc-complete-depreciation-schedule" class="nav-link" data-scroll-target="#complete-depreciation-schedule">Complete Depreciation Schedule</a></li>
+  </ul></li>
+  <li><a href="#key-findings-and-reflections" id="toc-key-findings-and-reflections" class="nav-link" data-scroll-target="#key-findings-and-reflections">Key Findings and Reflections</a></li>
   </ul>
 </nav>
     </div>
@@ -184,94 +204,210 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="load-libraries" class="level2">
-<h2 class="anchored" data-anchor-id="load-libraries">Load libraries</h2>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+<section id="executive-summary" class="level2">
+<h2 class="anchored" data-anchor-id="executive-summary">Executive Summary</h2>
+<p><em>Write a 2-3 sentence summary of what you learned about using R for accounting calculations after completing this assignment.</em></p>
+<hr>
 </section>
-<section id="quarterly-pl-metrics" class="level2">
-<h2 class="anchored" data-anchor-id="quarterly-pl-metrics">Quarterly P&amp;L Metrics</h2>
-<p><strong>Task</strong>: Fill in the blanks, inspect the output, then answer the question.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 1: Build the monthly P&amp;L table</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>monthly_pnl <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>month,     <span class="sc">~</span>revenue, <span class="sc">~</span>expenses,</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"January"</span>,    <span class="dv">50000</span>,     <span class="dv">40000</span>,</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"February"</span>,   <span class="dv">55000</span>,     <span class="dv">42000</span>,</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"March"</span>,      <span class="dv">60000</span>,     <span class="dv">45000</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Show the raw monthly data</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>monthly_pnl</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 2: Compute net income</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>monthly_pnl <span class="ot">&lt;-</span> monthly_pnl <span class="sc">|&gt;</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">net_income =</span> _______   <span class="co"># Fill in: revenue - expenses</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspect the net income column</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>monthly_pnl</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 3: Summarise quarterly totals</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>quarterly_totals <span class="ot">&lt;-</span> monthly_pnl <span class="sc">|&gt;</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">quarterly_revenue    =</span> <span class="fu">sum</span>(_______),    <span class="co"># Fill in: revenue</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">quarterly_net_income =</span> <span class="fu">sum</span>(_______)     <span class="co"># Fill in: net_income</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># View the quarterly totals</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>quarterly_totals</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 4: Calculate profit margin</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>quarterly_totals <span class="ot">&lt;-</span> quarterly_totals <span class="sc">|&gt;</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">quarterly_profit_margin =</span> _______ <span class="sc">/</span> _______   <span class="co"># Fill in: quarterly_net_income, quarterly_revenue</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Final quarterly summary with profit margin</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>quarterly_totals</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p><strong>Questions:</strong></p>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>R offers powerful advantages:</p>
 <ul>
-<li><p>Based on quarterly_totals, what is the profit margin for the quarter?</p></li>
-<li><p>What does that percentage tell you about the company’s profitability this quarter?</p></li>
+<li><strong>Reproducibility</strong>: Every calculation is documented in code</li>
+<li><strong>Scalability</strong>: Handle thousands of transactions effortlessly<br>
+</li>
+<li><strong>Automation</strong>: Repeat analyses with new data instantly</li>
 </ul>
+<p>In this blog post, I’ll demonstrate how to: - Use R as a financial calculator - Create organized data structures for accounting information - Build depreciation schedules - Analyze financial performance</p>
+<hr>
 </section>
-<section id="expense-category-breakdown" class="level2">
-<h2 class="anchored" data-anchor-id="expense-category-breakdown">Expense Category Breakdown</h2>
-<p><strong>Task:</strong> Create a one-month expense tribble, compute each category’s share of total spending, and answer the question.</p>
+<section id="setup-and-load-libraries" class="level2">
+<h2 class="anchored" data-anchor-id="setup-and-load-libraries">Setup and Load Libraries</h2>
+<section id="required-libraries" class="level3">
+<h3 class="anchored" data-anchor-id="required-libraries">Required Libraries</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 1: Create your expense table</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>monthly_expenses <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>category,        <span class="sc">~</span>amount,</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Travel"</span>,           _______,   <span class="co"># Fill in an amount</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Meals"</span>,            _______,  </span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Supplies"</span>,         _______</span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load required packages</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)  <span class="co"># For data manipulation</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales)     <span class="co"># For formatting numbers as currency and percentages</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="r-as-your-financial-calculator" class="level2">
+<h2 class="anchored" data-anchor-id="r-as-your-financial-calculator">R as Your Financial Calculator</h2>
+<section id="present-value-calculation" class="level3">
+<h3 class="anchored" data-anchor-id="present-value-calculation">Present Value Calculation</h3>
+<p>Let’s start with a fundamental finance calculation - present value. If you expect to receive $25,000 in 3 years and the annual interest rate is 4.5%, what is that worth today?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set up the variables</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>future_value <span class="ot">&lt;-</span> <span class="dv">25000</span>  </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>annual_rate <span class="ot">&lt;-</span> <span class="fl">0.045</span>   </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>years <span class="ot">&lt;-</span> <span class="dv">3</span>             </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate present value using the formula: PV = FV / (1 + r)^n</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>present_value <span class="ot">&lt;-</span> _____ <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> _____)<span class="sc">^</span>_____</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the result</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>present_value</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Display with currency formatting</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="fu">dollar</span>(present_value)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="financial-ratios" class="level3">
+<h3 class="anchored" data-anchor-id="financial-ratios">Financial Ratios</h3>
+<p>Now let’s calculate some key financial ratios that help assess company health:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Current Ratio = Current Assets / Current Liabilities</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>current_assets <span class="ot">&lt;-</span> <span class="dv">120000</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>current_liabilities <span class="ot">&lt;-</span> <span class="dv">80000</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>current_ratio <span class="ot">&lt;-</span> _____ <span class="sc">/</span> _____</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the current ratio</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>current_ratio</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if it meets the benchmark of 2.0</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>meets_benchmark <span class="ot">&lt;-</span> current_ratio <span class="sc">&gt;=</span> _____</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>meets_benchmark</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Quick Ratio = (Current Assets - Inventory) / Current Liabilities</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>inventory <span class="ot">&lt;-</span> <span class="dv">35000</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>quick_ratio <span class="ot">&lt;-</span> (_____ <span class="sc">-</span> _____) <span class="sc">/</span> _____</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>quick_ratio</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="creating-financial-data-structures" class="level2">
+<h2 class="anchored" data-anchor-id="creating-financial-data-structures">Creating Financial Data Structures</h2>
+<p><strong>Chart of Accounts</strong> Let’s create a simple chart of accounts using a data frame:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create chart of accounts using tribble (an easy way to create small data frames)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>chart_of_accounts <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>account_code, <span class="sc">~</span>account_name,         <span class="sc">~</span>account_type, <span class="sc">~</span>balance,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1001</span>,          <span class="st">"Cash"</span>,                <span class="st">"Asset"</span>,        <span class="dv">25000</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1002</span>,          <span class="st">"Accounts Receivable"</span>, <span class="st">"Asset"</span>,        <span class="dv">18500</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1003</span>,          <span class="st">"Inventory"</span>,           <span class="st">"Asset"</span>,        <span class="dv">32000</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="dv">2001</span>,          <span class="st">"Accounts Payable"</span>,    <span class="st">"_____"</span>,        <span class="dv">15000</span>,  <span class="co"># Fill in account type</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="dv">3001</span>,          <span class="st">"Owner's Equity"</span>,      <span class="st">"_____"</span>,        <span class="dv">60500</span>   <span class="co"># Fill in account type</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co"># View the chart of accounts</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>chart_of_accounts</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="verify-the-accounting-equation" class="level2">
+<h2 class="anchored" data-anchor-id="verify-the-accounting-equation">Verify the Accounting Equation</h2>
+<p>Let’s check if our accounting equation balances (Assets = Liabilities + Equity):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate totals by account type</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>account_summary <span class="ot">&lt;-</span> chart_of_accounts <span class="sc">|&gt;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(_____) <span class="sc">|&gt;</span>  <span class="co"># Group by account_type</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">total =</span> <span class="fu">sum</span>(_____))  <span class="co"># Sum the balances</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># View the summary</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>account_summary</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if Assets = Liabilities + Equity</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Hint: You'll need to extract the totals for each account type</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="monthly-financial-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="monthly-financial-analysis">Monthly Financial Analysis</h2>
+<p><strong>Creating Monthly P&amp;L Data</strong></p>
+<p>Let’s create and analyze profit &amp; loss data for the first quarter:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create monthly P&amp;L data</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>monthly_pnl <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>month,      <span class="sc">~</span>revenue, <span class="sc">~</span>expenses,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"January"</span>,    <span class="dv">65000</span>,    <span class="dv">48000</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"February"</span>,   <span class="dv">72000</span>,    <span class="dv">52000</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"March"</span>,      <span class="dv">68000</span>,    <span class="dv">49000</span></span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>monthly_expenses</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Add calculated columns</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>monthly_analysis <span class="ot">&lt;-</span> monthly_pnl <span class="sc">|&gt;</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">net_income =</span> _____ <span class="sc">-</span> _____,  <span class="co"># Calculate net income</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">profit_margin =</span> _____ <span class="sc">/</span> _____  <span class="co"># Calculate profit margin</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co"># View the analysis</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>monthly_analysis</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<section id="quarterly-summary" class="level3">
+<h3 class="anchored" data-anchor-id="quarterly-summary">Quarterly Summary</h3>
+<p>Now let’s create a quarterly summary:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 1: Create your expense table</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>monthly_expenses <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>category,        <span class="sc">~</span>amount,</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Travel"</span>,           <span class="dv">10</span>,   <span class="co"># Fill in an amount</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Meals"</span>,            <span class="dv">20</span>,  </span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Supplies"</span>,         <span class="dv">30</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>monthly_expenses</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate quarterly totals</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>quarterly_summary <span class="ot">&lt;-</span> monthly_analysis <span class="sc">|&gt;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_revenue =</span> <span class="fu">sum</span>(_____),</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_expenses =</span> <span class="fu">sum</span>(_____),</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_net_income =</span> <span class="fu">sum</span>(_____),</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">avg_profit_margin =</span> <span class="fu">mean</span>(_____)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co"># View quarterly summary</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>quarterly_summary</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Format the profit margin as a percentage</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="fu">percent</span>(quarterly_summary<span class="sc">$</span>avg_profit_margin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+</section>
+</section>
+<section id="depreciation-schedule" class="level2">
+<h2 class="anchored" data-anchor-id="depreciation-schedule">Depreciation Schedule</h2>
+<section id="straight-line-depreciation" class="level3">
+<h3 class="anchored" data-anchor-id="straight-line-depreciation">Straight-Line Depreciation</h3>
+<p>Let’s create a depreciation schedule for equipment:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 2: Compute percentage of total expenses</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>expense_pct <span class="ot">&lt;-</span> monthly_expenses <span class="sc">|&gt;</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct_of_total =</span> <span class="fu">percent</span>(amount <span class="sc">/</span> <span class="fu">sum</span>(amount))  <span class="co"># share of total</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>expense_pct</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Equipment details</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>equipment_cost <span class="ot">&lt;-</span> <span class="dv">75000</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>salvage_value <span class="ot">&lt;-</span> <span class="dv">5000</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>useful_life <span class="ot">&lt;-</span> <span class="dv">7</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate annual depreciation</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>annual_depreciation <span class="ot">&lt;-</span> (_____ <span class="sc">-</span> _____) <span class="sc">/</span> _____</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>annual_depreciation</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p><strong>Question</strong> - Which expense category represents the largest share of spending?</p>
+</section>
+<section id="complete-depreciation-schedule" class="level3">
+<h3 class="anchored" data-anchor-id="complete-depreciation-schedule">Complete Depreciation Schedule</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the full depreciation schedule</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>depreciation_schedule <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">year =</span> <span class="dv">1</span><span class="sc">:</span>_____  <span class="co"># Create years 1 through useful_life</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">annual_depreciation =</span> _____,  <span class="co"># Same amount each year for straight-line</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">accumulated_depreciation =</span> _____ <span class="sc">*</span> year,  <span class="co"># Cumulative depreciation</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">book_value =</span> _____ <span class="sc">-</span> _____  <span class="co"># Cost minus accumulated depreciation</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="co"># View the schedule</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>depreciation_schedule</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="co"># What's the book value at the end of year 5?</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>year_5_value <span class="ot">&lt;-</span> depreciation_schedule <span class="sc">|&gt;</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">5</span>) <span class="sc">|&gt;</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(book_value)</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="fu">dollar</span>(year_5_value)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="key-findings-and-reflections" class="level2">
+<h2 class="anchored" data-anchor-id="key-findings-and-reflections">Key Findings and Reflections</h2>
+<p><strong>Summary of Calculations</strong> Based on the analyses above:</p>
+<ul>
+<li><strong>Present Value</strong>: $25,000 received in 3 years at 4.5% interest is worth $_____ today</li>
+<li><strong>Liquidity Ratios</strong>:
+<ul>
+<li>Current Ratio: _____ (does/doesn’t meet the 2.0 benchmark)</li>
+<li>Quick Ratio: _____ (indicates the company can/cannot pay short-term debts without selling inventory)</li>
+</ul></li>
+<li><strong>Profitability</strong>: The company achieved an average profit margin of _____% in Q1</li>
+<li><strong>Asset Management</strong>: The equipment will have a book value of $_____ after 5 years</li>
+</ul>
 
 
 </section>
@@ -349,7 +485,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/idyllic-mermaid-70d964\.netlify\.app");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

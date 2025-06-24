@@ -5,6 +5,9 @@ _site/
 /.quarto/
 .quarto/
 
+# Draft/temporary posts (files starting with _ in posts folder)
+posts/_*
+
 # R data and history files
 *.RData
 *.Rds

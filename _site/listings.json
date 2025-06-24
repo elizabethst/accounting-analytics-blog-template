@@ -2,8 +2,6 @@
   {
     "listing": "/index.html",
     "items": [
-      "/posts/03-data-wrangling.html",
-      "/posts/03-clustering.html",
       "/posts/02-introduction.html"
     ]
   }

@@ -1,0 +1,4 @@
+- source: project
+  netlify:
+    - id: 9e313721-8aaf-4931-bb98-4419250da77e
+      url: https://idyllic-mermaid-70d964.netlify.app
