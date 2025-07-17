@@ -1,0 +1,585 @@
+---
+title: "9: KPI Dashboard for CFO"
+date: today
+execute: 
+  eval: false
+  message: false
+  warning: false
+---
+
+## Executive Summary
+
+*Write a 2-3 sentence summary of the financial performance and key insights from your KPI dashboard. Complete this section after finishing the assignment.*
+
+---
+
+## Introduction
+
+As an accounting professional creating executive dashboards, you need to build visualizations that communicate financial performance effectively to CFOs. KPI dashboards help executives:
+
+- Monitor financial health at a glance
+- Track performance against targets
+- Identify trends and potential issues
+- Make data-driven strategic decisions
+
+In this blog post, you will:
+
+- Create professional KPI tables using gt
+- Build interactive financial visualizations
+- Analyze liquidity and profitability metrics
+- Design a comprehensive CFO dashboard
+
+## Setup and Load Libraries
+
+### Required Libraries
+
+```{r}
+#| label: setup
+# Load packages we need - matching the slides
+library(tidyverse)     # For data manipulation
+library(scales)        # For formatting numbers
+library(gt)            # For creating elegant tables
+library(plotly)        # For interactive plots
+
+# Set theme for consistent styling
+theme_set(theme_minimal(base_size = 12))
+
+# Create custom color palette for financial data
+fin_colors <- c(
+  positive = "#2E7D32",  # Green for positive values
+  negative = "#C62828",  # Red for negative values
+  neutral = "#1976D2",   # Blue for neutral values
+  posback = "#C8E6C9",   # Light green for background
+  negback = "#FFCDD2"    # Light red for background
+)
+```
+
+### Load and Explore the Data
+
+```{r}
+# Load the financial data
+financial_data <- read_rds("data/09-assignment-financial_data.rds")
+
+# Display structure of the data
+glimpse(financial_data)
+
+# View summary statistics
+financial_data |>
+  summary()
+```
+
+## Initial Data Exploration
+
+### Financial Performance Overview
+
+```{r}
+# Calculate summary statistics for key metrics
+performance_summary <- financial_data |>
+  summarize(
+    months_of_data = n(),
+    avg_revenue = mean(_____),
+    revenue_growth = (last(_____) - first(_____)) / first(_____),
+    avg_gross_margin = mean(_____),
+    avg_operating_margin = mean(_____),
+    ending_cash = last(_____)
+  )
+
+# Display summary
+performance_summary |>
+  gt() |>
+  fmt_currency(columns = c(_____, _____), decimals = 0) |>
+  fmt_percent(columns = c(_____, _____, _____), decimals = 1) |>
+  fmt_number(columns = months_of_data, decimals = 0)
+```
+
+### Monthly Trends Overview
+
+```{r}
+# Create a trend summary for the last 6 months
+recent_trends <- financial_data |>
+  slice_tail(n = 6) |>
+  select(date, revenue, operating_margin, cash_balance) |>
+  gt() |>
+  fmt_date(columns = date, date_style = "yMMM") |>
+  fmt_currency(columns = c(_____, _____), decimals = 0) |>
+  fmt_percent(columns = _____, decimals = 1) |>
+  tab_header(
+    title = "Recent Performance Trends",
+    subtitle = "Last 6 Months"
+  )
+
+recent_trends
+```
+
+## Key Performance Indicators Table
+
+### Current vs Prior Month Comparison
+
+```{r}
+# Get current and prior month data
+current_month <- financial_data |>
+  filter(date == _____(date))
+
+prior_month <- financial_data |>
+  filter(date == max(date) - _____(1))
+
+# Create KPI comparison with more metrics
+kpi_comparison <- tribble(
+  ~Metric, ~Current, ~Prior, ~Change, ~Status,
+  "Revenue", current_month$_____, prior_month$_____, 
+    (current_month$_____ - prior_month$_____) / prior_month$_____,
+    ifelse(current_month$_____ > prior_month$_____, "positive", "negative"),
+  
+  "Gross Margin", current_month$_____, prior_month$_____,
+    current_month$_____ - prior_month$_____,
+    ifelse(current_month$_____ > prior_month$_____, "positive", "negative"),
+  
+  "Operating Margin", current_month$_____, prior_month$_____,
+    current_month$_____ - prior_month$_____,
+    ifelse(current_month$_____ > prior_month$_____, "positive", "negative"),
+  
+  "Cash Balance", current_month$_____, prior_month$_____,
+    (current_month$_____ - prior_month$_____) / prior_month$_____,
+    ifelse(current_month$_____ > prior_month$_____, "positive", "negative"),
+    
+  "Current Ratio", current_month$_____, prior_month$_____,
+    current_month$_____ - prior_month$_____,
+    ifelse(current_month$_____ > prior_month$_____, "positive", "negative")
+)
+
+# Format as professional table with gt
+kpi_comparison |>
+  gt() |>
+  # Format different types of metrics appropriately
+  fmt_currency(
+    columns = c(Current, Prior),
+    rows = Metric %in% c("Revenue", "Cash Balance"),
+    decimals = 0
+  ) |>
+  fmt_percent(
+    columns = c(Current, Prior),
+    rows = Metric %in% c("Gross Margin", "Operating Margin"),
+    decimals = 1
+  ) |>
+  fmt_number(
+    columns = c(Current, Prior),
+    rows = Metric == "Current Ratio",
+    decimals = 2
+  ) |>
+  fmt_percent(
+    columns = Change,
+    rows = Metric %in% c("Revenue", "Cash Balance"),
+    decimals = 1
+  ) |>
+  fmt_number(
+    columns = Change,
+    rows = Metric %in% c("Gross Margin", "Operating Margin", "Current Ratio"),
+    decimals = 2
+  ) |>
+  cols_hide(columns = Status) |>
+  # Add conditional formatting
+  tab_style(
+    style = cell_text(color = fin_colors["_____"], weight = "bold"),
+    locations = cells_body(
+      columns = Change,
+      rows = Status == "_____"
+    )
+  ) |>
+  tab_style(
+    style = cell_text(color = fin_colors["_____"], weight = "bold"),
+    locations = cells_body(
+      columns = Change,
+      rows = Status == "_____"
+    )
+  ) |>
+  # Add header
+  tab_header(
+    title = "Monthly KPI Summary",
+    subtitle = "Key Financial Metrics - Month over Month"
+  )
+```
+
+## Liquidity Analysis
+
+### Calculate and Display Liquidity Ratios
+
+```{r}
+# Calculate liquidity metrics for the latest month
+liquidity_metrics <- financial_data |>
+  filter(date == max(date)) |>
+  select(current_ratio, quick_ratio, cash_ratio) |>
+  pivot_longer(everything(), names_to = "ratio_type", values_to = "Value") |>
+  mutate(
+    Ratio = case_when(
+      ratio_type == "current_ratio" ~ "Current Ratio",
+      ratio_type == "quick_ratio" ~ "Quick Ratio", 
+      ratio_type == "cash_ratio" ~ "Cash Ratio"
+    ),
+    Benchmark = c(2.0, 1.0, 0.5),  # Industry benchmarks
+    Status = ifelse(Value >= Benchmark, "_____", "_____"),
+    Difference = Value - Benchmark
+  )
+
+# Create enhanced liquidity table
+liquidity_metrics |>
+  select(Ratio, Value, Benchmark, Difference, Status) |>
+  gt() |>
+  fmt_number(
+    columns = c(Value, Benchmark, Difference),
+    decimals = 2
+  ) |>
+  # Add conditional formatting for Status
+  tab_style(
+    style = cell_fill(color = fin_colors["_____"]),
+    locations = cells_body(
+      columns = Status,
+      rows = Status == "Healthy"
+    )
+  ) |>
+  tab_style(
+    style = cell_fill(color = fin_colors["_____"]),
+    locations = cells_body(
+      columns = Status,
+      rows = Status == "Warning"
+    )
+  ) |>
+  # Color code the difference
+  tab_style(
+    style = cell_text(color = fin_colors["positive"]),
+    locations = cells_body(
+      columns = Difference,
+      rows = Difference > 0
+    )
+  ) |>
+  tab_style(
+    style = cell_text(color = fin_colors["negative"]),
+    locations = cells_body(
+      columns = Difference,
+      rows = Difference < 0
+    )
+  ) |>
+  cols_label(
+    Ratio = "Liquidity Metric",
+    Value = "Current",
+    Benchmark = "Target",
+    Difference = "+/-",
+    Status = "Status"
+  ) |>
+  tab_header(
+    title = "Liquidity Analysis",
+    subtitle = "Current Month vs Industry Benchmarks"
+  )
+```
+
+## Financial Visualizations
+
+### Revenue and Profitability Trends
+
+```{r}
+# Create revenue trend plot with profit overlay
+revenue_profit_plot <- financial_data |>
+  ggplot(aes(x = date)) +
+  geom_col(aes(y = _____), fill = fin_colors["neutral"], alpha = 0.7) + # revenue
+  geom_line(aes(y = _____), color = fin_colors["positive"], size = 2) + # operating_profit
+  geom_point(aes(y = _____), color = fin_colors["positive"], size = 3) + # operating_profit
+  scale_y_continuous(
+    labels = dollar_format(scale = 1e-6, suffix = "M")) +
+  scale_x_date(date_labels = "%b %Y") +
+  labs(
+    title = "Revenue and Operating Profit Trends",
+    subtitle = "Monthly Performance Over Time",
+    x = NULL,
+    y = NULL
+  ) 
+
+# Convert to interactive
+ggplotly(revenue_profit_plot) |>
+layout(
+    hovermode = "x unified"
+  )
+```
+
+### Margin Analysis
+
+```{r}
+# Create margin comparison over time
+margin_data <- financial_data |>
+  select(date, gross_margin, operating_margin) |>
+  _____(cols = -date, names_to = "Metric", values_to = "Value") |>
+  mutate(
+    Metric = case_when(
+      Metric == "gross_margin" ~ "Gross Margin",
+      Metric == "operating_margin" ~ "Operating Margin"
+    )
+  )
+
+# Create the plot
+margin_plot <- margin_data |>
+  ggplot(aes(x = date, y = Value, color = Metric)) +
+  geom_line(linewidth = 1.2) +
+  geom_point(size = 2.5) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  _____(labels = percent_format()) +
+  scale_x_date(date_labels = "%b %Y") +
+  scale_color_manual(values = c(
+    "Gross Margin" = fin_colors[["positive"]],
+    "Operating Margin" = fin_colors[["neutral"]]
+  )) +
+  _____(
+    title = "Profitability Margins Trend",
+    subtitle = "Gross vs Operating Margins",
+    x = NULL,
+    y = NULL,
+    color = NULL
+  ) 
+
+# Make interactive
+ggplotly(_____) |>
+  layout(
+    hovermode = "x unified"
+  )
+```
+
+## Working Capital Analysis
+
+### Days Sales Outstanding and Days Payable Outstanding
+
+```{r}
+# Create working capital efficiency metrics plot
+wc_metrics <- financial_data |>
+  select(date, days_sales_outstanding, days_payable_outstanding) |>
+  pivot_longer(cols = -date, names_to = "Metric", values_to = "Days") |>
+  _____(
+    Metric = case_when(
+      Metric == "days_sales_outstanding" ~ "Days Sales Outstanding",
+      Metric == "days_payable_outstanding" ~ "Days Payable Outstanding"
+    )
+  )
+
+# Create the plot
+wc_plot <- wc_metrics |>
+  _____(aes(x = date, y = Days, fill = Metric)) +
+  geom_col(position = "dodge") +
+  scale_x_date(date_labels = "%b %Y") +
+  scale_fill_manual(values = c(
+    "Days Sales Outstanding" = fin_colors[["negative"]],
+    "Days Payable Outstanding" = fin_colors[["positive"]]
+  )) +
+  labs(
+    title = "Working Capital Efficiency",
+    x = NULL,
+    y = "Days",
+    fill = NULL
+  ) 
+
+# Convert to interactive
+ggplotly(wc_plot) |>
+  layout(hovermode = "x unified")
+```
+
+### Cash Balance and Cash Flow Analysis
+
+```{r}
+# Calculate monthly cash flow (simplified)
+cash_flow_data <- financial_data |>
+  mutate(
+    monthly_cash_change = cash_balance - lag(cash_balance),
+    cash_from_operations = operating_profit + 
+      (lag(accounts_receivable) - accounts_receivable) - 
+      (lag(accounts_payable) - accounts_payable)
+  ) |>
+  filter(!is.na(monthly_cash_change))
+
+# Create cash balance trend with cash flow
+cash_plot <- cash_flow_data |>
+  ggplot(aes(x = date)) +
+  geom_area(aes(y = _____), fill = fin_colors["neutral"], alpha = 0.3) +
+  geom_line(aes(y = _____), color = fin_colors["neutral"], size = 1.5) +
+  geom_col(aes(y = _____), 
+           fill = ifelse(cash_flow_data$_____ > 0, 
+                        fin_colors["positive"], 
+                        fin_colors["negative"]),
+           alpha = 0.7) +
+  scale_y_continuous(labels = dollar_format(scale = 1e-3, suffix = "K")) +
+  scale_x_date(date_labels = "%b %Y") +
+  labs(
+    title = "Cash Position and Monthly Cash Flow",
+    subtitle = "Balance (Line) and Monthly Change (Bars)",
+    x = NULL,
+    y = NULL
+  )
+
+# Convert to interactive
+ggplotly(cash_plot) |>
+  layout(hovermode = "x unified")
+```
+
+## Executive Summary Dashboard
+
+### Comprehensive Performance Summary
+
+```{r}
+# Create executive summary for last 6 months
+exec_summary <- financial_data |>
+  slice_tail(n = 6) |>
+  arrange(date) |>
+  mutate(
+    month_name = month(date, label = TRUE, abbr = FALSE)
+  )
+
+
+# Create comprehensive summary table
+exec_summary |>
+  select(month_name, revenue, gross_margin, operating_margin, 
+         cash_balance, current_ratio, revenue_growth_rate) |>
+  gt() |>
+  # Format monetary columns
+  fmt_currency(
+    columns = c(_____, _____),
+    decimals = 0
+  ) |>
+  # Format percentage columns
+  fmt_percent(
+    columns = c(_____, _____, _____),
+    decimals = 1
+  ) |>
+  # Format ratio
+  fmt_number(
+    columns = _____,
+    decimals = 2
+  ) |>
+  # Add column labels
+  cols_label(
+    month_name = "Month",
+    revenue = "Revenue",
+    gross_margin = "Gross Margin",
+    operating_margin = "Op Margin",
+    cash_balance = "Cash",
+    current_ratio = "Current Ratio",
+    revenue_growth_rate = "YoY Growth"
+  ) |>
+  # Add header
+  tab_header(
+    title = "Executive Performance Summary (2026)",
+    subtitle = "Six-Month Financial Dashboard"
+  ) |>
+  # Highlight most recent month
+  tab_style(
+    style = list(
+      cell_fill(color = "#E3F2FD"),
+      cell_text(weight = "bold")
+    ),
+    locations = cells_body(rows = _____)
+  ) 
+```
+
+### Key Metrics Scorecard
+
+```{r}
+# Create a metrics scorecard for the latest month
+latest_metrics <- financial_data |>
+  filter(date == max(date))
+
+# Define targets and create scorecard
+scorecard <- tribble(
+  ~Category, ~Metric, ~Value, ~Target, ~Performance,
+  "Growth", "Monthly Revenue", latest_metrics$revenue, 850000, 
+    ifelse(latest_metrics$revenue >= 850000, "Above Target", "Below Target"),
+  
+  "Profitability", "Operating Margin", latest_metrics$operating_margin, 0.15,
+    ifelse(latest_metrics$operating_margin >= 0.15, "Above Target", "Below Target"),
+  
+  "Liquidity", "Current Ratio", latest_metrics$current_ratio, 2.0,
+    ifelse(latest_metrics$current_ratio >= 2.0, "Above Target", "Below Target"),
+  
+  "Efficiency", "Days Sales Outstanding", latest_metrics$days_sales_outstanding, 50,
+    ifelse(latest_metrics$days_sales_outstanding <= 50, "Above Target", "Below Target"),
+  
+  "Cash Management", "Cash Balance", latest_metrics$cash_balance, 1000000,
+    ifelse(latest_metrics$cash_balance >= 1000000, "Above Target", "Below Target")
+)
+
+# Create scorecard table
+scorecard |>
+  gt() |>
+  # Format values based on metric type
+  fmt_currency(
+    columns = Value,
+    rows = Metric %in% c("Monthly Revenue", "Cash Balance"),
+    decimals = 0
+  ) |>
+  fmt_percent(
+    columns = Value,
+    rows = Metric == "Operating Margin",
+    decimals = 1
+  ) |>
+  fmt_number(
+    columns = Value,
+    rows = Metric %in% c("Current Ratio", "Days Sales Outstanding"),
+    decimals = 1
+  ) |>
+  # Format targets similarly
+  fmt_currency(
+    columns = Target,
+    rows = Metric %in% c("Monthly Revenue", "Cash Balance"),
+    decimals = 0
+  ) |>
+  fmt_percent(
+    columns = Target,
+    rows = Metric == "Operating Margin",
+    decimals = 1
+  ) |>
+  fmt_number(
+    columns = Target,
+    rows = Metric %in% c("Current Ratio", "Days Sales Outstanding"),
+    decimals = 1
+  ) |>
+  # Apply conditional formatting
+  tab_style(
+    style = list(
+      cell_fill(color = fin_colors["posback"]),
+      cell_text(weight = "bold")
+    ),
+    locations = cells_body(
+      columns = Performance,
+      rows = Performance == "Above Target"
+    )
+  ) |>
+  tab_style(
+    style = list(
+      cell_fill(color = fin_colors["negback"]),
+      cell_text(weight = "bold")
+    ),
+    locations = cells_body(
+      columns = Performance,
+      rows = Performance == "Below Target"
+    )
+  ) |>
+  tab_header(
+    title = "Performance Scorecard",
+    subtitle = "Current Month vs Targets"
+  )
+```
+
+## Key Insights and Recommendations
+
+Based on your dashboard analysis, complete these insights:
+
+1. **Revenue Performance**: Revenue has grown from $_____ to $_____ over the 24-month period, representing _____% growth.
+
+2. **Profitability Trends**: 
+   - Gross margin has averaged _____% and is currently at _____%
+   - Operating margin has improved from _____% to _____%, showing _____
+
+3. **Liquidity Position**:
+   - Current ratio of _____ is above/below industry benchmark of 2.0
+   - Cash position has grown/declined from $_____ to $_____
+
+4. **Working Capital Management**:
+   - Days Sales Outstanding averages _____ days
+   - Cash conversion cycle is _____ days (DSO - DPO)
+
+5. **Recommendations for CFO**:
+   - Focus area 1: _____
+   - Focus area 2: _____
+   - Key metric to monitor: _____

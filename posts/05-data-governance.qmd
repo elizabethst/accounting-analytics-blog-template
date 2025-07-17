@@ -1,0 +1,268 @@
+---
+title: "5: Data Governance and Management"
+date: today
+execute: 
+  eval: false #set to true
+  message: false
+  warning: false
+---
+
+## Executive Summary
+
+*Write a 2-3 sentence summary of your data governance implementations and key insights here after completing the assignment.*
+
+---
+
+## Introduction
+
+As an accounting professional, you need to ensure data integrity, quality, and compliance. Effective data governance helps organizations:
+
+- Maintain accurate and consistent financial records
+- Ensure referential integrity between related data
+- Document data structures for audit and compliance
+- Implement controls to prevent errors and fraud
+
+In this blog post, you will:
+
+- Create validation functions for accounting data standards
+- Build referential integrity checks between tables
+- Design a comprehensive data dictionary
+
+## Setup and Load Libraries
+
+### Required Libraries
+
+```{r}
+#| label: setup
+# Load required packages
+library(tidyverse)  # For data manipulation
+library(gt)         # For formatted tables
+library(lubridate)  # For date handling
+```
+
+### Setting Up Sample Data
+
+Let's create sample data representing accounting records:
+
+**Chart of Accounts Master Data**
+
+```{r}
+# Create chart of accounts
+chart_of_accounts <- tribble(
+  ~account_id, ~account_code, ~account_name,        ~account_type, ~active,
+  1,           "1010",        "Cash",               "Asset",       TRUE,
+  2,           "1200",        "Accounts Receivable","Asset",       TRUE,
+  3,           "2010",        "Accounts Payable",   "Liability",   TRUE,
+  4,           "3010",        "Common Stock",       "Equity",      TRUE,
+  5,           "4010",        "Sales Revenue",      "Revenue",     TRUE,
+  6,           "5010",        "Rent Expense",       "Expense",     TRUE,
+  7,           "5020",        "Salary Expense",     "Expense",     FALSE
+)
+
+# View the data
+chart_of_accounts
+```
+
+**Sample Transactions**
+
+```{r}
+# Create sample transactions (some with errors)
+transactions <- tribble(
+  ~trans_id, ~trans_date,    ~account_id, ~debit,  ~credit, ~description,
+  "T001",    "2025-03-15",   1,           5000,    0,       "Customer payment",
+  "T002",    "2025-03-15",   5,           0,       5000,    "Sales revenue",
+  "T003",    "03/20/2025",   6,           1200,    0,       "Rent payment",
+  "T004",    "2025-03-32",   3,           0,       1200,    "Rent payable",
+  "T005",    "2025-03-25",   99,          500,     0,       "Office supplies",
+  "T006",    "2025-03-25",   2,           0,       500,     "Customer invoice"
+)
+
+# View the data
+transactions
+```
+
+## Exercise 1: Data Standards Implementation
+
+### Create Account Code Validation Function
+
+```{r}
+# Function to validate account codes
+validate_account_code <- function(account_code) {
+  # Check if account code is exactly 4 digits
+  is_valid <- str_detect(account_code, "^\\d{_____}$")
+  
+  return(is_valid)
+}
+
+# Test the function
+test_codes <- c("1010", "ABC1", "10100", "999")
+
+# Create results table
+validation_results <- tibble(
+  account_code = test_codes,
+  is_valid = map_lgl(_____, validate_account_code)
+)
+
+# Display results
+validation_results
+```
+
+### Create Date Validation Function
+
+```{r}
+# Function to validate transaction dates
+validate_date <- function(date_string) {
+  # Try to parse the date
+  parsed_date <- suppressWarnings(as_date(date_string))
+  
+  # Check if parsing was successful
+  if (is.na(parsed_date)) {
+    return(list(valid = FALSE, reason = "Invalid date format"))
+  }
+  
+  # Check if date is not in the future
+  if (parsed_date > _____) {  # Compare to today's date
+    return(list(valid = _____, reason = "Date cannot be in the future"))
+  }
+  
+  # Check if date is reasonable (not before 2020)
+  if (parsed_date < as_date("_____")) {
+    return(list(valid = FALSE, reason = "Date too far in the past"))
+  }
+  
+  return(list(valid = TRUE, reason = "Valid date"))
+}
+# Test dates
+test_dates <- c("2025-03-15", "03/20/2025", "2025-03-32", "2028-01-01", "2019-01-01")
+
+# Validate each date
+date_validation <- tibble(
+  date_string = test_dates,
+  validation = map(_____, validate_date)
+) |>
+  mutate(
+    is_valid = map_lgl(validation, ~ .$valid),
+    reason = map_chr(validation, ~ ._____) 
+  ) |>
+  select(-validation)
+
+# Display results
+date_validation
+```
+
+## Exercise 2: Referential Integrity Check
+
+### Create Referential Integrity Function
+
+```{r}
+# Function to check if all account IDs exist in chart of accounts
+check_referential_integrity <- function(transactions_df, chart_of_accounts_df) {
+  # Get valid account IDs from chart of accounts
+  valid_account_ids <- chart_of_accounts_df$_____
+  
+  # Find transactions with invalid account IDs
+  invalid_transactions <- transactions_df |>
+    filter(!_____ %in% valid_account_ids)
+  
+  # Check if debits equal credits by date
+  daily_balance <- transactions_df |>
+    group_by(_____) |>
+    summarize(
+      total_debits = sum(debit),
+      total_credits = sum(_____),
+      difference = round(total_debits - _____ , 2)
+    ) |>
+    filer(difference != 0)
+  
+  # Return results
+  return(list(
+    has_invalid_accounts = nrow(invalid_transactions) > 0,
+    invalid_transactions = invalid_transactions,
+    has_unbalanced_days = nrow(daily_balance) > 0,
+    unbalanced_days = daily_balance
+  ))
+}
+
+# Check referential integrity
+integrity_check <- check_referential_integrity(_____, _____)
+
+# Display invalid account references
+if (integrity_check$has_invalid_accounts) {
+  cat("Invalid Account References Found:\n")
+  print(integrity_check$invalid_transactions)
+}
+
+# Display unbalanced days
+if (integrity_check$_____) {
+  cat("\nUnbalanced Transaction Days:\n")
+  print(integrity_check$_____)
+}
+```
+
+## Exercise 3: Data Dictionary Creation
+
+### Design AR System Data Dictionary
+
+Create a comprehensive data dictionary for an accounts receivable system with the following structure:
+
+```{r}
+# Create AR data dictionary
+ar_data_dictionary <- tribble(
+  ~field_name,        ~data_type,     ~max_length, ~required, ~description,                          ~valid_values,                    ~business_rules,
+  "customer_id",      "VARCHAR",      10,          "Yes",     "Unique customer identifier",          "C0001-C9999",                   "System generated, sequential",
+  "customer_name",    "VARCHAR",      100,         "Yes",     "_____",                              "Any valid business name",        "Must match legal entity name",
+  "invoice_number",   "_____",        20,          "Yes",     "Unique invoice identifier",           "INV-YYYY-NNNNN",                "Year + sequential number",
+  "invoice_date",     "DATE",         NA,          "Yes",     "Date invoice was issued",             "Valid date",                    "_____",
+  "due_date",         "DATE",         NA,          "Yes",     "_____",                              "Valid date",                    "Must be >= invoice_date",
+  "invoice_amount",   "DECIMAL(10,2)", NA,         "Yes",     "Total invoice amount",                "> 0",                          "Must be positive",
+  "payment_status",   "VARCHAR",      20,          "_____",   "Current payment status",              "Open, Partial, Paid, Overdue",  "Updated based on payments",
+  "days_outstanding", "INTEGER",      NA,          "No",      "_____",                              ">= 0",                          "Calculated: Today - Invoice Date"
+)
+
+# Display the data dictionary
+ar_data_dictionary |>
+  gt() |>
+  tab_header(
+    title = "Accounts Receivable System Data Dictionary",
+    subtitle = "Field Specifications and Business Rules"
+  ) |>
+  tab_style(
+    style = cell_fill(color = "lightblue"),
+    locations = cells_body(
+      columns = required,
+      rows = required == "Yes"
+    )
+  )
+```
+
+
+## Summary and Best Practices
+
+### Key Validation Rules Implemented
+
+```{r}
+# Summarize validation rules
+validation_summary <- tribble(
+  ~validation_type,        ~rule_description,                               ~purpose,
+  "Account Code Format",   "_____",                                         "Ensures consistent account identification",
+  "Date Validation",       "Valid format, not future, reasonable range",    "_____",
+  "Referential Integrity", "_____",                                         "Prevents orphaned transactions",
+  "Balance Check",         "Daily debits must equal credits",               "_____",
+  "Required Fields",       "Check for NULL in required fields",             "Data completeness"
+)
+
+# Display summary
+validation_summary |>
+  gt() |>
+  tab_header(title = "Data Governance Validation Rules")
+```
+
+## Key Findings
+
+Based on your data governance implementation, complete these insights:
+
+- **Data Quality Issues Found**: The sample transactions had _____ invalid account reference.
+- **Date Validation**: There were _____ valid dates and _____ non-valid dates (out of 5).
+- **Referential Integrity**: _____ transactions referenced non-existent accounts and _____ transactions had unbalanced transaction days. 
+- **Data Dictionary Completeness**: The AR system requires _____ mandatory fields out of _____ total fields.
+

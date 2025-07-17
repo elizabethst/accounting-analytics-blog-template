@@ -1,0 +1,401 @@
+---
+title: "4: Data Visualization for Accounting"
+date: today
+execute: 
+  eval: false #set to true
+  message: false
+  warning: false
+---
+
+## Executive Summary
+
+*Write a 2-3 sentence summary of your visualizations and key insights here after completing the assignment.*
+
+---
+
+## Introduction
+
+As an accounting professional, you need to communicate complex financial information clearly. Effective data visualization helps stakeholders understand:
+
+- Financial performance trends
+- Budget variances and anomalies
+- Departmental spending patterns
+- Revenue growth across customer segments
+
+In this blog post, you will:
+
+- Create professional bar charts for categorical comparisons
+- Build line charts to show financial trends
+- Design dashboard layouts for comprehensive reporting
+- Apply best practices for ethical data visualization
+
+## Setup and Load Libraries
+
+### Required Libraries
+
+```{r}
+#| label: setup
+# Load required packages
+library(tidyverse)  # For ggplot2 and data manipulation
+library(scales)     # For formatting currency and percentages
+library(patchwork)  # For combining multiple plots
+```
+
+### Creating Sample Financial Data
+
+Let's create sample data representing a company's financial performance:
+
+**Monthly Financial Performance**
+
+```{r}
+# Monthly financial data for 2027
+monthly_financials <- tribble(
+  ~month, ~revenue, ~expenses, ~net_income, ~quarter,
+  "2027-01-01", 125000, 95000, 30000, "Q1",
+  "2027-02-01", 135000, 98000, 37000, "Q1",
+  "2027-03-01", 142000, 102000, 40000, "Q1",
+  "2027-04-01", 155000, 110000, 45000, "Q2",
+  "2027-05-01", 148000, 108000, 40000, "Q2",
+  "2027-06-01", 162000, 115000, 47000, "Q2",
+  "2027-07-01", 158000, 112000, 46000, "Q3",
+  "2027-08-01", 171000, 120000, 51000, "Q3",
+  "2027-09-01", 166000, 118000, 48000, "Q3",
+  "2027-10-01", 180000, 125000, 55000, "Q4",
+  "2027-11-01", 195000, 135000, 60000, "Q4",
+  "2027-12-01", 210000, 145000, 65000, "Q4"
+) |>
+  mutate(month = as.Date(month))
+
+# View the data
+monthly_financials
+```
+
+**Department Expense Data**
+
+```{r}
+# Department expense breakdown
+dept_expenses <- tribble(
+  ~department, ~expense_category, ~amount,
+  "Sales", "Salaries", 225236,
+  "Sales", "Travel", 75308,
+  "Sales", "Supplies", 34419,
+  "Marketing", "Salaries", 179800,
+  "Marketing", "Advertising", 134369,
+  "Marketing", "Supplies", 29876,
+  "Operations", "Salaries", 270664,
+  "Operations", "Equipment", 88937,
+  "Operations", "Supplies", 57135,
+  "Finance", "Salaries", 202516,
+  "Finance", "Software", 57135,
+  "Finance", "Supplies", 27605
+)
+
+# View the data
+dept_expenses
+```
+
+### Setting Professional Defaults
+
+```{r}
+# Set a clean theme for all plots
+theme_set(theme_minimal())
+
+# Prevent scientific notation in output
+options(scipen = 9999)
+```
+
+## Creating Your First Visualization
+
+### Bar Chart: Department Total Expenses
+
+```{r}
+# Calculate total expenses by department
+dept_totals <- dept_expenses |>
+  group_by(_____) |>  # Group by department
+  summarize(total_expenses = _____) |>  # Sum the amounts
+  arrange(desc(total_expenses))
+
+# Display dept_totals
+dept_totals
+
+# Create a horizontal bar chart
+ggplot(dept_totals, aes(x = _____, y = reorder(department, _____))) +
+  geom_col(fill = "dark blue") +
+  scale_x_continuous(labels = _____) +  # Format as currency
+  labs(
+    title = "Total Expenses by Department",
+    subtitle = "Fiscal Year 2027",
+    x = NULL,
+    y = NULL,
+    caption = "Source: General Ledger"
+  )
+```
+
+### Line Chart: Revenue Trend Analysis
+
+```{r}
+# Create a line chart showing monthly revenue
+monthly_financials |>
+  ggplot(aes(x = _____, y = _____)) +  # Map month to x, revenue to y
+  geom_line(color = "dark green", size = 1.2) +
+  geom_point(color = "dark green", size = 2.5) +
+  scale_x_date(
+    labels = label_date_short(), 
+    breaks = breaks_width("1 months")) +
+  scale_y_continuous(labels = _____) +  # Format as currency
+  labs(
+    title = "_____",  # Add appropriate title
+    subtitle = "January - December 2027",
+    x = NULL,
+    y = NULL,
+    caption = "Source: Financial Reporting System"
+  )
+```
+
+## Multi-Series Line Chart
+
+### Comparing Revenue vs Expenses
+
+```{r}
+# Transform data for multi-line plotting
+financial_trends <- monthly_financials |>
+  select(month, revenue, expenses) |>
+  pivot_longer(
+    cols = c(_____, _____),  # Select revenue and expenses columns
+    names_to = "metric",
+    values_to = "amount"
+  )
+
+
+# Display financial_trends
+_____
+
+
+# Create multi-line chart
+ggplot(financial_trends, aes(x = month, y = amount, color = _____)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 2) +
+  scale_x_date(
+    labels = label_date_short(),
+    breaks = breaks_width("3 months")) +
+  scale_y_continuous(labels = dollar_format()) +
+  scale_color_manual(
+    values = c("revenue" = "_____", "expenses" = "_____"),  # Choose appropriate colors
+    labels = c("revenue" = "Revenue", "expenses" = "Expenses"),
+    breaks = c("revenue", "expenses") # Set order of legend items
+  ) +
+  labs(
+    title = "Revenue vs Expenses Trend",
+    subtitle = "2027 Financial Performance",
+    x = NULL,
+    y = NULL,
+    color = NULL
+  ) +
+  theme(legend.position = "bottom")
+```
+
+## Department Expense Breakdown
+
+### Stacked Bar Chart by Category
+
+```{r}
+# Create stacked bar chart showing expense categories
+dept_expenses |>
+  ggplot(aes(x = department, y = amount, fill = _____)) +  # Fill by expense_category
+  geom_col(position = "_____") +  # Use "stack" position
+  scale_y_continuous(labels = dollar_format()) +
+  scale_fill_brewer(palette = "Blues") +
+  labs(
+    title = "Department Expenses by Category",
+    subtitle = "Fiscal Year 2027",
+    x = NULL,
+    y = NULL,
+    fill = NULL,
+    caption = "Source: General Ledger"
+  ) +
+  theme(legend.position = "bottom")
+```
+
+## Creating a Financial Dashboard
+
+### Panel 1: Net Income Trend
+
+```{r}
+# Create net income visualization
+p1 <- monthly_financials |>
+  ggplot(aes(x = month, y = _____)) +  # Plot net_income
+  geom_col(fill = ifelse(monthly_financials$net_income > 0, "seagreen", "tomato")) +
+  scale_x_date(labels = label_date_short()) +
+  scale_y_continuous(labels = dollar_format()) +
+  labs(
+    title = "Monthly Net Income",
+    x = NULL,
+    y = NULL
+  )
+
+# Display p1
+_____
+```
+
+### Panel 2: Quarterly Performance
+
+```{r}
+# Summarize by quarter
+quarterly_summary <- monthly_financials |>
+  group_by(_____) |>  # Group by quarter
+  summarize(
+    total_revenue = sum(_____),
+    total_expenses = sum(_____),
+    total_net_income = sum(_____)
+  )
+
+# Display quarterly_summary
+_____
+
+# Create quarterly comparison
+p2 <- quarterly_summary |>
+  ggplot(aes(x = _____)) +
+  geom_col(aes(y = total_revenue), fill = "seagreen") +
+  geom_col(aes(y = -total_expenses), fill = "tomato") +
+  scale_y_continuous(
+    labels = function(x) dollar_format()(abs(x))
+  ) +
+  labs(
+    title = "Quarterly Revenue vs Expenses",
+    subtitle = "Revenue (green) above, Expenses (red) below",
+    x = NULL,
+    y = NULL
+  )
+
+
+# Display p2
+p2
+
+```
+
+### Combine Dashboard Panels
+
+```{r}
+# Combine panels using patchwork
+dashboard <- p1 / p2
+
+# Display dashboard
+dashboard +
+  plot_annotation(
+    title = "Financial Performance Dashboard",
+    subtitle = "Fiscal Year 2027",
+    caption = "Source: Financial Reporting System"
+  )
+```
+
+## Advanced Visualization: Variance Analysis
+
+```{r}
+# Create budget vs actual data
+budget_data <- tribble(
+  ~department, ~budget, ~actual,
+  "Sales", 350000, 334963,
+  "Marketing", 320000, 344045,
+  "Operations", 420000, 416736,
+  "Finance", 280000, 287256
+) |>
+  mutate(
+    variance_amount = _____ - _____,  # Calculate variance
+    variance_pct = (variance_amount / budget) * 100,
+    favorable = variance_amount < 0  # For expenses, under budget is favorable
+  )
+
+
+# Display budget_data
+_____
+
+
+# Create variance visualization
+budget_data |>
+  ggplot(aes(x = variance_pct, y = reorder(department, variance_pct))) +
+  geom_col(aes(fill = favorable)) +
+  scale_fill_manual(
+    values = c("TRUE" = "_____", "FALSE" = "_____"),  # Green for favorable, red for unfavorable
+    labels = c("TRUE" = "Favorable", "FALSE" = "Unfavorable")
+  ) +
+  scale_x_continuous(labels = percent_format(scale = 1)) +
+  labs(
+    title = "Budget Variance by Department",
+    subtitle = "Percentage Over/Under Budget",
+    x = NULL,
+    y = NULL,
+    fill = NULL
+  ) +
+  theme(legend.position = "bottom")
+```
+
+## Key Insights and Best Practices
+
+### Data Visualization Ethics
+
+```{r}
+# Example of ethical vs misleading visualization
+# Create the same data with different y-axis scales
+
+# Misleading (truncated y-axis)
+misleading <- monthly_financials |>
+  ggplot(aes(x = month, y = revenue)) +
+  geom_line(color = "dark green", size = 1.2) +
+  scale_y_continuous(
+    limits = c(120000, 220000),  # Truncated axis
+    labels = dollar_format()
+  ) +
+  labs(title = "MASSIVE Revenue Growth!")
+
+# Ethical (starts at zero)
+ethical <- monthly_financials |>
+  ggplot(aes(x = month, y = revenue)) +
+  geom_line(color = "dark green", size = 1.2) +
+  scale_y_continuous(
+    limits = c(0, NA),  # Start at zero
+    labels = dollar_format()
+  ) +
+  labs(title = "Monthly Revenue Growth")
+
+# Compare side by side
+misleading | ethical
+```
+
+### Summary Metrics
+
+```{r}
+# Calculate key performance metrics
+performance_summary <- monthly_financials |>
+  summarize(
+    total_revenue = sum(revenue),
+    total_expenses = sum(expenses),
+    total_net_income = sum(net_income),
+    profit_margin = (total_net_income / total_revenue),
+    revenue_growth = ((last(revenue) - first(revenue)) / first(revenue)) 
+  )
+
+
+# Display performance_summary
+performance_summary
+
+
+# Format the summary
+performance_summary |>
+  mutate(
+    total_revenue = dollar(total_revenue),
+    total_expenses = dollar(total_expenses),
+    total_net_income = dollar(total_net_income),
+    profit_margin = percent(profit_margin),
+    revenue_growth = percent(revenue_growth)
+  )
+```
+
+## Key Findings
+
+Based on the visualizations above, complete these insights:
+
+- **Revenue Trend**: Revenue (increased/decreased) by _____% from January to December.
+- **Highest Spending Department**: _____ had the highest total expenses at $_____.
+- **Profit Margin**: The company achieved a _____% profit margin for the year.
+- **Best Performing Quarter**: Q_____ showed the highest net income at $_____.
+- **Budget Performance**: The _____ and _____ departments were under budget (favorable variance).

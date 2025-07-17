@@ -16,5 +16,35 @@
   },
   "posts/02-introduction.qmd": {
     "02-introduction.html": "75887858"
+  },
+  "posts/05-data-governance.qmd": {
+    "05-data-governance.html": "d670869a"
+  },
+  "posts/03-data-wrangling.qmd": {
+    "03-data-wrangling.html": "bd686432"
+  },
+  "posts/04_data_visualization.qmd": {
+    "04_data_visualization.html": "0dc6ea9a"
+  },
+  "posts/08-sol-classification.qmd": {
+    "08-sol-classification.html": "c8eeca2c"
+  },
+  "posts/07-regression-analysis.qmd": {
+    "07-regression-analysis.html": "49ebef71"
+  },
+  "posts/06-clustering.qmd": {
+    "06-clustering.html": "830b6129"
+  },
+  "posts/08-classification.qmd": {
+    "08-classification.html": "1b12e7e2"
+  },
+  "posts/09_kpi_cfo.qmd": {
+    "09_kpi_cfo.html": "429a3fec"
+  },
+  "posts/dashboard.qmd": {
+    "dashboard.html": "d2ceab12"
+  },
+  "posts/10_ar_dashboard.qmd": {
+    "10_ar_dashboard.html": "1a35022c"
   }
 }

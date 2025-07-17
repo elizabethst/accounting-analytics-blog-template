@@ -35,7 +35,7 @@ In this blog post, I'll demonstrate how to:
 
 ```{r}
 #| label: setup
- 
+
 # Load required packages
 library(tidyverse)  # For data manipulation
 library(scales)     # For formatting numbers as currency and percentages
