@@ -53,13 +53,10 @@ set.seed(2027)              # Reproducible results
 
 ```{r}
 # Load the expense report data
-expense_reports <- read_csv("expense_reports.csv")
-# TODO: fix path after loaded on web
+expense_reports <- read_csv("https://estanny.org/data/06_expense_reports.csv")
+
 # Display structure of the data
 glimpse(expense_reports)
-
-# View first few rows
-head(expense_reports)
 
 # Basic summary statistics
 summary(expense_reports)

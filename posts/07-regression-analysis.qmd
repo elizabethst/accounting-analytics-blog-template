@@ -53,7 +53,8 @@ set.seed(2027)             # Reproducible results
 <!-- TODO: add data to data   -->
 ```{r}
 # Load the financial data
-financial_data <- read_csv("../data/07_company_financial_data.csv")
+financial_data <- read_csv("https://estanny.org/data/07_monthly_financial_data.csv")
+
 
 # Display structure of the data
 glimpse(financial_data)

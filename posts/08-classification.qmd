@@ -53,8 +53,7 @@ set.seed(2027)              # Reproducible results
 
 ```{r}
 # Load the fraud detection data
-fraud_data  <- read_rds("data/08-assignment-fraud_data.rds")
-# TODO: fix path after loaded on web
+fraud_data  <- read_rds("https://estanny.org/data/08-assignment-fraud_data.rds")
 
 # Display structure of the data
 glimpse(fraud_data)

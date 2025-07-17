@@ -58,7 +58,7 @@ fin_colors <- c(
 
 ```{r}
 # Load the financial data
-financial_data <- read_rds("data/09-assignment-financial_data.rds")
+financial_data <- read_rds("https://estanny.org/data/09-assignment-financial_data.rds")
 
 # Display structure of the data
 glimpse(financial_data)
