@@ -2,7 +2,6 @@
   {
     "listing": "/index.html",
     "items": [
-      "/posts/dashboard.html",
       "/posts/08-classification.html",
       "/posts/07-regression-analysis.html",
       "/posts/10_ar_dashboard.html",

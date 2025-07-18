@@ -1,0 +1,733 @@
+---
+title: "10: Accounts Receivable Dashboard"
+date: today
+format: dashboard
+execute: 
+  eval: false # change to true
+  message: false
+  warning: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+# Load required packages
+library(tidyverse)   # for data manipulation
+library(scales)      # for formatting numbers
+library(DT)          # for interactive tables
+library(plotly)      # for interactive plots
+library(gt)          # for creating beautiful tables
+
+# Set theme for consistent plot appearance
+theme_set(theme_minimal(base_size = 12))
+
+# Define color scheme for AR status
+ar_colors <- c(
+  current = "#2E7D32",      # Green for current
+  early = "#FFC107",        # Yellow for 1-30 days
+  moderate = "#FF9800",     # Orange for 31-60 days
+  late = "#F44336",         # Red for 61-90 days
+  critical = "#B71C1C",     # Dark red for over 90 days
+  positive = "#1976D2",     # Blue for positive indicators
+  negative = "#C62828"      # Red for negative indicators
+)
+```
+
+# Executive Summary {.tabset}
+
+## Key Metrics
+
+### Row {height="25%"}
+
+```{r}
+#| label: load-data
+# Load the AR data
+ar_data <- read_rds("https://estanny.org/data/10-assignment-ar_data.rds")
+# Set current date for aging calculations
+current_date <- today()
+
+# Display data structure
+glimpse(ar_data)
+```
+
+```{r}
+#| label: calculate-kpis
+# Calculate key performance indicators
+
+# Total AR balance
+total_ar <- ar_data |>
+  filter(status == "_____") |>
+  summarise(total = sum(_____)) |>
+  pull(total)
+
+# Calculate Days Sales Outstanding (DSO)
+# Assume average daily sales for calculation
+average_daily_sales <- 5000  # You'll need to calculate this from your data
+current_dso <- round(_____ / _____, 1)
+
+# Calculate past due percentage
+past_due_amount <- ar_data |>
+  filter(status == "Open" & _____ > 0) |>
+  summarise(total = sum(amount)) |>
+  pull(total)
+
+past_due_percentage <- _____ / _____
+
+# Count of overdue invoices
+overdue_count <- ar_data |>
+  filter(status == "Open" & days_overdue > _____) |>
+  nrow()
+
+# Average days to pay (for paid invoices)
+avg_days_to_pay <- ar_data |>
+  filter(status == "_____") |>
+  summarise(avg_days = mean(_____, na.rm = TRUE)) |>
+  pull(avg_days)
+```
+
+::: {.valuebox icon="credit-card" color="primary"}
+**Total AR Balance**
+
+`r dollar(total_ar)`
+:::
+
+::: {.valuebox icon="calendar" color="`r if(current_dso > 45) 'warning' else 'success'`"}
+**Days Sales Outstanding**
+
+`r paste(current_dso, "days")`
+:::
+
+::: {.valuebox icon="exclamation-triangle" color="`r if(past_due_percentage > 0.2) 'danger' else 'secondary'`"}
+**Past Due %**
+
+`r percent(past_due_percentage)`
+:::
+
+::: {.valuebox icon="clock" color="info"}
+**Avg Days to Pay**
+
+`r round(avg_days_to_pay, 0)` days
+:::
+
+### Row {height="75%"}
+
+## Summary Statistics
+
+```{r}
+#| label: summary-table
+# Create comprehensive AR summary statistics
+summary_stats <- ar_data |>
+  filter(status == "_____") |>
+  summarise(
+    `Total Outstanding AR` = sum(_____),
+    `Number of Open Invoices` = n(),
+    `Average Invoice Amount` = mean(_____),
+    `Median Invoice Amount` = median(_____),
+    `Largest Invoice` = max(_____),
+    `Smallest Invoice` = min(_____),
+    `Total Past Due` = sum(_____[_____ > 0]),
+    `Current (Not Due)` = sum(_____[_____ <= 0])
+  )
+
+# Create summary table using gt
+summary_stats |>
+  pivot_longer(everything(), names_to = "Metric", values_to = "Value") |>
+  gt() |>
+  tab_header(
+    title = "Accounts Receivable Summary",
+    subtitle = paste("As of", format(current_date, "%B %d, %Y"))
+  ) |>
+  fmt_currency(
+    columns = Value,
+    rows = c(1, 3:8),
+    decimals = 0
+  ) |>
+  fmt_number(
+    columns = Value,
+    rows = 2,
+    decimals = 0
+  ) |>
+  cols_label(
+    Metric = "Metric",
+    Value = "Value"
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#E3F2FD"),
+    locations = cells_body(rows = c(1, 7))
+  )
+```
+
+# Aging Analysis
+
+## Row {height="30%"}
+
+### Aging Summary
+
+```{r}
+#| label: create-aging-buckets
+# Create aging buckets for AR analysis
+ar_aging <- ar_data |>
+  filter(status == "_____") |>
+  mutate(
+    # Calculate days outstanding
+    days_outstanding = as.numeric(current_date - _____),
+    # Calculate days overdue
+    days_overdue = as.numeric(current_date - _____),
+    days_overdue = if_else(days_overdue < 0, 0, days_overdue),
+    # Create aging buckets
+    aging_bucket = case_when(
+      days_overdue == 0 ~ "Current",
+      days_overdue <= 30 ~ "1-30 Days",
+      days_overdue <= 60 ~ "31-60 Days",
+      days_overdue <= 90 ~ "61-90 Days",
+      TRUE ~ "Over 90 Days"
+    ),
+    # Set factor levels for proper ordering
+    aging_bucket = factor(aging_bucket, 
+                         levels = c("Current", "1-30 Days", "31-60 Days", 
+                                   "61-90 Days", "Over 90 Days"))
+  )
+
+# Create aging summary table
+aging_summary <- ar_aging |>
+  group_by(_____) |>
+  summarise(
+    `Invoice Count` = n(),
+    `Total Amount` = sum(_____),
+    `Percentage` = sum(amount) / sum(ar_aging$amount),
+    .groups = "drop"
+  )
+
+# Display aging summary with gt
+aging_summary |>
+  gt() |>
+  tab_header(
+    title = "AR Aging Summary",
+    subtitle = "Distribution by aging bucket"
+  ) |>
+  fmt_number(
+    columns = `Invoice Count`,
+    decimals = 0
+  ) |>
+  fmt_currency(
+    columns = `Total Amount`,
+    decimals = 0
+  ) |>
+  fmt_percent(
+    columns = Percentage,
+    decimals = 0 
+  ) |>
+  cols_label(
+    aging_bucket = "Aging Bucket"
+  ) |>
+  # Apply conditional formatting based on aging
+  tab_style(
+    style = cell_fill(color = ar_colors["current"]),
+    locations = cells_body(
+      columns = everything(),
+      rows = aging_bucket == "Current"
+    )
+  ) |>
+  tab_style(
+    style = cell_fill(color = ar_colors["critical"]),
+    locations = cells_body(
+      columns = everything(),
+      rows = aging_bucket == "Over 90 Days"
+    )
+  )
+```
+
+## Row {height="70%"}
+
+### Column {width="50%"}
+
+#### Aging Distribution
+
+```{r}
+#| label: aging-distribution-plot
+# Create aging distribution bar chart
+industry_plot <- industry_aging |>
+  ggplot(aes(y = reorder(industry, total, sum), x = total, fill = aging_bucket)) +  
+  geom_col(position = "stack") +
+  scale_x_continuous(labels = dollar_format()) +  # Changed to scale_x
+  scale_fill_manual(
+    values = c(
+      "Current" = ar_colors[["current"]],
+      "1-30 Days" = ar_colors[["early"]],
+      "31-60 Days" = ar_colors[["moderate"]],
+      "61-90 Days" = ar_colors[["late"]],
+      "Over 90 Days" = ar_colors[["critical"]]
+    )
+  ) +
+  labs(
+    title = "Aging by Industry",
+    y = NULL,  # Swapped labels
+    x = "Amount Outstanding",
+    fill = NULL
+  )
+
+# Convert to interactive plot
+ggplotly(aging_plot, tooltip = c("x", "y")) |>
+  layout(hovermode = "x unified")
+```
+
+### Column {width="50%"}
+
+#### Aging by Customer Type
+
+```{r}
+#| label: aging-by-customer-type
+# Create aging analysis by customer industry/type
+industry_aging <- ar_aging |>
+  group_by(_____, _____) |>
+  summarise(total = sum(amount), .groups = "drop")
+
+# Create stacked bar chart
+industry_plot <- industry_aging |>
+  ggplot(aes(x = _____, y = total, fill = aging_bucket)) +
+  geom_col(position = "stack") +
+  scale_y_continuous(labels = dollar_format()) +
+  scale_fill_manual(
+    values = c(
+      "Current" = ar_colors["current"],
+      "1-30 Days" = ar_colors["early"],
+      "31-60 Days" = ar_colors["moderate"],
+      "61-90 Days" = ar_colors["late"],
+      "Over 90 Days" = ar_colors["critical"]
+    )
+  ) +
+  labs(
+    title = "Aging by Industry",
+    x = NULL,
+    y = "Amount Outstanding",
+    fill = "Aging Bucket"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Convert to interactive
+ggplotly(industry_plot) |>
+  layout(hovermode = "x unified")
+```
+
+# Customer Analysis
+
+## Row
+
+### Top Customers by Exposure
+
+```{r}
+#| label: top-customers-table
+# Calculate customer exposure metrics
+customer_summary <- ar_aging |>
+  group_by(_____, _____, _____) |>
+  summarise(
+    total_ar = sum(_____),
+    invoice_count = n(),
+    oldest_invoice = min(_____),
+    days_oldest = as.numeric(current_date - oldest_invoice),
+    avg_days_overdue = round(mean(_____, na.rm = TRUE), 0),
+    .groups = "drop"
+  ) |>
+  mutate(
+    credit_utilization = _____ / _____,
+    risk_score = case_when(
+      avg_days_overdue > 60 | credit_utilization > 0.9 ~ "High",
+      avg_days_overdue > 30 | credit_utilization > 0.7 ~ "Medium",
+      TRUE ~ "Low"
+    )
+  ) |>
+  arrange(desc(_____)) 
+
+# Create interactive customer table
+datatable(
+  customer_summary |>
+    select(
+      Customer = customer_name,
+      `Total AR` = total_ar,
+      `Credit Limit` = credit_limit,
+      `Utilization %` = credit_utilization,
+      `Invoices` = invoice_count,
+      `Avg Days Overdue` = avg_days_overdue,
+      `Risk` = risk_score
+    ),
+  options = list(
+    pageLength = 10,
+    dom = 'ftip',
+    order = list(list(1, 'desc'))
+  ),
+  rownames = FALSE
+) |>
+  formatCurrency(c("Total AR", "Credit Limit"), digits = 0) |>
+  formatPercentage("Utilization %", digits = 0) |>
+  formatStyle(
+    "Risk",
+    backgroundColor = styleEqual(
+      c("Low", "Medium", "High"),
+      c("#C8E6C9", "#FFF3E0", "#FFCDD2")
+    )
+  )
+```
+
+## Row
+
+### Column {width="50%"}
+
+#### Customer Risk Matrix
+
+```{r}
+#| label: customer-risk-matrix
+# Create risk matrix scatter plot
+risk_data <- customer_summary |>
+  slice_head(n = 20)
+
+risk_plot <- risk_data |>
+  ggplot(aes(
+    x = avg_days_overdue, 
+    y = total_ar,
+    color = risk_score,
+    size = credit_utilization,
+    text = paste(
+      "Customer:", customer_name,
+      "<br>Total AR:", dollar(total_ar),
+      "<br>Avg Days Overdue:", avg_days_overdue,
+      "<br>Utilization:", percent(credit_utilization)
+    )
+  )) +
+  geom_point(alpha = 0.7) +
+  scale_y_continuous(labels = dollar_format()) +
+  scale_color_manual(
+    values = c(
+      "Low" = ar_colors[["current"]],
+      "Medium" = ar_colors[["early"]],
+      "High" = ar_colors[["critical"]]
+    )
+  ) +
+  scale_size_continuous(range = c(3, 10)) +
+  labs(
+    title = "Customer Risk Matrix",
+    x = "Average Days Overdue",
+    y = "Total AR Outstanding",
+    color = "Risk Level",
+    size = "Credit\nUtilization"
+  )
+
+# Convert to interactive
+ggplotly(risk_plot, tooltip = "text") |>
+  layout(hovermode = "closest")
+```
+
+### Column {width="50%"}
+
+#### Credit Utilization Analysis
+
+```{r}
+#| label: credit-utilization
+# Create credit utilization chart
+utilization_data <- customer_summary |>
+  mutate(
+    utilization_category = case_when(
+      credit_utilization >= 1 ~ "Over Limit",
+      credit_utilization >= 0.9 ~ "90-100%",
+      credit_utilization >= 0.75 ~ "75-90%",
+      credit_utilization >= 0.5 ~ "50-75%",
+      TRUE ~ "Under 50%"
+    ),
+    utilization_category = factor(
+      utilization_category,
+      levels = c("Under 50%", "50-75%", "75-90%", "90-100%", "Over Limit")
+    )
+  )
+
+utilization_plot <- utilization_data |>
+  ggplot(aes(y = utilization_category)) +
+  geom_bar(fill = ar_colors["positive"]) +
+  scale_x_continuous(breaks = seq(0, 20, 2)) +
+  labs(
+    title = "Credit Utilization Distribution",
+    y = "Utilization Range",
+    x = "Number of Customers"
+  ) 
+
+# Convert to interactive
+ggplotly(utilization_plot) |>
+  layout(hovermode = "x")
+```
+
+# Collection Trends
+
+## Row
+
+### Column {width="50%"}
+
+#### Collection Performance Over Time
+
+```{r}
+#| label: collection-trends
+# Calculate monthly collection metrics
+monthly_collections <- ar_data |>
+  filter(!is.na(payment_date)) |>
+  mutate(
+    payment_month = floor_date(_____, "month"),
+    days_to_collect = as.numeric(_____ - _____)
+  ) |>
+  group_by(payment_month) |>
+  summarise(
+    collected_amount = sum(amount),
+    avg_collection_days = mean(days_to_collect, na.rm = TRUE),
+    invoices_collected = n(),
+    .groups = "drop"
+  )
+
+# Create collection trend plot
+collection_plot <- monthly_collections |>
+  ggplot(aes(x = payment_month)) +
+  geom_col(aes(y = collected_amount), fill = ar_colors["positive"], alpha = 0.7) +
+  geom_line(aes(y = avg_collection_days * 10000), color = ar_colors["negative"], size = 2) +
+  geom_point(aes(y = avg_collection_days * 10000), color = ar_colors["negative"], size = 3) +
+  scale_y_continuous(
+    labels = dollar_format(),
+    sec.axis = sec_axis(~ . / 10000, name = "Avg Days to Collect")
+  ) +
+  scale_x_date(date_labels = "%b %Y") +
+  labs(
+    title = "Monthly Collections and Average Days to Collect",
+    x = NULL,
+    y = "Amount Collected"
+  )
+
+# Convert to interactive
+ggplotly(collection_plot) |>
+  layout(hovermode = "x unified")
+```
+
+### Column {width="50%"}
+
+#### Payment Behavior Analysis
+
+```{r}
+#| label: payment-behavior
+# Analyze payment patterns
+payment_patterns <- ar_data |>
+  filter(status == "Paid" & !is.na(payment_date)) |>
+  mutate(
+    days_to_pay = as.numeric(payment_date - invoice_date),
+    payment_timing = case_when(
+      days_to_pay <= terms_days ~ "On Time",
+      days_to_pay <= terms_days + 10 ~ "Slightly Late",
+      days_to_pay <= terms_days + 30 ~ "Late",
+      TRUE ~ "Very Late"
+    ),
+    payment_timing = factor(
+      payment_timing,
+      levels = c("On Time", "Slightly Late", "Late", "Very Late")
+    )
+  )
+
+# Create payment timing distribution
+timing_plot <- payment_patterns |>
+  count(payment_timing) |>
+  ggplot(aes(x = payment_timing, y = n, fill = payment_timing)) +
+  geom_col() +
+  scale_fill_manual(
+    values = c(
+      "On Time" = ar_colors[["current"]],
+      "Slightly Late" = ar_colors[["early"]],
+      "Late" = ar_colors[["moderate"]],
+      "Very Late" = ar_colors[["critical"]]
+    )
+  ) +
+  labs(
+    title = "Payment Timing Distribution",
+    x = NULL,
+    y = "Number of Invoices",
+    fill = NULL
+  ) 
+
+# Convert to interactive
+ggplotly(timing_plot) |>
+  layout(hovermode = "x")
+```
+
+# Cash Flow Forecast
+
+## Row
+
+### Expected Collections Forecast
+
+```{r}
+#| label: collection-forecast
+# Create collection forecast based on aging and historical patterns
+forecast_data <- ar_aging |>
+  mutate(
+    # Assign collection probability based on aging
+    collection_probability = case_when(
+      aging_bucket == "Current" ~ 0.95,
+      aging_bucket == "1-30 Days" ~ 0.85,
+      aging_bucket == "31-60 Days" ~ 0.70,
+      aging_bucket == "61-90 Days" ~ 0.50,
+      TRUE ~ 0.25
+    ),
+    # Estimate collection timing
+    expected_collection_days = case_when(
+      aging_bucket == "Current" ~ 15,
+      aging_bucket == "1-30 Days" ~ 20,
+      aging_bucket == "31-60 Days" ~ 30,
+      aging_bucket == "61-90 Days" ~ 45,
+      TRUE ~ 90
+    ),
+    expected_collection_date = current_date + days(expected_collection_days),
+    expected_collection_week = floor_date(expected_collection_date, "week"),
+    expected_amount = amount * collection_probability
+  )
+
+# Aggregate by week
+weekly_forecast <- forecast_data |>
+  filter(expected_collection_week <= current_date + weeks(8)) |>
+  group_by(expected_collection_week) |>
+  summarise(
+    expected_collections = sum(expected_amount),
+    best_case = sum(amount),
+    worst_case = sum(expected_amount * 0.7),
+    .groups = "drop"
+  )
+
+# Create forecast visualization
+forecast_plot <- weekly_forecast |>
+  ggplot(aes(x = expected_collection_week)) +
+  geom_ribbon(
+    aes(ymin = worst_case, ymax = best_case),
+    fill = ar_colors["positive"],
+    alpha = 0.2
+  ) +
+  geom_line(
+    aes(y = expected_collections),
+    color = ar_colors["positive"],
+    size = 2
+  ) +
+  geom_point(
+    aes(y = expected_collections),
+    color = ar_colors["positive"],
+    size = 3
+  ) +
+  scale_y_continuous(labels = dollar_format()) +
+  scale_x_date(date_labels = "%b %d") +
+  labs(
+    title = "8-Week Collection Forecast",
+    subtitle = "Expected collections with confidence band",
+    x = NULL,
+    y = "Expected Collections"
+  )
+
+# Convert to interactive
+ggplotly(forecast_plot) |>
+  layout(hovermode = "x unified")
+```
+
+## Row
+
+### Collection Probability by Aging
+
+```{r}
+#| label: collection-probability-table
+# Create collection probability analysis
+probability_summary <- ar_aging |>
+  group_by(aging_bucket) |>
+  summarise(
+    outstanding_amount = sum(amount),
+    invoice_count = n(),
+    .groups = "drop"
+  ) |>
+  mutate(
+    collection_probability = case_when(
+      aging_bucket == "Current" ~ 95,
+      aging_bucket == "1-30 Days" ~ 85,
+      aging_bucket == "31-60 Days" ~ 70,
+      aging_bucket == "61-90 Days" ~ 50,
+      TRUE ~ 25
+    ),
+    expected_collection = outstanding_amount * (collection_probability / 100),
+    expected_loss = outstanding_amount - expected_collection
+  )
+
+# Display probability table
+probability_summary |>
+  gt() |>
+  tab_header(
+    title = "Collection Probability Analysis",
+    subtitle = "Expected collections based on historical patterns"
+  ) |>
+  fmt_currency(
+    columns = c(outstanding_amount, expected_collection, expected_loss),
+    decimals = 0
+  ) |>
+  fmt_number(
+    columns = invoice_count,
+    decimals = 0
+  ) |>
+  fmt_percent(
+    columns = collection_probability,
+    scale_values = FALSE,
+    decimals = 0
+  ) |>
+  cols_label(
+    aging_bucket = "Aging Bucket",
+    outstanding_amount = "Outstanding",
+    invoice_count = "Invoices",
+    collection_probability = "Collection %",
+    expected_collection = "Expected",
+    expected_loss = "Risk"
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#FFEBEE"),
+    locations = cells_body(
+      columns = expected_loss,
+      rows = expected_loss > 10000
+    )
+  ) |>
+  grand_summary_rows(
+    columns = c(outstanding_amount, expected_collection, expected_loss),
+    fns = list(Total = ~sum(.)),
+    fmt = ~fmt_currency(., decimals = 0)
+  )
+```
+
+# Insights & Actions
+
+## Key Findings
+
+Based on your dashboard analysis, identify the following insights:
+
+1. **Overall AR Health**:
+   - Current DSO of _____ days compared to target of 45 days
+   - _____% of AR is current (target: 70%+)
+   - Total past due amount: $_____
+
+2. **Customer Concentration Risk**:
+   - Top 5 customers represent _____% of total AR
+   - _____ customers are over their credit limit
+   - Highest risk customer: _____ with $_____ overdue
+
+3. **Collection Performance**:
+   - Average days to collect: _____ days
+   - Collection effectiveness trending up/down
+   - Expected collections next 4 weeks: $_____
+
+## Recommended Actions
+
+Complete these action items based on your analysis:
+
+1. **Immediate Actions** (This Week):
+   - Contact all accounts over _____ days
+   - Review credit limits for customers at >90% utilization
+   - Focus collection efforts on: _____
+
+2. **Short-term Improvements** (This Month):
+   - Implement automated reminders for accounts approaching _____ days
+   - Review payment terms for industries with poor payment history
+   - Target DSO reduction to _____ days
+
+3. **Strategic Initiatives** (This Quarter):
+   - Develop early payment discount program for _____
+   - Revise credit policy for _____ risk customers
+   - Implement _____ to improve collection effectiveness

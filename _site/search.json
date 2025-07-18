@@ -403,7 +403,7 @@
     "href": "posts/07-regression-analysis.html#setup-and-load-libraries",
     "title": "7: Regression Analysis for Financial Forecasting",
     "section": "Setup and Load Libraries",
-    "text": "Setup and Load Libraries\n\nRequired Libraries\n\n# Load packages we need - matching the slides\nlibrary(tidyverse)    # For data manipulation\nlibrary(tidymodels)   # For modeling\nlibrary(scales)       # For formatting numbers\nlibrary(gt)           # For nice tables\nlibrary(patchwork)    # For combining plots\n\n# Set preferences\ntheme_set(theme_minimal())  # Clean plots\ntidymodels_prefer()        # Prefer tidymodels functions\noptions(scipen = 999)      # No scientific notation\nset.seed(2027)             # Reproducible results\n\n\n\nLoad and Explore the Data\n\n\n# Load the financial data\nfinancial_data &lt;- read_csv(\"../data/07_company_financial_data.csv\")\n\n# Display structure of the data\nglimpse(financial_data)\n\n# Basic summary statistics\nsummary(financial_data)"
+    "text": "Setup and Load Libraries\n\nRequired Libraries\n\n# Load packages we need - matching the slides\nlibrary(tidyverse)    # For data manipulation\nlibrary(tidymodels)   # For modeling\nlibrary(scales)       # For formatting numbers\nlibrary(gt)           # For nice tables\nlibrary(patchwork)    # For combining plots\n\n# Set preferences\ntheme_set(theme_minimal())  # Clean plots\ntidymodels_prefer()        # Prefer tidymodels functions\noptions(scipen = 999)      # No scientific notation\nset.seed(2027)             # Reproducible results\n\n\n\nLoad and Explore the Data\n\n# Load the financial data\nfinancial_data &lt;- read_csv(\"https://estanny.org/data/07_company_financial_data.csv\")\n\n# Display structure of the data\nglimpse(financial_data)\n\n# Basic summary statistics\nsummary(financial_data)"
   },
   {
     "objectID": "posts/07-regression-analysis.html#initial-data-exploration",
@@ -677,5 +677,103 @@
     "title": "9: KPI Dashboard for CFO",
     "section": "Key Insights and Recommendations",
     "text": "Key Insights and Recommendations\nBased on your dashboard analysis, complete these insights:\n\nRevenue Performance: Revenue has grown from $_____ to $_____ over the 24-month period, representing _____% growth.\nProfitability Trends:\n\nGross margin has averaged _____% and is currently at _____%\nOperating margin has improved from _____% to _____%, showing _____\n\nLiquidity Position:\n\nCurrent ratio of _____ is above/below industry benchmark of 2.0\nCash position has grown/declined from $_____ to $_____\n\nWorking Capital Management:\n\nDays Sales Outstanding averages _____ days\nCash conversion cycle is _____ days (DSO - DPO)\n\nRecommendations for CFO:\n\nFocus area 1: _____\nFocus area 2: _____\nKey metric to monitor: _____"
+  },
+  {
+    "objectID": "posts/10_ar_dashboard.html",
+    "href": "posts/10_ar_dashboard.html",
+    "title": "Accounts Receivable Dashboard",
+    "section": "",
+    "text": "$value\n[1] \"$125,600\"\n\n\n\n\n\n\n\n$value\n[1] \"25.1 days\"\n\n\n\n\n\n\n\n$value\n[1] \"22%\"\n\n\n\n\n\n\n\n$value\n[1] \"82%\"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nAR Summary Statistics\n\n\nKey metrics for outstanding receivables\n\n\nMetric\nValue\n\n\n\n\nTotal AR\n$125,600\n\n\nNumber of Invoices\n11\n\n\nAverage Invoice\n$11,418\n\n\nLargest Invoice\n$24,500\n\n\nSmallest Invoice\n$3,200\n\n\nPast Due Amount\n$27,200\n\n\nCurrent Amount\n$98,400"
+  },
+  {
+    "objectID": "posts/10_ar_dashboard.html#row",
+    "href": "posts/10_ar_dashboard.html#row",
+    "title": "Accounts Receivable Dashboard",
+    "section": "",
+    "text": "$value\n[1] \"$125,600\"\n\n\n\n\n\n\n\n$value\n[1] \"25.1 days\"\n\n\n\n\n\n\n\n$value\n[1] \"22%\"\n\n\n\n\n\n\n\n$value\n[1] \"82%\""
+  },
+  {
+    "objectID": "posts/10_ar_dashboard.html#summary-table",
+    "href": "posts/10_ar_dashboard.html#summary-table",
+    "title": "Accounts Receivable Dashboard",
+    "section": "",
+    "text": "AR Summary Statistics\n\n\nKey metrics for outstanding receivables\n\n\nMetric\nValue\n\n\n\n\nTotal AR\n$125,600\n\n\nNumber of Invoices\n11\n\n\nAverage Invoice\n$11,418\n\n\nLargest Invoice\n$24,500\n\n\nSmallest Invoice\n$3,200\n\n\nPast Due Amount\n$27,200\n\n\nCurrent Amount\n$98,400"
+  },
+  {
+    "objectID": "posts/10_ar_dashboard.html#row-1",
+    "href": "posts/10_ar_dashboard.html#row-1",
+    "title": "Accounts Receivable Dashboard",
+    "section": "Row",
+    "text": "Row\n\n\n\n\n\n\n\n\nAging Summary by Bucket\n\n\nAging Bucket\nAmount\nInvoices\n\n\n\n\nCurrent\n$98,400\n7\n\n\n1-30 Days\n$6,700\n1\n\n\n31-60 Days\n$9,800\n1\n\n\n61-90 Days\n$7,500\n1\n\n\nOver 90 Days\n$3,200\n1"
+  },
+  {
+    "objectID": "posts/10_ar_dashboard.html#row-2",
+    "href": "posts/10_ar_dashboard.html#row-2",
+    "title": "Accounts Receivable Dashboard",
+    "section": "Row",
+    "text": "Row\n\nAging Distribution\n\n\n\n\n\n\n\n\nAging by Customer Type"
+  },
+  {
+    "objectID": "posts/10_ar_dashboard.html#row-3",
+    "href": "posts/10_ar_dashboard.html#row-3",
+    "title": "Accounts Receivable Dashboard",
+    "section": "Row",
+    "text": "Row\n\nTop 10 Customers by Exposure"
+  },
+  {
+    "objectID": "posts/10_ar_dashboard.html#row-4",
+    "href": "posts/10_ar_dashboard.html#row-4",
+    "title": "Accounts Receivable Dashboard",
+    "section": "Row",
+    "text": "Row\n\nCustomer Risk Matrix\n\n\n\n\n\n\n\n\nCredit Utilization Heat Map"
+  },
+  {
+    "objectID": "posts/10_ar_dashboard.html#row-5",
+    "href": "posts/10_ar_dashboard.html#row-5",
+    "title": "Accounts Receivable Dashboard",
+    "section": "Row",
+    "text": "Row\n\nCollection Metrics"
+  },
+  {
+    "objectID": "posts/10_ar_dashboard.html#row-6",
+    "href": "posts/10_ar_dashboard.html#row-6",
+    "title": "Accounts Receivable Dashboard",
+    "section": "Row",
+    "text": "Row\n\nCollection Effectiveness by Collector\n\n\n\n\n\n\n\n\nPromise-to-Pay Tracking"
+  },
+  {
+    "objectID": "posts/10_ar_dashboard.html#row-7",
+    "href": "posts/10_ar_dashboard.html#row-7",
+    "title": "Accounts Receivable Dashboard",
+    "section": "Row",
+    "text": "Row\n\nExpected Collections by Week"
+  },
+  {
+    "objectID": "posts/10_ar_dashboard.html#row-8",
+    "href": "posts/10_ar_dashboard.html#row-8",
+    "title": "Accounts Receivable Dashboard",
+    "section": "Row",
+    "text": "Row\n\nCollection Probability by Aging\n\n\n\n\n\n\n\n\nCollection Probability Analysis\n\n\nExpected collections based on historical patterns\n\n\n\nAging Bucket\nOutstanding Amount\nCollection Probability\nExpected Collection\n\n\n\n\n\nCurrent\n$98,400.00\n95%\n$93,480.00\n\n\n\n1-30 Days\n$6,700.00\n80%\n$5,360.00\n\n\n\n31-60 Days\n$9,800.00\n60%\n$5,880.00\n\n\n\n61-90 Days\n$7,500.00\n40%\n$3,000.00\n\n\n\nOver 90 Days\n$3,200.00\n20%\n$640.00\n\n\nTotal\n—\n$125,600.00\n—\n$108,360.00"
+  },
+  {
+    "objectID": "posts/10_ar_dashboard.html#row-9",
+    "href": "posts/10_ar_dashboard.html#row-9",
+    "title": "Accounts Receivable Dashboard",
+    "section": "Row",
+    "text": "Row\n\n12-Month DSO Trend\n\n\n\n\n\n\n\n\nAR Balance Trend"
+  },
+  {
+    "objectID": "posts/10_ar_dashboard.html#row-10",
+    "href": "posts/10_ar_dashboard.html#row-10",
+    "title": "Accounts Receivable Dashboard",
+    "section": "Row",
+    "text": "Row\n\nMonthly Metrics Comparison"
+  },
+  {
+    "objectID": "posts/10_ar_dashboard.html#row-11",
+    "href": "posts/10_ar_dashboard.html#row-11",
+    "title": "Accounts Receivable Dashboard",
+    "section": "Row",
+    "text": "Row\n\nData Completeness Check\n\n\n\n\n\n\n\n\nData Quality Metrics\n\n\nCompleteness and accuracy checks\n\n\nMetric\nValue\n\n\n\n\nTotal Open Invoices\n11\n\n\nInvoices with Missing Customer Info\n01\n\n\nInvoices with Missing Due Dates\n01\n\n\nInvoices with Zero Amount\n01\n\n\nInvoices with Negative Amount\n01\n\n\nData Last Updated\nNovember 20, 2026\n\n\n\n1 Green indicates no data quality issues\n\n\n\n\n\n\n\n\n\n\nData Validation Summary\n\n\n\n\n\n\n\n\nData Validation Summary\n\n\nSystem integrity checks\n\n\nValidation Check\nStatus\nDetails\n\n\n\n\nCustomer Credit Limits\n✓ Pass\nAll customers have valid credit limits\n\n\nInvoice Dates\n✓ Pass\nAll invoice dates are valid\n\n\nAging Calculation\n✓ Pass\nAging buckets calculated correctly\n\n\nAmount Validation\n✓ Pass\nAll amounts are positive values\n\n\nCustomer Matching\n✓ Pass\nAll invoices matched to customers"
   }
 ]
