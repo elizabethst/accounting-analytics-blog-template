@@ -1,0 +1,15 @@
+{
+  "hash": "929fcdceda3fe8c6254a8f0859b1c998",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"10: Accounts Receivable Dashboard\"\ndate: today\nformat: dashboard\nexecute: \n  eval: false # change to true\n  message: false\n  warning: false\n---\n\n\n\n# Executive Summary {.tabset}\n\n## Key Metrics\n\n### Row {height=\"25%\"}\n\n\n::: {.cell}\n\n:::\n\n\n\n::: {.cell}\n\n:::\n\n\n### Row {height=\"75%\"}\n\n## Summary Statistics\n\n\n::: {.cell}\n\n:::\n\n\n# Aging Analysis\n\n## Row {height=\"30%\"}\n\n### Aging Summary\n\n\n::: {.cell}\n\n:::\n\n\n## Row {height=\"70%\"}\n\n### Column {width=\"50%\"}\n\n#### Aging Distribution\n\n\n::: {.cell}\n\n:::\n\n\n### Column {width=\"50%\"}\n\n#### Aging by Customer Type\n\n\n::: {.cell}\n\n:::\n\n\n# Customer Analysis\n\n## Row\n\n### Top Customers by Exposure\n\n\n::: {.cell}\n\n:::\n\n\n## Row\n\n### Column {width=\"50%\"}\n\n#### Customer Risk Matrix\n\n\n::: {.cell}\n\n:::\n\n\n### Column {width=\"50%\"}\n\n#### Credit Utilization Analysis\n\n\n::: {.cell}\n\n:::\n\n\n# Collection Trends\n\n## Row\n\n### Column {width=\"50%\"}\n\n#### Collection Performance Over Time\n\n\n::: {.cell}\n\n:::\n\n\n### Column {width=\"50%\"}\n\n#### Payment Behavior Analysis\n\n\n::: {.cell}\n\n:::\n\n\n# Cash Flow Forecast\n\n## Row\n\n### Expected Collections Forecast\n\n\n::: {.cell}\n\n:::\n\n\n## Row\n\n### Collection Probability by Aging\n\n\n::: {.cell}\n\n:::\n\n\n# Insights & Actions\n\n## Key Findings\n\nBased on your dashboard analysis, identify the following insights:\n\n1. **Overall AR Health**:\n   - Current DSO of _____ days compared to target of 45 days\n   - _____% of AR is current (target: 70%+)\n   - Total past due amount: $_____\n\n2. **Customer Concentration Risk**:\n   - Top 5 customers represent _____% of total AR\n   - _____ customers are over their credit limit\n   - Highest risk customer: _____ with $_____ overdue\n\n3. **Collection Performance**:\n   - Average days to collect: _____ days\n   - Collection effectiveness trending up/down\n   - Expected collections next 4 weeks: $_____\n\n## Recommended Actions\n\nComplete these action items based on your analysis:\n\n1. **Immediate Actions** (This Week):\n   - Contact all accounts over _____ days\n   - Review credit limits for customers at >90% utilization\n   - Focus collection efforts on: _____\n\n2. **Short-term Improvements** (This Month):\n   - Implement automated reminders for accounts approaching _____ days\n   - Review payment terms for industries with poor payment history\n   - Target DSO reduction to _____ days\n\n3. **Strategic Initiatives** (This Quarter):\n   - Develop early payment discount program for _____\n   - Revise credit policy for _____ risk customers\n   - Implement _____ to improve collection effectiveness\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

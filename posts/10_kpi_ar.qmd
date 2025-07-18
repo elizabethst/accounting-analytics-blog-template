@@ -11,6 +11,7 @@ execute:
 ```{r}
 #| label: setup
 #| include: false
+#| eval: true 
 
 # Load required packages
 library(tidyverse)   # for data manipulation
@@ -85,30 +86,6 @@ avg_days_to_pay <- ar_data |>
   summarise(avg_days = mean(_____, na.rm = TRUE)) |>
   pull(avg_days)
 ```
-
-::: {.valuebox icon="credit-card" color="primary"}
-**Total AR Balance**
-
-`r dollar(total_ar)`
-:::
-
-::: {.valuebox icon="calendar" color="`r if(current_dso > 45) 'warning' else 'success'`"}
-**Days Sales Outstanding**
-
-`r paste(current_dso, "days")`
-:::
-
-::: {.valuebox icon="exclamation-triangle" color="`r if(past_due_percentage > 0.2) 'danger' else 'secondary'`"}
-**Past Due %**
-
-`r percent(past_due_percentage)`
-:::
-
-::: {.valuebox icon="clock" color="info"}
-**Avg Days to Pay**
-
-`r round(avg_days_to_pay, 0)` days
-:::
 
 ### Row {height="75%"}
 
