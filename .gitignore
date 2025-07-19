@@ -51,4 +51,4 @@ Thumbs.db
 node_modules/
 
 # Netlify specific
-.netlify/
+.netlify/.DS_Store
