@@ -1,0 +1,661 @@
+---
+title: "11: Controller Dashboard"
+date: today
+format: dashboard
+execute: 
+  eval: false # change to true
+  message: false
+  warning: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+# Load required packages
+library(tidyverse)   # for data manipulation
+library(scales)      # for formatting numbers
+library(gt)          # for creating tables
+library(plotly)      # for interactive plots
+library(DT)          # for interactive tables
+
+# Set consistent theme
+theme_set(theme_minimal())
+
+# Define color scheme for control status
+control_colors <- c(
+  effective = "#4CAF50",      # Green for effective
+  needs_improvement = "#FFC107",  # Yellow for needs improvement
+  ineffective = "#F44336",    # Red for ineffective
+  not_tested = "#E0E0E0",     # Gray for not tested
+  low_risk = "#C8E6C9",       # Light green for low risk
+  medium_risk = "#FFF3E0",    # Light orange for medium risk
+  high_risk = "#FFCDD2"       # Light red for high risk
+)
+
+# Generate sample data for the dashboard
+set.seed(123)
+
+# SOX Controls data
+sox_controls <- tribble(
+  ~control_id, ~control_name, ~frequency, ~owner, ~risk_rating,
+  "SOX-001", "Journal Entry Approval", "Daily", "Controller", "High",
+  "SOX-002", "Account Reconciliation", "Monthly", "Accounting Manager", "High",
+  "SOX-003", "Access Controls", "Quarterly", "IT Manager", "Medium",
+  "SOX-004", "Segregation of Duties", "Continuous", "Controller", "High",
+  "SOX-005", "Financial Reporting Review", "Monthly", "CFO", "High",
+  "SOX-006", "Vendor Master Changes", "Weekly", "AP Manager", "Medium"
+)
+
+# Control testing results
+control_tests <- tribble(
+  ~control_id, ~test_date, ~sample_size, ~failures, ~status,
+  "SOX-001", "2026-11-01", 25, 0, "Pass",
+  "SOX-001", "2026-11-15", 25, 2, "Fail",
+  "SOX-002", "2026-11-20", 10, 0, "Pass",
+  "SOX-003", "2026-11-10", 15, 1, "Review",
+  "SOX-004", "2026-11-25", 20, 0, "Pass",
+  "SOX-005", "2026-11-30", 5, 0, "Pass"
+) |>
+  mutate(test_date = ymd(test_date))
+
+# Financial data
+financial_data <- tribble(
+  ~account, ~category, ~current_month, ~prior_month, ~prior_year, ~budget,
+  "Revenue", "P&L", 1250000, 1180000, 1150000, 1200000,
+  "COGS", "P&L", -750000, -708000, -690000, -720000,
+  "Operating Expenses", "P&L", -350000, -340000, -330000, -360000,
+  "Cash", "BS", 450000, 425000, 380000, 400000,
+  "Accounts Receivable", "BS", 380000, 360000, 350000, 375000,
+  "Inventory", "BS", 290000, 310000, 280000, 300000,
+  "Accounts Payable", "BS", -220000, -210000, -200000, -225000
+)
+
+# Close tasks
+close_tasks <- tribble(
+  ~task_id, ~task_name, ~day_due, ~hours_estimate, ~predecessor, ~responsible,
+  1, "Subledger Close", 1, 4, NA, "AP/AR Teams",
+  2, "Bank Reconciliation", 2, 2, 1, "Treasury",
+  3, "Inventory Count", 1, 6, NA, "Operations",
+  4, "Accruals Calculation", 3, 3, 1, "GL Team",
+  5, "Intercompany Reconciliation", 3, 4, 1, "Consolidation",
+  6, "Journal Entry Review", 4, 2, 4, "Controller",
+  7, "Financial Statement Prep", 5, 4, 6, "Reporting",
+  8, "Variance Analysis", 5, 3, 7, "FP&A"
+)
+
+# Close progress
+close_progress <- tribble(
+  ~task_id, ~start_time, ~end_time, ~status, ~issues,
+  1, "2026-12-01 08:00", "2026-12-01 13:00", "Complete", "None",
+  2, "2026-12-02 09:00", "2026-12-02 11:30", "Complete", "Bank feed delay",
+  3, "2026-12-01 07:00", "2026-12-01 14:00", "Complete", "Overtime required",
+  4, "2026-12-03 08:00", NA, "In Progress", "Waiting for invoices",
+  5, "2026-12-03 10:00", NA, "In Progress", "System reconciling"
+) |>
+  mutate(
+    start_time = ymd_hm(start_time),
+    end_time = ymd_hm(end_time),
+    actual_hours = as.numeric(difftime(end_time, start_time, units = "hours"))
+  )
+
+# Journal entries
+journal_entries <- tribble(
+  ~entry_id, ~entry_date, ~entry_time, ~user_id, ~amount, ~description, ~account_type,
+  "JE001", "2026-11-29", "14:30:00", "jsmith", 25000, "Monthly depreciation", "Asset",
+  "JE002", "2026-11-30", "22:15:00", "admin", 75000, "Adjust revenue recognition", "Revenue",
+  "JE003", "2026-11-28", "09:00:00", "mjones", 15000, "Record payroll accrual", "Expense",
+  "JE004", "2026-11-30", "23:45:00", "temp001", 100000, "Correct inventory error", "Asset",
+  "JE005", "2026-11-27", "10:30:00", "kwilson", 5000, "Office supplies", "Expense",
+  "JE006", "2026-11-29", "03:00:00", "admin", 50000, "Reverse accrual", "Reserve",
+  "JE007", "2026-11-30", "16:00:00", "jsmith", 30000, "Book depreciation", "Asset",
+  "JE008", "2026-11-28", "21:00:00", "mjones", 80000, "Adjust reserve balance", "Reserve"
+) |>
+  mutate(
+    entry_date = ymd(entry_date),
+    entry_time = hms(entry_time),
+    entry_datetime = ymd_hms(paste(entry_date, entry_time))
+  )
+
+# Historical expense data
+historical_expenses <- tribble(
+  ~month, ~travel, ~supplies, ~utilities, ~consultants,
+  "2026-07", 45000, 12000, 18000, 25000,
+  "2026-08", 42000, 13000, 19000, 27000,
+  "2026-09", 47000, 11500, 17500, 24000,
+  "2026-10", 44000, 12500, 18500, 26000,
+  "2026-11", 46000, 11000, 19500, 25500,
+  "2026-12", 48000, 11800, 18200, 45000  # Current month with anomaly
+) |>
+  mutate(month = ym(month)) |>
+  pivot_longer(cols = -month, names_to = "category", values_to = "amount")
+
+# Calculate material variances
+variance_analysis <- financial_data |>
+  mutate(
+    budget_variance = current_month - budget,
+    budget_variance_pct = budget_variance / abs(budget),
+    is_material = abs(budget_variance_pct) > 0.05
+  )
+material_variances <- sum(variance_analysis$is_material)
+```
+
+# Compliance Monitoring {.sidebar width="25%"}
+
+## Control Overview
+
+```{r}
+#| label: compliance-sidebar
+# Calculate control effectiveness
+control_effectiveness <- control_tests |>
+  group_by(control_id) |>
+  _____(
+    total_tests = n(),
+    total_failures = sum(failures),
+    effectiveness_rate = (sum(sample_size) - sum(failures)) / sum(sample_size)
+  ) |>
+  _____(
+    total_controls = n_distinct(sox_controls$control_id),
+    tested_controls = n(),
+    avg_effectiveness = _____(effectiveness_rate)
+  )
+
+# Count open findings
+open_findings <- control_tests |>
+  _____(status == "Fail") |>
+  nrow()
+
+# Days to next filing
+next_filing <- as_date("2027-02-15")
+today = as_date("2026-12-15")
+days_to_filing <- as.numeric(next_filing - today)
+
+# Create compliance summary metrics
+compliance_summary <- tribble(
+  ~metric, ~value, ~status,
+  "SOX Controls Tested", paste0(control_effectiveness$tested_controls, "/", control_effectiveness$total_controls), "On Track",
+  "Controls Effective", percent(control_effectiveness$avg_effectiveness, accuracy = 0.1), if_else(control_effectiveness$avg_effectiveness > 0.95, "Good", "At Risk"),
+  "Open Audit Findings", as.character(open_findings), if_else(open_findings == 0, "Good", "Review"),
+  "Days to Next Filing", as.character(days_to_filing), "Normal"
+)
+
+# Display as simple list
+compliance_summary |>
+  gt()  |>
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(columns = value)
+  )
+```
+
+## Upcoming Deadlines
+
+```{r}
+#| label: filing-calendar
+# Create regulatory filing calendar
+filing_calendar <- tribble(
+  ~filing, ~due_date,
+  "10-Q Q4", "2027-02-15",
+  "10-K Annual", "2027-03-31",
+  "SOX Certification", "2027-03-31",
+  "Proxy Statement", "2027-04-30"
+) |>
+  mutate(
+    due_date = ymd(due_date),
+    days_remaining = as.numeric(due_date - today)
+  )
+
+# Display calendar
+filing_calendar |>
+  select(filing, due_date, days_remaining) |>
+  _____() |>
+  tab_header(title = "Regulatory Calendar") |>
+  fmt_date(columns = due_date, date_style = 3) |>
+  tab_style(
+    style = cell_fill(color = control_colors["high_risk"]),
+    locations = cells_body(
+      rows = days_remaining < 30
+    )
+  )
+```
+
+# Financial Reporting
+
+## Row
+
+### Column {width="50%"}
+
+#### Variance Analysis
+
+```{r}
+#| label: variance-analysis
+# Create variance table
+variance_analysis |>
+  _____(is_material) |>
+  select(account, current_month, budget, budget_variance, budget_variance_pct) |>
+  gt() |>
+  tab_header(
+    title = "Material Budget Variances",
+    subtitle = paste("As of", format(today, "%B %Y"))
+  ) |>
+  fmt_currency(
+    columns = c(current_month, budget, budget_variance),
+    decimals = 0
+  ) |>
+  fmt_percent(
+    columns = budget_variance_pct,
+    decimals = 1
+  ) |>
+  tab_style(
+    style = cell_fill(color = control_colors["high_risk"]),
+    locations = cells_body(
+      rows = abs(budget_variance_pct) > 0.10
+    )
+  )
+```
+
+### Column {width="50%"}
+
+#### Financial Trends
+
+```{r}
+#| label: financial-trends
+# Create monthly trend data (simulated for past 6 months)
+months <- seq(floor_date(today - months(5), "month"), 
+              floor_date(today, "month"), 
+              by = "month")
+
+monthly_trends <- expand_grid(
+  month = months,
+  category = c("Revenue", "Operating Expenses")
+) |>
+  mutate(
+    actual = case_when(
+      category == "Revenue" ~ 1200000 + rnorm(n(), 0, 50000),
+      category == "Operating Expenses" ~ -350000 + rnorm(n(), 0, 15000)
+    ),
+    budget = case_when(
+      category == "Revenue" ~ 1200000,
+      category == "Operating Expenses" ~ -360000
+    )
+  )
+
+# Create trend plot
+trend_plot <- monthly_trends |>
+  _____(aes(x = month)) +
+  geom_line(aes(y = actual, color = "Actual"), size = 2) +
+  geom_line(aes(y = budget, color = "Budget"), linetype = "dashed", size = 1) +
+  facet_wrap(~ category, scales = "free_y", ncol = 1) +
+  scale_y_continuous(labels = dollar_format()) +
+  scale_x_date(date_labels = "%b %Y") +
+  scale_color_manual(
+    values = c("Actual" = "#1976D2", "Budget" = "#757575")
+  ) +
+  _____(
+    title = "Actual vs Budget Trends",
+    x = NULL,
+    y = NULL,
+    color = NULL
+  ) 
+
+# Convert to interactive
+_____(trend_plot) |>
+  layout(hovermode = "x unified")
+```
+
+# Process Monitoring
+
+## Row
+
+### Close Progress
+
+```{r}
+#| label: close-progress
+# Merge close tasks with progress
+close_status <- close_tasks |>
+  left_join(close_progress, by = "task_id") |>
+  mutate(
+    status = case_when(
+      !is.na(end_time) ~ "Complete",
+      !is.na(start_time) ~ "In Progress",
+      TRUE ~ "Not Started"
+    ),
+    planned_start = case_when(
+      is.na(predecessor) ~ 1,
+      predecessor == 1 ~ 2,
+      predecessor == 4 ~ 4,
+      predecessor == 6 ~ 5,
+      TRUE ~ 3
+    ),
+    planned_end = day_due
+  )
+
+# Create Gantt chart
+gantt_plot <- close_status |>
+  ggplot(aes(y = fct_rev(factor(task_id)))) +
+  geom_segment(
+    aes(x = planned_start - 0.4, xend = planned_end + 0.4,
+        yend = fct_rev(factor(task_id)),
+        color = status),
+    size = 12
+  ) +
+  geom_text(
+    aes(x = (planned_start + planned_end) / 2,
+        label = paste0("D", planned_start, "-D", planned_end)),
+    color = "white", size = 3, fontface = "bold"
+  ) +
+  scale_color_manual(
+    values = c(
+      "Complete" = control_colors[["effective"]],
+      "In Progress" = "#2196F3",
+      "Not Started" = control_colors[["not_tested"]]
+    )
+  ) +
+  scale_x_continuous(
+    breaks = 1:8,
+    labels = paste("Day", 1:8)
+  ) +
+  scale_y_discrete(labels = close_tasks$task_name) +
+  labs(
+    title = "Month-End Close Progress",
+    subtitle = "Close Day 3 of 8",
+    x = NULL,
+    y = NULL,
+    color = NULL
+  ) +
+  theme(legend.position = "bottom")
+
+# Display plot
+_____
+```
+
+## Row
+
+### Task Status Table
+
+```{r}
+#| label: task-status-table
+# Create detailed task status table
+task_details <- close_status |>
+  select(
+    Task = task_name,
+    Responsible = responsible,
+    `Due Day` = day_due,
+    Status = status,
+    Issues = issues,
+    `Hours Est.` = hours_estimate,
+    `Hours Actual` = actual_hours
+  ) |>
+  mutate(
+    Efficiency = if_else(
+      !is.na(`Hours Actual`),
+      percent(`Hours Est.` / `Hours Actual`, accuracy = 1),
+      "-"
+    ),
+    Issues = replace_na(Issues, "-")
+  )
+
+# Create interactive table
+_____(
+  task_details,
+  options = list(
+    dom = 'ft',
+    columnDefs = list(
+      list(className = 'dt-center', targets = 2:7)
+    )
+  ),
+  rownames = FALSE
+) |>
+  formatStyle(
+    "Status",
+    backgroundColor = styleEqual(
+      c("Complete", "In Progress", "Not Started"),
+      c(control_colors["effective"], "#E3F2FD", control_colors["not_tested"])
+    )
+  )
+```
+
+# Risk & Controls
+
+## Row {height="40%"}
+
+### Control Status Overview
+
+```{r}
+#| label: control-status
+# Calculate control effectiveness
+control_effectiveness <- control_tests |>
+  # Group control test results by control ID to calculate effectiveness metrics for each control
+  _____(control_id) |>
+  summarise(
+    total_tests = n(),
+    total_failures = sum(failures),
+    effectiveness_rate = (sum(sample_size) - sum(failures)) / sum(sample_size),
+    .groups = "drop"
+  ) |>
+  # Join with sox_controls to get control names and details
+  _____(sox_controls, by = "control_id") |>
+  mutate(
+    status = case_when(
+      effectiveness_rate >= 0.95 ~ "Effective",
+      effectiveness_rate >= 0.90 ~ "Needs Improvement",
+      is.na(effectiveness_rate) ~ "Not Tested",
+      TRUE ~ "Ineffective"
+    )
+  )
+
+# Create control status plot
+control_plot <- control_effectiveness |>
+  ggplot(aes(x = effectiveness_rate, y = control_name, fill = status)) +
+  geom_col() +
+  geom_vline(xintercept = 0.95, linetype = "dashed", color = "red") +
+  scale_x_continuous(labels = percent_format()) +
+  scale_fill_manual(
+    values = c(
+      "Effective" = control_colors[["effective"]],
+      "Needs Improvement" = control_colors[["needs_improvement"]],
+      "Ineffective" = control_colors[["ineffective"]],
+      "Not Tested" = control_colors[["not_tested"]]
+    )
+  ) +
+  labs(
+    title = "SOX Control Effectiveness",
+    x = "Effectiveness Rate",
+    y = NULL,
+    fill = NULL
+  )
+
+# Convert to interactive
+ggplotly(control_plot) |>
+  layout(hovermode = "y unified")
+```
+
+## Row {height="60%"}
+
+### Column {width="50%"}
+
+#### Exception Report
+
+```{r}
+#| label: exception-report
+# Identify high-risk entries
+high_risk_je <- journal_entries |>
+  _____(
+    days_until_period_end = as.numeric(ymd("2026-11-30") - entry_date)
+  ) |>
+  _____(
+    amount > 50000 |                          # Large amounts
+    hour(entry_time) > 18 |                   # After 6 PM
+    hour(entry_time) < 6 |                    # Before 6 AM
+    wday(entry_date) %in% c(1, 7) |          # Weekends
+    user_id %in% c("temp001", "admin") |     # High-risk users
+    str_detect(tolower(description),          # Suspicious keywords
+              "adjust|correct|reverse") |
+    account_type %in% c("Reserve", "Revenue") # Sensitive accounts
+  ) |>
+  mutate(
+    risk_score = case_when(
+      amount > 100000 ~ 50,
+      TRUE ~ 0
+    ) +
+    _____(
+      hour(entry_time) > 20 | hour(entry_time) < 5 ~ 25,
+      TRUE ~ 0
+    ) +
+    case_when(
+      wday(entry_date) %in% c(1, 7) ~ 25,
+      TRUE ~ 0
+    ) +
+    case_when(
+      user_id %in% c("temp001", "admin") ~ 25,
+      TRUE ~ 0
+    ) +
+    case_when(
+      str_detect(tolower(description), "adjust|correct|reverse") ~ 15,
+      TRUE ~ 0
+    ) +
+    case_when(
+      account_type %in% c("Reserve", "Revenue") ~ 25,
+      TRUE ~ 0
+    ) ,
+    risk_level = case_when(
+      risk_score >= 75 ~ "High",
+      risk_score >= 50 ~ "Medium",
+      TRUE ~ "Low"
+    )
+  ) |>
+  arrange(desc(risk_score)) 
+
+# Display exception table
+high_risk_je |>
+  select(
+    `Entry ID` = entry_id,
+    Date = entry_date,
+    User = user_id,
+    Amount = amount,
+    Description = description,
+    `Risk Score` = risk_score,
+    `Risk Level` = risk_level
+  ) |>
+  gt() |>
+  tab_header(
+    title = "High-Risk Journal Entries",
+    subtitle = "Exceptions requiring review"
+  ) |>
+  fmt_currency(columns = Amount, decimals = 0) |>
+  tab_style(
+    style = cell_fill(color = control_colors["high_risk"]),
+    locations = cells_body(
+      columns = `Risk Level`,
+      rows = `Risk Level` == "High"
+    )
+  )
+```
+
+### Column {width="50%"}
+
+#### Anomaly Alerts
+
+```{r}
+#| label: anomaly-detection
+# Calculate historical baselines (excluding current month)
+normal_ranges <- historical_expenses |>
+  # Filter out current month to establish historical baseline
+  filter(month < ym("2026-12")) |>
+  # Calculate statistical measures for each expense category
+  group_by(category) |>
+  summarise(
+    mean_amount = mean(amount),              # Historical average
+    sd_amount = sd(amount),                  # Standard deviation
+    lower_bound = mean_amount - 2 * sd_amount,  # 2σ lower control limit
+    upper_bound = mean_amount + 2 * sd_amount,  # 2σ upper control limit
+    .groups = "drop"
+  )
+
+# Check current month for anomalies
+current_expenses <- historical_expenses |>
+  # Get current month data only
+  _____(month == ym("2026-12")) |>
+  # Join with historical ranges for comparison
+  _____(normal_ranges, by = "category") |>
+  mutate(
+    # Flag values outside 2 standard deviation range as anomalies
+    is_anomaly = amount < lower_bound | amount > upper_bound,
+    # Calculate how many standard deviations from mean
+    deviation = (amount - mean_amount) / sd_amount
+  )
+
+# Create anomaly visualization
+anomaly_plot <- current_expenses |>
+  ggplot(aes(x = category, y = amount)) +
+  # Add error bars showing normal range (±2σ)
+  geom_errorbar(
+    aes(ymin = lower_bound, ymax = upper_bound),
+    width = 0.2, color = "gray50", size = 1
+  ) +
+  # Add cross marks at historical mean
+  geom_point(aes(y = mean_amount), shape = 4, size = 3) +
+  # Plot current month values, colored by anomaly status
+  geom_point(aes(color = is_anomaly), size = 5) +
+  # Set colors for normal vs anomalous values
+  scale_color_manual(
+    values = c("FALSE" = control_colors[["effective"]], 
+               "TRUE" = control_colors[["ineffective"]]),
+    labels = c("Normal", "Anomaly")
+  ) +
+  # Format y-axis as currency
+  scale_y_continuous(labels = dollar_format()) +
+  # Flip coordinates for better readability
+  coord_flip() +
+  labs(
+    title = "Expense Anomaly Detection",
+    subtitle = "Current vs. normal range (±2σ)",
+    x = NULL,
+    y = "Amount",
+    color = "Status"
+  )
+
+# Display plot
+ggplotly(anomaly_plot) |>
+  layout(hovermode = "y unified")
+```
+
+# Insights & Actions
+
+## Key Control Findings
+
+Based on your dashboard analysis, identify the following:
+
+1. **Compliance Status**:
+   - SOX control effectiveness: _____% 
+   - Controls requiring remediation: _____
+   - Days until next regulatory filing: _____
+
+2. **Financial Reporting Quality**:
+   - Reporting accuracy rate: _____%
+   - Material variances identified: _____
+   - Average days to close: _____
+
+3. **Risk Assessment**:
+   - High-risk journal entries: _____
+   - Expense anomalies detected: _____
+   - Unreconciled items aging > 30 days: _____
+
+## Recommended Actions
+
+Complete these action items based on your analysis:
+
+1. **Immediate Actions** (Today):
+   - Review all journal entries with risk score > _____
+   - Investigate expense anomalies in: _____
+   - Address control failures in: _____
+
+2. **This Week**:
+   - Complete testing for _____ controls
+   - Clear reconciling items for accounts: _____
+   - Document variance explanations for: _____
+
+3. **This Month**:
+   - Implement process improvements to reduce close time to _____ days
+   - Update control procedures for: _____
+   - Schedule training for: _____
