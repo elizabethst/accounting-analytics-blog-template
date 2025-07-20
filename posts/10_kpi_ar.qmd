@@ -1,7 +1,9 @@
 ---
 title: "10: Accounts Receivable Dashboard"
 date: today
-format: dashboard
+format: 
+  dashboard:
+    code-fold: true
 execute: 
   eval: false # change to true
   message: false

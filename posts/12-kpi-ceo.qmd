@@ -1,0 +1,1016 @@
+---
+title: "CEO Strategic Dashboard"
+author: "Analytics Team"
+date: today
+format: 
+  dashboard: 
+    code-fold: true
+execute:
+  eval: false # change to true
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+# Load required libraries
+library(tidyverse)
+library(scales)
+library(gt)
+library(plotly)
+library(DT)
+
+# Set theme
+theme_set(theme_minimal())
+
+# Define company colors
+company_colors <- list(
+  primary = "#1976d2",
+  success = "#4caf50",
+  warning = "#ff9800",
+  danger = "#f44336",
+  info = "#2196f3",
+  neutral = "#6c757d"
+)
+```
+
+# Executive Summary
+
+## Key Metrics
+
+```{r}
+# Create executive summary metrics
+# This table contains the top 5 KPIs that CEOs track most closely
+executive_kpis <- tribble(
+  ~metric, ~current, ~target, ~prior_year, ~status,
+  "Revenue ($M)", 850, 825, 780, "Ahead",          # Revenue: beating target by $25M
+  "EBITDA Margin %", 18.2, 19.0, 17.5, "Behind",  # Profitability: 80bps below target
+  "Market Share %", 21.0, 22.0, 21.2, "Behind",   # Competitive position: above target but classified as behind
+  "Customer NPS", 72, 75, 68, "Behind",            # Customer loyalty: improving but below target
+  "Stock Price ($)", 142.50, 150.00, 118.25, "Behind" # Shareholder value: strong growth but below target
+) |>
+  mutate(
+    # Calculate year-over-year changes with different logic for percentages vs. absolute values
+    yoy_change = case_when(
+      str_detect(metric, "%") ~ current - prior_year,  # For percentages: use percentage point change
+      TRUE ~ (current - prior_year) / prior_year * 100  # For absolute values: use percent change
+    ),
+    
+    # Calculate variance against target with same logic
+    vs_target = case_when(
+      str_detect(metric, "%") ~ current - target,  # Percentage point difference for margins/percentages
+      TRUE ~ (current - target) / target * 100     # Percent difference for revenue/stock price
+    ),
+    
+    # Create user-friendly display formats with appropriate units
+    yoy_change_display = case_when(
+      str_detect(metric, "%") ~ paste0(if_else(yoy_change > 0, "+", ""), 
+                                      round(yoy_change, 1), "pp"),  # "pp" = percentage points
+      TRUE ~ paste0(if_else(yoy_change > 0, "+", ""), 
+                  round(yoy_change, 1), "%")                      # Regular percent for growth rates
+    ),
+    
+    # Same formatting logic for target comparison
+    vs_target_display = case_when(
+      str_detect(metric, "%") ~ paste0(if_else(vs_target > 0, "+", ""), 
+                                      round(vs_target, 1), "pp"),
+      TRUE ~ paste0(if_else(vs_target > 0, "+", ""),            
+      round(vs_target, 1), "%")
+    )
+  )
+
+# Create professional executive summary table using gt package
+_____ |>
+  # Select only the columns needed for display (hide calculation columns)
+  select(metric, current, target, prior_year, yoy_change_display, 
+        vs_target_display, status) |>
+  gt() |>
+    # Add professional header with title and subtitle
+  tab_header(
+    title = "Executive KPI Summary",
+    subtitle = "FY 2026 Performance"
+  ) |>
+  
+  # Format numeric columns to show 1 decimal place for consistency
+  fmt_number(columns = c(current, target, prior_year), decimals = 1) |>
+  
+  # Rename columns to be more user-friendly
+  cols_label(
+    yoy_change_display = "YoY Change",    # Year-over-year change
+    vs_target_display = "vs Target"       # Variance against target
+  ) |>
+  
+  # Apply conditional formatting: green background for metrics ahead of target
+  tab_style(
+    style = cell_fill(color = company_colors$success),  # Green fill
+    locations = cells_body(
+      columns = status,
+      rows = status == "Ahead"
+    )
+  ) |>
+  
+  # Apply conditional formatting: yellow/orange background for metrics behind target
+  tab_style(
+    style = cell_fill(color = company_colors$warning),  # Warning color fill
+    locations = cells_body(
+      columns = status,
+      rows = status == "Behind"
+    )
+  )
+```
+
+## Performance Snapshot
+
+```{r}
+# Create performance gauge visualization
+# This section creates a performance score calculation and horizontal bar chart
+# showing how well each KPI is performing relative to its target
+
+# Calculate performance scores for each executive KPI
+performance_data <- executive_kpis |>
+  mutate(
+    # Calculate performance as percentage of target achievement
+    # For all metrics, higher current value = better performance
+    performance_score = case_when(
+      metric == "Revenue ($M)" ~ current / target * 100,        # Revenue: $850M actual vs $825M target = 103.0%
+      metric == "EBITDA Margin %" ~ current / target * 100,     # EBITDA: 18.2% actual vs 19.0% target = 95.8%
+      metric == "Market Share %" ~ current / target * 100,      # Market share: 21.0% actual vs 22.0% target = 95.5%
+      metric == "Customer NPS" ~ current / target * 100,        # NPS: 72 actual vs 75 target = 96.0%
+      metric == "Stock Price ($)" ~ current / target * 100      # Stock: $142.50 actual vs $150.00 target = 95.0%
+    )
+  )
+
+# Create horizontal gauge chart showing performance vs targets
+gauge_plot <- performance_data |>
+  ggplot(aes(x = metric, y = performance_score, fill = performance_score)) +
+  
+  # Add horizontal bars representing achievement percentage for each KPI
+  geom_col() +
+  
+  # Add dashed reference line at 100% (target achievement level)
+  geom_hline(yintercept = 100, linetype = "dashed", color = "black") +
+  
+  # Apply color gradient based on performance level
+  scale_fill_gradient2(
+    low = company_colors$danger,      # Red for significantly below target (< 95%)
+    mid = company_colors$warning,     # Orange for slightly below target (95-100%)
+    high = company_colors$success,    # Green for above target (> 100%)
+    midpoint = 95                     # Set color transition point at 95% achievement
+  ) +
+  
+  # Format y-axis as percentages (e.g., 95.8 displays as 95.8%)
+  scale_y_continuous(labels = percent_format(scale = 1)) +
+  
+  # Flip coordinates to create horizontal bars (easier to read metric names)
+  coord_flip() +
+  
+  # Set chart title and axis labels
+  labs(
+    title = "Performance vs. Target",
+    x = NULL,                        # Remove x-axis label (metric names are self-explanatory)
+    y = "Achievement %",             # Y-axis shows percentage of target achieved
+    fill = "Score"                   # Legend title for color scale
+  ) +
+  
+  # Hide legend since color coding is intuitive (red=bad, green=good)
+  theme(legend.position = "none")
+
+# Convert to interactive plotly chart with hover tooltips showing exact percentages
+_____(gauge_plot)
+```
+
+# Financial Performance 
+
+## Revenue Analysis
+
+
+```{r}
+# Create revenue data for last 3 years
+revenue_data <- tribble(
+  ~year, ~quarter, ~revenue, ~growth_rate,
+  "2024", "Q1", 170, 0.055,
+  "2024", "Q2", 175, 0.061,
+  "2024", "Q3", 180, 0.068,
+  "2024", "Q4", 195, 0.073,
+  "2025", "Q1", 185, 0.088,
+  "2025", "Q2", 190, 0.086,
+  "2025", "Q3", 195, 0.083,
+  "2025", "Q4", 210, 0.077,
+  "2026", "Q1", 205, 0.108,
+  "2026", "Q2", 210, 0.105,
+  "2026", "Q3", 215, 0.103,
+  "2026", "Q4", 230, 0.095  
+) |>
+  mutate(
+    period = paste(year, quarter),
+    period_date = yq(period)
+  )
+# Create revenue trend plot
+# Create a dual-axis chart showing quarterly revenue bars and growth rate line
+revenue_plot <- revenue_data |>
+  _____(aes(x = period_date)) +
+  
+  # Add revenue bars with company primary color and transparency
+  geom_col(aes(y = revenue), fill = company_colors$primary, alpha = 0.7) +
+  
+  # Add growth rate line (scaled by 2000 to fit on same axis as revenue)
+  _____(aes(y = growth_rate * 2000, group = 1), 
+            color = company_colors$success, size = 2) +
+  
+  # Add points on the growth rate line for better visibility
+  _____(aes(y = growth_rate * 2000), 
+             color = company_colors$success, size = 3) +
+  
+  # Configure dual y-axes: left for revenue ($M), right for growth rate (%)
+  scale_y_continuous(
+    name = "Revenue ($M)",                          # Left axis label
+    sec.axis = sec_axis(~./2000, name = "Growth Rate %", 
+                        labels = percent_format())  # Right axis: divide by 2000, format as %
+  ) +
+  
+  # Set chart title and remove x-axis label
+  _____(
+    title = "Quarterly Revenue & Growth Rate",
+    x = NULL
+  )
+
+# Display
+revenue_plot
+```
+
+## Profitability Metrics
+
+```{r}
+# Create profitability analysis
+# Build quarterly profit margin data for 2026 showing improvement trends
+profit_metrics <- tribble(
+  ~metric, ~q1_2026, ~q2_2026, ~q3_2026, ~q4_2026,
+  "Gross Margin %", 41.5, 42.0, 42.5, 43.0,      # Gross margin trending up from 41.5% to 43%
+  "EBITDA Margin %", 17.5, 17.8, 18.2, 18.5,     # EBITDA margin improving toward target
+  "Net Margin %", 11.5, 11.8, 12.1, 12.3         # Net margin showing steady quarterly gains
+) |>
+  # Transform data from wide to long format for plotting
+  pivot_longer(cols = -metric, names_to = "quarter", values_to = "value") |>
+  # Clean up quarter names for better display (remove "_2026" suffix)
+  mutate(quarter = str_replace(quarter, "_2026", " 2026"))
+
+# Create line chart showing margin trends across quarters
+margin_plot <- profit_metrics |>
+  ggplot(aes(x = quarter, y = value, color = metric, group = metric)) +
+  
+  # Add trend lines with increased thickness for visibility
+  geom_line(linewidth = 2) +
+  
+  # Add data points to highlight quarterly values
+  _____(size = 4) +
+  
+  # Apply company color scheme to differentiate margin types
+  scale_color_manual(values = c(
+    "Gross Margin %" = company_colors$primary,      # Blue for gross margin
+    "EBITDA Margin %" = company_colors$success,     # Green for EBITDA margin
+    "Net Margin %" = company_colors$info            # Light blue for net margin
+  )) +
+  
+  # Format y-axis as percentages for readability
+  scale_y_continuous(_____ = percent_format(scale = 1)) +
+  
+  # Set chart labels and remove legend title for cleaner look
+  labs(
+    title = "Profitability Trends",
+    x = NULL,                    # Remove x-axis label (quarters are self-explanatory)
+    y = "Margin %",             # Y-axis shows margin percentages
+    color = NULL                # Remove legend title
+  ) 
+
+ggplotly(_____, tooltip = c("x", "y")) |>
+  layout(
+    # Show data for all series when hovering over a date
+    hovermode = "x unified",
+    # Customize hover label appearance
+    hoverlabel = list(font = list(size = 12))
+  )
+```
+
+## Cash Flow
+
+```{r}
+# Create quarterly cash flow data for 2026
+# Shows operating, investing, and financing cash flows by quarter
+cash_flow_data <- tribble(
+  ~category, ~q1, ~q2, ~q3, ~q4,
+  "Operating", 45, 48, 52, 55,      # Operating cash flow: positive and growing quarterly
+  "Investing", -20, -15, -18, -22,  # Investing cash flow: negative (capital expenditures)
+  "Financing", -15, -20, -25, -18   # Financing cash flow: negative (debt payments, dividends)
+) |>
+  # Transform from wide to long format for visualization
+  pivot_longer(cols = -category, names_to = "quarter", values_to = "amount") |>
+  mutate(
+    # Ensure quarters display in chronological order
+    quarter = factor(quarter, levels = c("q1", "q2", "q3", "q4")),
+    # Create color classification for positive vs negative flows
+    color = if_else(amount >= 0, "Positive", "Negative")
+  )
+
+# Create grouped bar chart showing cash flows by category and quarter
+cash_plot <- cash_flow_data |>
+  ggplot(_____(x = quarter, y = amount, fill = category)) +
+  
+  # Use dodged bars to show all three categories side by side
+  geom_col(position = "dodge") +
+  
+  # Apply company color scheme to differentiate cash flow categories
+  scale_fill_manual(values = c(
+    "Operating" = company_colors$success,    # Green for positive operating cash
+    "Investing" = company_colors$warning,    # Orange for capital investments
+    "Financing" = company_colors$info        # Blue for financing activities
+  )) +
+  
+  # Format y-axis labels as dollar amounts with "M" suffix
+  scale_y_continuous(labels = dollar_format(suffix = "M")) +
+  
+  # Set chart title and axis labels
+  labs(
+    title = "Quarterly Cash Flow Analysis",
+    x = "Quarter",
+    y = NULL,
+    fill = NULL              # Legend title for cash flow categories
+  ) 
+  
+
+ggplotly(cash_plot)
+```
+
+# Market Position
+
+## Market Share
+
+```{r}
+# Create market share analysis
+# Create market share data showing current vs. prior year positions for all major competitors
+market_data <- tribble(
+  ~company, ~current_share, ~prior_share,
+  "Our Company", 22.5, 21.2,      # Our company: gained 1.3 percentage points
+  "Competitor A", 28.1, 28.5,     # Market leader: lost slight share (-0.4pp)
+  "Competitor B", 19.8, 20.1,     # Second competitor: also lost share (-0.3pp)
+  "Competitor C", 15.2, 14.8,     # Growing competitor: gained share (+0.4pp)
+  "Others", 14.4, 15.4           # Fragmented market: others losing share (-1.0pp)
+) |>
+  mutate(
+    # Calculate percentage point change from prior year
+    change = current_share - prior_share,
+    
+    # Create formatted display string with + for positive changes
+    change_label = paste0(if_else(change > 0, "+", ""), round(change, 1), "pp")
+  )
+
+# Create horizontal bar chart showing market share distribution and changes
+share_plot <- market_data |>
+  # Reorder companies by current market share (ascending order for horizontal bars)
+  mutate(company = fct_reorder(company, current_share)) |>
+  
+  # Create horizontal bar chart with market share on x-axis
+  ggplot(aes(x = current_share, y = company)) +
+  
+  # Add bars showing current market share percentage
+  geom_col(fill = company_colors$primary) +
+  
+  # Add text labels showing current share percentage at end of each bar
+  geom_text(aes(label = paste0(current_share, "%")), 
+          nudge_x = 1, size = 3) +
+          
+  # Add change indicators (YoY change in percentage points) on the left side of bars
+  geom_text(aes(x = 2, label = change_label), 
+            color = "white", nudge_x = 2,
+            fontface = "bold", size = 3) +
+            
+  # Set x-axis limits and format as percentages
+  _____(limits = c(0, 30), labels = percent_format(scale = 1)) +
+  
+  # Set chart title and remove axis labels (self-explanatory)
+  labs(
+    title = "Market Share Distribution: Current share % and YoY change",
+    x = NULL,     # Remove x-axis label
+    y = NULL      # Remove y-axis label
+  )
+
+# Convert to interactive plotly chart with hover tooltips
+ggplotly(share_plot, tooltip = c("x", "y"))  
+```
+
+## Competitive Analysis
+
+```{r}
+# Create competitive benchmarking table
+# Create competitive benchmarking data showing key metrics across competitors
+competitive_data <- tribble(
+  ~metric, ~your_company, ~competitor_a, ~competitor_b, ~competitor_c,
+  "Revenue Growth %", 9.0, 7.5, 6.8, 8.2,      # Revenue growth: We lead at 9.0% vs competitors
+  "EBITDA Margin %", 18.2, 19.5, 16.8, 17.5,   # Profitability: Behind Competitor A by 130bps
+  "Market Share %", 22.5, 28.1, 19.8, 15.2,     # Market position: 2nd place, behind leader
+  "Customer NPS", 72, 78, 65, 70,                # Customer loyalty: Mid-pack performance
+  "R&D Spend %", 8.5, 9.2, 7.5, 8.0             # Innovation investment: Moderate spending level
+)
+
+# Create interactive table using DT package for enhanced user experience
+competitive_data |>
+  _____(
+    options = list(
+      dom = 't'              # Display only table (no search box, pagination controls)
+    ),
+    rownames = FALSE         # Don't show row numbers
+  ) |>
+  
+  # Highlight our company's column with company brand color and bold text
+  formatStyle(
+    columns = "your_company",             # Target our company's data column
+    backgroundColor = company_colors$primary,  # Use company primary color as background
+    color = "white",                      # White text for contrast
+    fontWeight = "bold"                   # Bold text to emphasize our performance
+  ) |>
+  
+  # Format numeric columns to show 1 decimal place for consistency
+  formatRound(columns = 2:5, digits = 1)  # Round columns 2-5 (all competitor data) to 1 decimal
+```
+
+# Customer Metrics
+
+## Customer Health
+
+```{r}
+# Create customer health metrics data
+# This table tracks key customer success indicators with their current values,
+# targets, and performance trends using arrow symbols
+customer_metrics <- tribble(
+  ~metric, ~current, ~target, ~trend,
+  "NPS", 72, 75, "↑",                          # Net Promoter Score: improving but below target
+  "Retention Rate %", 88.5, 90, "↑",          # Customer retention: trending up, close to target
+  "Lifetime Value ($K)", 142, 150, "↑",       # CLV: growing but needs 8K increase to hit target
+  "Acquisition Cost ($)", 450, 500, "↓",      # CAC: decreasing (good), under budget by $50
+  "Upsell Rate %", 22, 25, "→"                # Upselling: flat performance, 3pp below target
+) |>
+  mutate(
+    # Calculate performance ratio: current vs target
+    # For acquisition cost, lower is better so we flip the ratio (target/current)
+    performance = if_else(
+      metric == "Acquisition Cost ($)",
+      target / current,                         # For cost metrics: target/current (lower cost = better performance)
+      current / target                          # For all other metrics: current/target (higher = better)
+    ),
+    
+    # Categorize performance status based on achievement percentage
+    status = case_when(
+      performance >= 1.0 ~ "On Target",         # 100%+ of target achieved
+      performance >= 0.9 ~ "Near Target",      # 90-99% of target achieved  
+      TRUE ~ "Below Target"                     # Less than 90% of target achieved
+    )
+  )
+
+# Create horizontal bar chart to visualize customer health metrics
+customer_plot <- customer_metrics |>
+  ggplot(aes(x = performance, y = metric, fill = status)) +
+  
+  # Add horizontal bars showing performance ratio for each metric
+  geom_col() +
+  
+  # Add vertical reference line at 100% target achievement
+  geom_vline(xintercept = 1.0, linetype = "dashed") +
+  
+  # Add performance percentage labels at the end of each bar
+  _____(aes(label = percent(performance, accuracy = 2)), 
+            nudge_x = 0.04, size = 3, color = "black") +
+            
+  # Format x-axis as percentages with upper limit of 120%
+  scale_x_continuous(labels = percent_format(), limits = c(0, 1.2)) +
+  
+  # Apply color coding based on performance status
+  scale_fill_manual(values = c(
+    "On Target" = company_colors$success,      # Green for metrics meeting target
+    "Near Target" = company_colors$warning,    # Orange for metrics close to target
+    "Below Target" = company_colors$danger     # Red for metrics significantly below target
+  )) +
+  
+  # Set chart title and axis labels
+  _____(
+    title = "Customer Success Metrics",
+    x = "Performance vs. Target",              # X-axis shows achievement percentage
+    y = NULL,                                  # Remove y-axis label (metric names are self-explanatory)
+    fill = NULL                       # Remove legend title for status categories
+  )
+
+ggplotly(customer_plot)
+```
+
+## Segment Analysis
+
+```{r}
+# Analyze customers by segment
+# Create customer segment analysis data
+# This data shows revenue, growth rates, margins, and customer counts for each business segment
+segment_data <- tribble(
+  ~segment, ~revenue_m, ~growth_pct, ~margin_pct, ~customers,
+  "Enterprise", 425, 12, 22, 150,      # Enterprise: High revenue, growth, margins but fewer customers
+  "Mid-Market", 285, 8, 18, 450,       # Mid-Market: Moderate metrics across all dimensions
+  "Small Business", 140, 5, 15, 2500   # Small Business: Lower margins/growth but high customer volume
+) |>
+  mutate(
+    # Calculate average revenue per customer for each segment (convert $M to $K)
+    revenue_per_customer = revenue_m * 1000 / customers,
+    
+    # Create composite score combining growth rate and profitability
+    segment_score = (growth_pct + margin_pct) / 2
+  )
+
+# Create bubble chart to visualize segment performance across multiple dimensions
+segment_plot <- segment_data |>
+  ggplot(aes(x = growth_pct, y = margin_pct, size = revenue_m, color = segment)) +
+  
+  # Add bubble points with transparency for overlapping bubbles
+  geom_point(alpha = 0.7) +
+  
+  # Set bubble size range (5-20 point scale) based on revenue
+  scale_size_continuous(range = c(5, 20)) +
+  
+  # Apply company color scheme to differentiate segments
+  scale_color_manual(values = c(
+    "Enterprise" = company_colors$primary,     # Blue for enterprise segment
+    "Mid-Market" = company_colors$success,     # Green for mid-market segment
+    "Small Business" = company_colors$neutral # Grey for small business segment
+  )) +
+  
+  # Format axes as percentages for better readability
+  scale_x_continuous(labels = percent_format(scale = 1), limits = c(0, 15)) +
+  scale_y_continuous(labels = percent_format(scale = 1), limits = c(0, 25)) +
+  
+  # Set chart labels and legend titles
+  labs(
+    title = "Customer Segment Analysis",
+    subtitle = "Bubble size = Revenue",           # Explain what bubble size represents
+    x = "Growth Rate %",                          # X-axis shows segment growth performance
+    y = "Margin %",                              # Y-axis shows segment profitability
+    color = "Segment",                           # Legend for segment colors
+    size = "Revenue ($M)"                        # Legend for bubble sizes
+  )
+
+ggplotly(_____)
+```
+
+# Operational Excellence
+
+## Efficiency Metrics
+
+```{r}
+# Create operational efficiency dashboard
+# Build operational metrics data comparing actual performance to industry benchmarks
+ops_metrics <- tribble(
+  ~category, ~metric, ~value, ~benchmark,
+  "Productivity", "Revenue per Employee ($K)", 425, 400,  # Revenue productivity: $425K vs $400K benchmark
+  "Productivity", "Units per Hour", 82, 75,               # Manufacturing productivity: 82 vs 75 units/hour
+  "Efficiency", "Asset Turnover", 1.8, 1.5,              # Asset utilization: 1.8x vs 1.5x benchmark
+  "Efficiency", "Inventory Turns", 12.5, 10.0,           # Inventory management: 12.5 vs 10.0 turns/year
+  "Quality", "Defect Rate %", 1.2, 2.0,                  # Quality performance: 1.2% vs 2.0% benchmark
+  "Quality", "On-Time Delivery %", 94.5, 92.0            # Service quality: 94.5% vs 92.0% benchmark
+) |>
+  _____(
+    # Calculate percentage difference from benchmark for each metric
+    vs_benchmark = (value - benchmark) / benchmark,
+    
+    # Adjust performance calculation: for defect rate, lower values are better
+    # so we flip the sign to show positive performance when defects are below benchmark
+    performance = if_else(
+      metric %in% c("Defect Rate %"),
+      -vs_benchmark,  # Lower defect rate = better performance (flip sign)
+      vs_benchmark    # For all other metrics, higher values = better performance
+    )
+  )
+
+# Create horizontal bar chart showing performance vs benchmarks
+ops_plot <- ops_metrics |>
+  ggplot(aes(y = metric, x = performance, fill = category)) +
+  
+  # Add bars showing performance relative to benchmark (positive = above benchmark)
+  geom_col() +
+  
+  # Add reference line at zero (benchmark level)
+  geom_vline(xintercept = 0, linetype = "solid") +
+  
+  # Format y-axis as percentages (e.g., 0.06 displays as 6%)
+  scale_x_continuous(labels = percent_format()) +
+  
+  # Apply company color scheme to differentiate metric categories
+  scale_fill_manual(values = c(
+    "Productivity" = company_colors$primary,    # Blue for productivity metrics
+    "Efficiency" = company_colors$success,      # Green for efficiency metrics  
+    "Quality" = company_colors$neutral          # Grey for quality metrics
+  )) +
+  
+  # Set chart title and axis labels
+  labs(
+    title = "Operational Performance vs. Benchmark",
+    x = NULL,                                   # Remove x-axis label (metric names are self-explanatory)
+    y = "Performance vs. Benchmark",            # Y-axis shows percentage above/below benchmark
+    fill = "Category"                           # Legend title for metric categories
+  )
+
+# Convert to interactive plotly chart with hover functionality
+ggplotly(ops_plot)
+```
+
+## Quality Indicators
+
+```{r}
+# Track quality metrics over time
+# Create monthly quality metrics data for the first half of 2026
+quality_trend <- tribble(
+  ~month, ~complaints, ~defects, ~satisfaction,
+  "2026-01-01", 45, 1.5, 88,    # January: 45 complaints, 1.5% defects, 88 satisfaction
+  "2026-02-01", 42, 1.4, 89,    # February: Slight improvement across all metrics
+  "2026-03-01", 38, 1.3, 90,    # March: Continued positive trend in quality indicators
+  "2026-04-01", 35, 1.2, 91,    # April: Sustained improvement momentum
+  "2026-05-01", 32, 1.2, 92,    # May: Complaints decreasing, satisfaction increasing
+  "2026-06-01", 30, 1.1, 93     # June: Best performance with lowest complaints/defects
+) |>
+  # Convert to proper date format
+  mutate(
+    month = as.Date(_____),
+    month_label = format(month, "%b")  # Get abbreviated month names
+  )
+
+# Create quality dashboard with trend visualization
+quality_plot <- quality_trend |>
+  # Transform data from wide to long format for multi-line plotting
+  _____(cols = c(complaints, defects, satisfaction), 
+              names_to = "metric", 
+              values_to = "value") |>
+  
+  # Create user-friendly metric labels for display
+  mutate(
+    metric_label = _____(
+      metric == "complaints" ~ "Customer Complaints",      
+      metric == "defects" ~ "Defect Rate %",              
+      metric == "satisfaction" ~ "Satisfaction Score"      
+    ),
+    # Ensure proper ordering for facets
+    metric_label = factor(metric_label, 
+                      levels = c("Customer Complaints", 
+                              "Defect Rate %", 
+                                  "Satisfaction Score"))
+  ) |>
+  
+  # Create line chart with separate panels for each quality metric
+  ggplot(aes(x = month, y = value, color = metric_label, group = metric_label)) +
+  
+  # Add trend lines with increased thickness for visibility
+  geom_line(size = 2) +
+  
+  # Add data points to highlight monthly values
+  geom_point(size = 3) +
+  
+  # Use date scale for x-axis with monthly breaks
+  scale_x_date(
+    date_breaks = "1 month",
+    date_labels = "%b",
+    expand = c(0, 0.05)  # Add some padding
+  ) +
+  
+  # Create separate panels for each metric with independent y-axis scales
+  facet_wrap(~metric_label, scales = "free_y", ncol = 1) +
+  
+  # Apply color scheme based on metric type
+  scale_color_manual(values = c(
+    "Customer Complaints" = company_colors$danger,     
+    "Defect Rate %" = company_colors$warning,          
+    "Satisfaction Score" = company_colors$success      
+  )) +
+  
+  # Set chart title and labels
+  labs(
+    title = "Quality Trends: 6-Month Quality Performance Indicators",
+    x = NULL,
+    y = NULL
+  ) +
+  # Improve theme
+  theme(
+    legend.position = "none",
+  )
+
+# Convert to interactive plotly chart
+ggplotly(quality_plot, tooltip = c("x", "y", "group")) |>
+  layout(
+    # Show data for all series when hovering over a date
+    hovermode = "x unified"
+  )
+
+```
+
+# Innovation & Growth 
+
+## R&D Pipeline
+
+```{r}
+# Visualize innovation pipeline
+# Create R&D innovation pipeline data
+# This table tracks projects at each stage of development from initial research to market launch
+pipeline_data <- tribble(
+  ~stage, ~projects, ~potential_value,
+  "Research", 45, 250,          # Research stage: 45 projects with $250M potential value
+  "Development", 30, 180,       # Development stage: 30 projects narrowed down, $180M potential  
+  "Testing", 18, 120,           # Testing stage: 18 projects in trials/validation, $120M potential
+  "Launch Ready", 8, 85         # Launch ready: 8 projects ready for market, $85M near-term value
+) |>
+  mutate(
+    # Set stage order from top to bottom (reverse order for funnel visualization)
+    stage = factor(stage, levels = rev(c("Research", "Development", 
+                                        "Testing", "Launch Ready"))),
+    # Calculate conversion rate between consecutive stages (projects that advance)
+    conversion_rate = projects / lag(projects)
+  )
+
+# Create horizontal funnel chart showing innovation pipeline progression
+pipeline_plot <- pipeline_data |>
+  ggplot(aes(x = potential_value, y = stage, fill = potential_value)) +
+  
+  # Add horizontal bars representing potential value at each stage
+  geom_col() +
+  
+  scale_x_continuous(labels = label_dollar(suffix = "M")) +
+  # Add text labels showing both potential value and number of projects
+  _____(aes(label = paste0(dollar(potential_value), "M\n", 
+                              projects, " projects")),
+            nudge_x = -20, color = "white", fontface = "bold") +
+            
+  # Apply color gradient: lighter for early stages, darker for advanced stages
+  scale_fill_gradient(low = company_colors$warning,    # Orange for early stages (research)
+          high = company_colors$success) +  # Green for advanced stages (launch ready)
+                    
+  # Set chart title and axis labels
+  labs(
+    title = "Innovation Pipeline: Projects and potential value by stage",
+    x = NULL,              # Remove x-axis 
+    y = NULL                                 # Remove y-axis label (stage names are self-explanatory)
+  ) +
+  theme(legend.position = "none") 
+  
+
+pipeline_plot
+```
+
+## Digital Transformation
+
+```{r}
+# Track digital initiatives progress
+digital_projects <- tribble(
+  ~initiative, ~completion_pct, ~impact, ~status,
+  "Cloud Migration", 78, "High", "On Track",
+  "AI/ML Platform", 45, "High", "Behind",
+  "Customer Portal", 92, "Medium", "Nearly Complete",
+  "Process Automation", 65, "High", "On Track",
+  "Data Analytics", 35, "Critical", "At Risk"
+) |>
+  mutate(
+    initiative = factor(initiative, levels = rev(initiative)),
+    # Order impact levels
+    impact = factor(impact, levels = c("Medium", "High", "Critical"))
+  )
+
+# Visualize progress with impact shown
+digital_plot <- digital_projects |>
+  ggplot(aes(x = completion_pct, _____ = initiative)) +
+  # Base bar colored by status
+  geom_col(aes(fill = status)) +
+  # Impact labels on the bars
+  geom_text(aes(x = completion_pct/2, label = paste0("Impact: ", impact)), 
+            color = "white", fontface = "bold", size = 3) +
+  scale_x_continuous(limits = c(0, 105), 
+                    labels = percent_format(scale = 1)) +
+  scale_fill_manual(values = c(
+    "Complete" = company_colors$success,
+    "Nearly Complete" = "#81c784",
+    "On Track" = company_colors$primary,
+    "Behind" = company_colors$warning,
+    "At Risk" = company_colors$danger
+  )) +
+  labs(
+    title = "Digital Transformation Progress",
+    x = "Completion",
+    y = NULL,
+    fill = "Status"
+  ) 
+
+ggplotly(digital_plot)
+```
+
+# Strategic Forecast 
+
+## 5-Year Outlook
+
+```{r}
+# Create 5-year financial forecast data
+# This table projects key financial and market metrics from 2024 to 2028
+forecast_data <- tribble(
+  ~year, ~revenue, ~ebitda_margin, ~market_share,
+  2024, 720, 16.8, 20.5,     # 2024 baseline: $720M revenue, 16.8% EBITDA margin, 20.5% market share
+  2025, 780, 17.5, 21.2,     # 2025: 8.3% revenue growth, margin improvement, gaining market share
+  2026, 850, 18.2, 22.5,     # 2026 current: 9.0% revenue growth, continued margin expansion
+  2027, 925, 19.0, 23.5,     # 2027 projection: 8.8% revenue growth, approaching 19% EBITDA target
+  2028, 1010, 19.8, 24.3     # 2028 target: Cross $1B revenue milestone, nearly 20% EBITDA margin
+) |>
+  mutate(
+    # Calculate year-over-year revenue growth percentage for trend analysis
+    revenue_growth = (revenue / lag(revenue) - 1) * 100,
+    
+    # Calculate absolute EBITDA dollars (revenue × margin percentage)
+    ebitda_dollars = revenue * ebitda_margin / 100
+  )
+
+# Create forecast visualization showing trends across all key metrics
+forecast_plot <- forecast_data |>
+  # Select the three main forecast metrics for visualization
+  _____(year, revenue, ebitda_margin, market_share) |>
+  
+  # Transform from wide to long format for multi-line plotting
+  _____(cols = -year, names_to = "metric", values_to = "value") |>
+  
+  # Create user-friendly metric labels for chart display
+  mutate(
+    metric_label = case_when(
+      metric == "revenue" ~ "Revenue ($M)",           # Revenue in millions of dollars
+      metric == "ebitda_margin" ~ "EBITDA Margin %", # EBITDA margin as percentage
+      metric == "market_share" ~ "Market Share %"    # Market share as percentage
+    )
+  ) |>
+  
+  # Create line chart with separate panels for each metric
+  ggplot(aes(x = year, y = value, color = metric_label)) +
+  
+  # Add trend lines with increased thickness for visibility
+  geom_line(size = 2) +
+  
+  # Add data points to highlight yearly values
+  geom_point(size = 3) +
+  
+  # Create separate panels for each metric with independent y-axis scales
+  facet_wrap(~metric_label, scales = "free_y", ncol = 1) +
+  
+  # Apply company color scheme to differentiate metrics
+  scale_color_manual(values = c(
+    "Revenue ($M)" = company_colors$primary,        # Blue for revenue trend
+    "EBITDA Margin %" = company_colors$success,     # Green for profitability trend
+    "Market Share %" = company_colors$info          # Light blue for market position trend
+  )) +
+  
+  # Set chart title and remove axis labels (panel titles are self-explanatory)
+  labs(
+    title = "5-Year Strategic Forecast",
+    x = NULL,    # Remove x-axis label (years are obvious)
+    y = NULL     # Remove y-axis label (units shown in panel titles)
+  ) +
+  
+  # Hide legend since colors are obvious from panel titles
+  theme(legend.position = "none")
+
+ggplotly(forecast_plot) |>
+  layout(
+    # Show data for all series when hovering over a date
+    hovermode = "x unified",
+    # Customize hover label appearance
+    hoverlabel = list(font = list(size = 12))
+  )
+```
+
+## Scenario Analysis
+
+```{r}
+# Create best/base/worst case scenarios
+# Create scenario analysis data with three potential outcomes for 2028
+# Each scenario includes revenue projection, EBITDA margin, and probability of occurrence
+scenarios <- tribble(
+  ~scenario, ~revenue_2028, ~ebitda_2028, ~probability,
+  "Best Case", 1150, 21.5, 20,      # Optimistic: $1.15B revenue, 21.5% EBITDA margin, 20% probability
+  "Base Case", 1010, 19.8, 60,      # Expected: $1.01B revenue, 19.8% EBITDA margin, 60% probability  
+  "Worst Case", 875, 17.5, 20       # Pessimistic: $875M revenue, 17.5% EBITDA margin, 20% probability
+) |>
+  mutate(
+    # Set scenario order from best to worst for consistent visualization
+    scenario = factor(scenario, levels = c("Best Case", "Base Case", "Worst Case")),
+    
+    # Calculate probability-weighted expected value for each scenario
+    expected_value = revenue_2028 * probability / 100
+  )
+
+# Transform scenario data for visualization
+# Select key metrics and convert from wide to long format for charting
+scenario_data <- scenarios |>
+  select(scenario, revenue_2028, ebitda_2028) |>
+  
+  # Pivot to long format: one row per scenario-metric combination
+  pivot_longer(cols = -scenario, names_to = "metric", values_to = "value") |>
+  
+  # Create user-friendly metric labels for chart display
+  _____(
+    metric_label = if_else(metric == "revenue_2028", 
+                          "Revenue ($M)",           # Revenue projections in millions
+                          "EBITDA Margin %")        # EBITDA margins as percentages
+  )
+
+# Create scenario comparison visualization
+scenario_plot <- scenario_data |>
+  ggplot(aes(x = scenario, y = value, fill = scenario)) +
+  
+  # Add bars showing projected values for each scenario
+  geom_col() +
+  
+  # Add value labels on top of each bar for precise reading
+  geom_text(aes(label = round(value, 1)), 
+            nudge_y = .2, size = 3) +
+            
+  # Create separate panels for revenue vs EBITDA margin (different scales)
+  facet_wrap(~metric_label, scales = "free_y") +
+  
+  # Apply color coding: green for best case, blue for base case, red for worst case
+  scale_fill_manual(values = c(
+    "Best Case" = company_colors$success,      # Green for optimistic scenario
+    "Base Case" = company_colors$primary,      # Blue for expected scenario
+    "Worst Case" = company_colors$danger       # Red for pessimistic scenario
+  )) +
+  
+  # Set chart title and remove axis labels (scenario names and panel titles are self-explanatory)
+  labs(
+    title = "2028 Scenario Analysis",
+    x = NULL,     # Remove x-axis label (scenario names are clear)
+    y = NULL      # Remove y-axis label (units shown in panel titles)
+  ) +
+  
+  # Hide legend since colors are intuitive (green=good, red=bad)
+  theme(legend.position = "none")
+
+# Convert to interactive plotly chart with hover functionality
+ggplotly(scenario_plot)
+```
+
+# Insights & Actions
+
+## Key Strategic Findings
+
+Based on your dashboard analysis, identify the following:
+
+**Financial Performance**:
+
+- Revenue growth rate: _____% 
+- EBITDA margin vs. target: _____ bps
+- Free cash flow growth: _____%
+
+**Market Position**:
+
+- Market share change: _____ pp
+- Competitive advantage in: _____
+- Key competitor threats: _____
+
+**Customer Health**:
+
+- Net Promoter Score: _____
+- Customer retention rate: _____%
+- Lifetime value to CAC ratio: _____:1
+
+**Operational Excellence**:
+
+- Revenue per employee: $_____
+- Quality metrics trending: ↑/↓/→
+- Digital transformation progress: _____%
+
+## Strategic Priorities
+
+Complete these action items based on your analysis:
+
+**Immediate Actions** (This Quarter):
+
+- Address margin gap by: _____
+- Launch initiative to improve: _____
+- Accelerate progress on: _____
+
+**Short-term Focus** (Next 6 Months):
+
+- Capture market share through: _____
+- Improve customer NPS by implementing: _____
+- Complete digital transformation of: _____
+
+**Long-term Strategy** (Next Year):
+
+- Achieve revenue target of $_____ by: _____
+- Expand into new markets: _____
+- Build competitive moat through: _____
+
+## Risk Mitigation
+
+**Identified Risks**:
+
+- Primary competitive threat: _____
+- Operational bottleneck: _____
+- Customer satisfaction gap: _____
+
+**Mitigation Strategies**:
+
+- Invest $_____ in: _____
+- Hire _____ resources for: _____
+- Partner with _____ to address: _____

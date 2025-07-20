@@ -1,7 +1,9 @@
 ---
 title: "11: Controller Dashboard"
 date: today
-format: dashboard
+format: 
+  dashboard:
+    code-fold: true
 execute: 
   eval: false # change to true
   message: false
@@ -600,7 +602,7 @@ anomaly_plot <- current_expenses |>
   # Set colors for normal vs anomalous values
   scale_color_manual(
     values = c("FALSE" = control_colors[["effective"]], 
-               "TRUE" = control_colors[["ineffective"]]),
+              "TRUE" = control_colors[["ineffective"]]),
     labels = c("Normal", "Anomaly")
   ) +
   # Format y-axis as currency
@@ -626,36 +628,42 @@ ggplotly(anomaly_plot) |>
 
 Based on your dashboard analysis, identify the following:
 
-1. **Compliance Status**:
-   - SOX control effectiveness: _____% 
-   - Controls requiring remediation: _____
-   - Days until next regulatory filing: _____
+**Compliance Status**:
 
-2. **Financial Reporting Quality**:
-   - Reporting accuracy rate: _____%
-   - Material variances identified: _____
-   - Average days to close: _____
+- SOX control effectiveness: _____% 
+- Controls requiring remediation: _____
+- Days until next regulatory filing: _____
 
-3. **Risk Assessment**:
-   - High-risk journal entries: _____
-   - Expense anomalies detected: _____
-   - Unreconciled items aging > 30 days: _____
+**Financial Reporting Quality**:
+
+- Reporting accuracy rate: _____%
+- Material variances identified: _____
+- Average days to close: _____
+
+**Risk Assessment**:
+
+- High-risk journal entries: _____
+- Expense anomalies detected: _____
+- Unreconciled items aging > 30 days: _____
 
 ## Recommended Actions
 
 Complete these action items based on your analysis:
 
-1. **Immediate Actions** (Today):
-   - Review all journal entries with risk score > _____
-   - Investigate expense anomalies in: _____
-   - Address control failures in: _____
+**Immediate Actions** (Today):
 
-2. **This Week**:
-   - Complete testing for _____ controls
-   - Clear reconciling items for accounts: _____
-   - Document variance explanations for: _____
+- Review all journal entries with risk score > _____
+- Investigate expense anomalies in: _____
+- Address control failures in: _____
 
-3. **This Month**:
-   - Implement process improvements to reduce close time to _____ days
-   - Update control procedures for: _____
-   - Schedule training for: _____
+**This Week**:
+
+- Complete testing for _____ controls
+- Clear reconciling items for accounts: _____
+- Document variance explanations for: _____
+
+**This Month**:
+
+- Implement process improvements to reduce close time to _____ days
+- Update control procedures for: _____
+- Schedule training for: _____
