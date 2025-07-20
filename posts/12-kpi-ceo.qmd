@@ -1,6 +1,5 @@
 ---
-title: "CEO Strategic Dashboard"
-author: "Analytics Team"
+title: "12: CEO Strategic Dashboard"
 date: today
 format: 
   dashboard: 
