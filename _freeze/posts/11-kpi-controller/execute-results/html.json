@@ -1,0 +1,17 @@
+{
+  "hash": "ae32c84a882cd7d63920021074e70495",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"11: Controller Dashboard\"\ndate: today\nformat: dashboard\nexecute: \n  eval: false # change to true\n  message: false\n  warning: false\n---\n\n\n\n# Compliance Monitoring {.sidebar width=\"25%\"}\n\n## Control Overview\n\n\n::: {.cell}\n\n:::\n\n\n## Upcoming Deadlines\n\n\n::: {.cell}\n\n:::\n\n\n# Financial Reporting\n\n## Row\n\n### Column {width=\"50%\"}\n\n#### Variance Analysis\n\n\n::: {.cell}\n\n:::\n\n\n### Column {width=\"50%\"}\n\n#### Financial Trends\n\n\n::: {.cell}\n\n:::\n\n\n# Process Monitoring\n\n## Row\n\n### Close Progress\n\n\n::: {.cell}\n\n:::\n\n\n## Row\n\n### Task Status Table\n\n\n::: {.cell}\n\n:::\n\n\n# Risk & Controls\n\n## Row {height=\"40%\"}\n\n### Control Status Overview\n\n\n::: {.cell}\n\n:::\n\n\n## Row {height=\"60%\"}\n\n### Column {width=\"50%\"}\n\n#### Exception Report\n\n\n::: {.cell}\n\n:::\n\n\n### Column {width=\"50%\"}\n\n#### Anomaly Alerts\n\n\n::: {.cell}\n\n:::\n\n\n# Insights & Actions\n\n## Key Control Findings\n\nBased on your dashboard analysis, identify the following:\n\n**Compliance Status**:\n\n- SOX control effectiveness: _____% \n- Controls requiring remediation: _____\n- Days until next regulatory filing: _____\n\n**Financial Reporting Quality**:\n\n- Reporting accuracy rate: _____%\n- Material variances identified: _____\n- Average days to close: _____\n\n**Risk Assessment**:\n\n- High-risk journal entries: _____\n- Expense anomalies detected: _____\n- Unreconciled items aging > 30 days: _____\n\n## Recommended Actions\n\nComplete these action items based on your analysis:\n\n**Immediate Actions** (Today):\n\n- Review all journal entries with risk score > _____\n- Investigate expense anomalies in: _____\n- Address control failures in: _____\n\n**This Week**:\n\n- Complete testing for _____ controls\n- Clear reconciling items for accounts: _____\n- Document variance explanations for: _____\n\n**This Month**:\n\n- Implement process improvements to reduce close time to _____ days\n- Update control procedures for: _____\n- Schedule training for: _____",
+    "supporting": [
+      "11-kpi-controller_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

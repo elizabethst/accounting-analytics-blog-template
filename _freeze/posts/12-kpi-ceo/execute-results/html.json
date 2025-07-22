@@ -1,0 +1,15 @@
+{
+  "hash": "ec9613a83074beb7ca67f3059a4ae692",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"12: CEO Strategic Dashboard\"\ndate: today\nformat: dashboard\nexecute:\n  eval: false # change to true\n  warning: false\n  message: false\n---\n\n\n\n# Executive Summary\n\n## Key Metrics\n\n\n::: {.cell}\n\n:::\n\n\n## Performance Snapshot\n\n\n::: {.cell}\n\n:::\n\n\n# Financial Performance \n\n## Revenue Analysis\n\n\n\n::: {.cell}\n\n:::\n\n\n## Profitability Metrics\n\n\n::: {.cell}\n\n:::\n\n\n## Cash Flow\n\n\n::: {.cell}\n\n:::\n\n\n# Market Position\n\n## Market Share\n\n\n::: {.cell}\n\n:::\n\n\n## Competitive Analysis\n\n\n::: {.cell}\n\n:::\n\n\n# Customer Metrics\n\n## Customer Health\n\n\n::: {.cell}\n\n:::\n\n\n## Segment Analysis\n\n\n::: {.cell}\n\n:::\n\n\n# Operational Excellence\n\n## Efficiency Metrics\n\n\n::: {.cell}\n\n:::\n\n\n## Quality Indicators\n\n\n::: {.cell}\n\n:::\n\n\n# Innovation & Growth \n\n## R&D Pipeline\n\n\n::: {.cell}\n\n:::\n\n\n## Digital Transformation\n\n\n::: {.cell}\n\n:::\n\n\n# Strategic Forecast \n\n## 5-Year Outlook\n\n\n::: {.cell}\n\n:::\n\n\n## Scenario Analysis\n\n\n::: {.cell}\n\n:::\n\n\n# Insights & Actions\n\n## Key Strategic Findings\n\nBased on your dashboard analysis, identify the following:\n\n**Financial Performance**:\n\n- Revenue growth rate: _____% \n- EBITDA margin vs. target: _____ bps\n- Free cash flow growth: _____%\n\n**Market Position**:\n\n- Market share change: _____ pp\n- Competitive advantage in: _____\n- Key competitor threats: _____\n\n**Customer Health**:\n\n- Net Promoter Score: _____\n- Customer retention rate: _____%\n- Lifetime value to CAC ratio: _____:1\n\n**Operational Excellence**:\n\n- Revenue per employee: $_____\n- Quality metrics trending: ↑/↓/→\n- Digital transformation progress: _____%\n\n## Strategic Priorities\n\nComplete these action items based on your analysis:\n\n**Immediate Actions** (This Quarter):\n\n- Address margin gap by: _____\n- Launch initiative to improve: _____\n- Accelerate progress on: _____\n\n**Short-term Focus** (Next 6 Months):\n\n- Capture market share through: _____\n- Improve customer NPS by implementing: _____\n- Complete digital transformation of: _____\n\n**Long-term Strategy** (Next Year):\n\n- Achieve revenue target of $_____ by: _____\n- Expand into new markets: _____\n- Build competitive moat through: _____\n\n## Risk Mitigation\n\n**Identified Risks**:\n\n- Primary competitive threat: _____\n- Operational bottleneck: _____\n- Customer satisfaction gap: _____\n\n**Mitigation Strategies**:\n\n- Invest $_____ in: _____\n- Hire _____ resources for: _____\n- Partner with _____ to address: _____",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}
