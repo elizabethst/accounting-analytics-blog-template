@@ -4,6 +4,7 @@ _site/
 # Quarto caching and temporary files
 /.quarto/
 .quarto/
+/_site/
 
 # Draft/temporary posts (files starting with _ in posts folder)
 posts/_*.qmd
@@ -39,7 +40,6 @@ posts/_*.qmd
 .DS_Store?
 ._*
 _freeze/
-_site/
 .Spotlight-V100
 .Trashes
 ehthumbs.db
