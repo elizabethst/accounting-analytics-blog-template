@@ -2,7 +2,7 @@
 title: "3: Data Wrangling"
 date: today
 execute: 
-  eval: false #set to true
+  eval: false  #set to true
   message: false
   warning: false
 ---
@@ -91,6 +91,7 @@ Before cleaning, let's identify the problems:
 **Check Date Formats**
 
 ```{r}
+#| eval: false
 # Look at the different date formats
 sales_raw |> 
   select(sale_date) |>
@@ -134,15 +135,15 @@ customers_raw |>
 sales_clean <- sales_raw |>
   mutate(
     # Fix dates: parse_date_time can handle multiple formats
-    sale_date = parse_date_time(_____, orders = c("mdy", "ymd")) |> 
+    sale_date = parse_date_time(sale_date, orders = c("mdy", "ymd")) |> 
                 as_date(),
-    
+
     # Fix amounts: remove $ and , then convert to number
-    amount = str_remove_all(amount, "[___]") |>  # Remove $ and ,
-             as.numeric(),
-    
+    amount = str_remove_all(amount, "[$,]") |>  # Remove $ and ,
+      as.numeric(),
+
     # Standardize text to Title Case
-    product_category = str_to_title(_____),
+    product_category = str_to_title(product_category),
     
     # Add useful columns for reporting
     month_name = month(sale_date, label = TRUE, abbr = FALSE)
