@@ -38,6 +38,8 @@ posts/_*.qmd
 .DS_Store
 .DS_Store?
 ._*
+_freeze/
+_site/
 .Spotlight-V100
 .Trashes
 ehthumbs.db
