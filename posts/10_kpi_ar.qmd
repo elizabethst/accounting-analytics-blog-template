@@ -219,13 +219,51 @@ aging_summary |>
 
 ### Column {width="50%"}
 
-#### Aging Distribution
+#### Aging Distribution 
 
 ```{r}
 #| label: aging-distribution-plot
 # Create aging distribution bar chart
+aging_plot <- ar_aging |>
+  group_by(aging_bucket) |>
+  summarise(total = sum(amount), .groups = "drop") |>
+  ggplot(aes(x = aging_bucket, y = total, fill = aging_bucket)) +
+  geom_col() +
+  scale_y_continuous(labels = dollar_format()) +
+  scale_fill_manual(
+    values = c(
+      "Current" = ar_colors[["current"]],
+      "1-30 Days" = ar_colors[["early"]],
+      "31-60 Days" = ar_colors[["moderate"]],
+      "61-90 Days" = ar_colors[["late"]],
+      "Over 90 Days" = ar_colors[["critical"]]
+    )
+  ) +
+  labs(
+    title = "AR Aging Distribution",
+    x = NULL,
+    y = "Amount Outstanding",
+    fill = NULL
+  )
+# Convert to interactive plot
+ggplotly(aging_plot, tooltip = c("x", "y")) |>
+  layout(hovermode = "x unified")
+```
+
+### Column {width="50%"}
+
+#### Aging by Customer Type
+
+```{r}
+#| label: aging-by-customer-type
+# Create aging analysis by customer industry/type
+industry_aging <- ar_aging |>
+  group_by(industry, aging_bucket) |>
+  summarise(total = sum(amount), .groups = "drop")
+
+# Create stacked bar chart
 industry_plot <- industry_aging |>
-  ggplot(aes(y = reorder(industry, total, sum), x = total, fill = aging_bucket)) +  
+  ggplot(aes(y = reorder(industry, total, sum), x = total, fill = aging_bucket)) +  # Swapped x and y, added sum function
   geom_col(position = "stack") +
   scale_x_continuous(labels = dollar_format()) +  # Changed to scale_x
   scale_fill_manual(
@@ -244,47 +282,9 @@ industry_plot <- industry_aging |>
     fill = NULL
   )
 
-# Convert to interactive plot
-ggplotly(aging_plot, tooltip = c("x", "y")) |>
-  layout(hovermode = "x unified")
-```
-
-### Column {width="50%"}
-
-#### Aging by Customer Type
-
-```{r}
-#| label: aging-by-customer-type
-# Create aging analysis by customer industry/type
-industry_aging <- ar_aging |>
-  group_by(_____, _____) |>
-  summarise(total = sum(amount), .groups = "drop")
-
-# Create stacked bar chart
-industry_plot <- industry_aging |>
-  ggplot(aes(x = _____, y = total, fill = aging_bucket)) +
-  geom_col(position = "stack") +
-  scale_y_continuous(labels = dollar_format()) +
-  scale_fill_manual(
-    values = c(
-      "Current" = ar_colors["current"],
-      "1-30 Days" = ar_colors["early"],
-      "31-60 Days" = ar_colors["moderate"],
-      "61-90 Days" = ar_colors["late"],
-      "Over 90 Days" = ar_colors["critical"]
-    )
-  ) +
-  labs(
-    title = "Aging by Industry",
-    x = NULL,
-    y = "Amount Outstanding",
-    fill = "Aging Bucket"
-  ) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
 # Convert to interactive
 ggplotly(industry_plot) |>
-  layout(hovermode = "x unified")
+  layout(hovermode = "y unified")  # Changed to y unified
 ```
 
 # Customer Analysis
