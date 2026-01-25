@@ -9,9 +9,7 @@ execute:
 
 ## Executive Summary
 
-*Write a 2-3 sentence summary of your classification analysis and the fraud detection model's performance. Complete this section after finishing the assignment.*
-
----
+The decision tree classification model achieves _______% overall accuracy with _______% sensitivity (fraud detection rate) and _______% specificity, enabling auditors to identify _______ of _______ fraudulent transactions in the test data while generating only _______ false positives (Prediction = Fraudulent; Truth = Legitimate), making it a reliable tool for risk-based audit sampling. Variable importance analysis reveals that transaction amount (importance score: _______) and documentation score (importance score: _______) are the strongest fraud predictors, supported by distinctive fraud patterns including _______% new vendor involvement versus _______% for legitimate transactions, _______% weekend processing versus _______%, and an average documentation score of _______ compared to 8.2 for legitimate transactions. Implementation of this model would require investigating only _______% of total transactions (12 high-risk cases) while capturing _______% of actual fraud, significantly improving audit efficiency compared to random sampling, with recommended control enhancements focusing on automated flags for transactions with poor documentation scores, new vendors under _______ days old, and after-hours or weekend processing where fraudulent activity rates are higher than legitimate transactions.
 
 ## Introduction
 
@@ -84,10 +82,14 @@ amount_summary <- fraud_data |>
     .groups = "drop"
   )
 
-no_legit  <- amount_summary |>filter(fraud == "Legitimate") |>pull(count)
-no_fraud  <- amount_summary |>filter(fraud == "Fraudulent") |>pull(count)
+no_legit  <- amount_summary |>
+  filter(fraud == "Legitimate") |>
+  pull(count)
 
-avg_fraud_amt  <- amount_summary |> filter(fraud == "Fraudulent") |> pull(avg_amount)
+no_fraud  <- amount_summary |>
+  filter(fraud == "Fraudulent") |>
+  pull(count)
+
 
 # Display summary using gt
 amount_summary |>
@@ -262,7 +264,7 @@ model_metrics |>
 # Extract variable importance
 tree_importance <- fraud_tree_fit |>
   extract_fit_parsnip() |>
-  vip::vi() |>
+  vi() |>
   mutate(
     Variable = case_when(
       Variable == "amount" ~ "Transaction Amount",
@@ -333,7 +335,7 @@ Based on your analysis, complete these recommendations:
 
 1. **Model Performance**: The decision tree achieved _____% accuracy with _____% sensitivity (fraud detection rate).
 
-2. **Key Fraud Indicators**: The top three predictors of fraud were:
+2. **Key Fraud Indicators**: The top predictors of fraud were:
    - _____: (Importance score: _____)
    - _____: (Importance score: _____)
 
@@ -342,7 +344,4 @@ Based on your analysis, complete these recommendations:
    - This would require investigating _____% of transactions
    - Expected to catch _____% of actual fraud
 
-4. **Control Improvements**:
-   - Strengthen controls around _____ (highest importance variable)
-   - Implement automated flags for _____
 

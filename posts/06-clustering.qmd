@@ -9,9 +9,7 @@ execute:
 
 ## Executive Summary
 
-*Write a 2-3 sentence summary of your clustering analysis and the highest-risk expense patterns identified. Complete this section after finishing the assignment.*
-
----
+K-means clustering analysis of _______ expense transactions identified Cluster _______ as the highest audit risk, containing _______ transactions (28.6% of volume) totaling $_______ (approximately 53% of total expense value), with an average transaction of $_______ and a maximum single expense of $_______. This enables auditors to achieve substantial coverage through risk-based sampling rather than random selection. The high-risk cluster exhibits multiple fraud indicators warranting substantive testing: _______% round-dollar amounts (a common fabrication pattern), _______% same-day multiple submissions by the same employee (potential expense splitting to avoid approval thresholds), and _______% of transactions exceeding the high-amount threshold, with the Sales and Operations departments contributing the majority of flagged expenses. Based on these findings, the audit plan should prioritize detailed vouching of all Cluster 2 expenses over $5,000 and implement analytical procedures for employees with same day submissions and recommend management strengthen controls, particularly in the Sales department where the combination of high transaction volumes and elevated risk indicators suggests potential policy circumvention or inadequate supervisory review.
 
 ## Introduction
 
@@ -278,12 +276,13 @@ cluster_profiles <- expense_reports_clustered |>
 # Display cluster profiles using gt
 cluster_profiles |>
   mutate(
-    avg_amount = dollar(avg_amount),
-    max_amount = dollar(max_amount),
-    weekend_pct = percent(weekend_pct),
-    round_amount_pct = percent(round_amount_pct),
-    high_amount_pct = percent(high_amount_pct),
-    multiple_same_day_pct = percent(multiple_same_day_pct)
+    avg_amount = dollar(avg_amount, accuracy = 0.1),
+    max_amount = dollar(max_amount, accuracy = 0.1),
+    avg_submission_delay = round(avg_submission_delay, 1),
+    weekend_pct = percent(weekend_pct, accuracy = 0.1),
+    round_amount_pct = percent(round_amount_pct, accuracy = 0.1),
+    high_amount_pct = percent(high_amount_pct, accuracy = 0.1),
+    multiple_same_day_pct = percent(multiple_same_day_pct, accuracy = 0.1)
   ) |>
   gt() |>
   tab_header(title = "Cluster Characteristics Analysis")
@@ -325,7 +324,7 @@ cluster_risk_mapping <- cluster_profiles |>
 
 # Apply risk labels to all transactions
 expense_reports_clustered <- expense_reports_clustered |>
-  left_join(cluster_risk_mapping, by = "i.cluster")
+  left_join(cluster_risk_mapping, by = ".cluster")
 
 # View high-risk transactions
 high_risk_expenses <- expense_reports_clustered |>
@@ -342,7 +341,7 @@ high_risk_expenses |>
   tab_header(title = "Top 10 High-Risk Expenses")
 ```
 
-## Audit Planning 📝
+## Audit Planning 
 
 Use clustering results to create an audit plan.
 
@@ -450,9 +449,8 @@ Based on the clustering analysis, complete these insights:
 4. **Audit Recommendations**:
 
 - Perform detailed review of all expenses over $_____ in the high-risk cluster
-- Investigate employees with multiple same-day expenses
-- Review weekend expense policies, especially for _____ department
-- Implement controls for expenses with submission delays over _____ days
+- Perform detailed testing on all _______ high-risk transactions
+- Review vendor approval and payment processes for _______ vendors in high-risk cluster
 
-5. **Estimated Audit Coverage**: By focusing on the high-risk cluster, auditors can review _____% of expenses by count while covering _____% of total expense value.
+5. **Estimated Audit Coverage**: By focusing on the high-risk cluster, auditors can review _____% of expenses by count while covering _____% of total expense value. (Hint: total high risk expenses / total expenses; total expenses = number of expenses x mean expense)
 

@@ -1,18 +1,16 @@
 ---
 title: "3: Data Wrangling"
-date: today
+# date: "Feb 18, 2026" 
 execute: 
   eval: false  #set to true
-  message: false
   warning: false
 ---
 
 
 ## Executive Summary
 
-*Write a 2-3 sentence summary of your analysis and key findings here after completing the assignment.*
+This analysis cleaned and combined sales transaction data with customer master data, resolving issues including inconsistent date formats, mixed currency formatting, and non-standardized text. After data cleaning, ________ had the highest sales at $________ across ________ transactions, with Software products generating ________% of total revenue ($________). One transaction (________) was flagged for having an invalid customer ID (________), resulting in an ________% data quality rate that requires follow-up investigation.
 
----
 
 ## Introduction
 

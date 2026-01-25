@@ -9,9 +9,7 @@ execute:
 
 ## Executive Summary
 
-*Write a 2-3 sentence summary of the financial performance and key insights from your KPI dashboard. Complete this section after finishing the assignment.*
-
----
+The company achieved exceptional growth over the 24-month analysis period, with monthly revenue increasing _______% from $_______K to $_______K while operating margin improved from _______% to _______%, demonstrating that the business has successfully scaled revenue while simultaneously improving operational efficiency. Liquidity remains exceptionally strong with cash growing over 7x from $_______K to $_______M and a current ratio of _______ (nearly 5x the industry benchmark of _______), positioning the company well for strategic investments or economic uncertainty. The sole area requiring management attention is accounts receivable collection, where Days Sales Outstanding of _______ days exceeds the _______-day target.
 
 ## Introduction
 
@@ -78,18 +76,40 @@ performance_summary <- financial_data |>
   summarize(
     months_of_data = n(),
     avg_revenue = mean(_____),
+    beginning_revenue = first(revenue),
+    ending_revenue = last(revenue),
     revenue_growth = (last(_____) - first(_____)) / first(_____),
     avg_gross_margin = mean(_____),
     avg_operating_margin = mean(_____),
+    beginning_cash = first(_______),
     ending_cash = last(_____)
   )
 
-# Display summary
+# Display summary as long table
+
 performance_summary |>
-  gt() |>
-  fmt_currency(columns = c(_____, _____), decimals = 0) |>
-  fmt_percent(columns = c(_____, _____, _____), decimals = 1) |>
-  fmt_number(columns = months_of_data, decimals = 0)
+  pivot_longer(everything(), names_to = "Metric", values_to = "Value") |>
+  mutate(
+    Metric = case_when(
+      Metric == "months_of_data" ~ "Months of Data",
+      Metric == "avg_revenue" ~ "Average Revenue",
+      Metric == "beginning_revenue" ~ "Beginning Revenue",
+      Metric == "ending_revenue" ~ "Ending Revenue",
+      Metric == "revenue_growth" ~ "Revenue Growth",
+      Metric == "avg_gross_margin" ~ "Average Gross Margin",
+      Metric == "avg_operating_margin" ~ "Average Operating Margin",
+      Metric == "beginning_cash" ~ "Beginning Cash",
+      Metric == "ending_cash" ~ "Ending Cash"
+    ),
+    Value = case_when(
+      Metric %in% c("Average Revenue", "Beginning Revenue", "Ending Revenue",
+                    "Beginning Cash", "Ending Cash") ~ dollar(Value, accuracy = 1),
+      Metric %in% c("Revenue Growth", "Average Gross Margin",
+                    "Average Operating Margin") ~ percent(Value, accuracy = .1),
+      TRUE ~ as.character(round(Value, 0))
+    )
+  ) |>
+  gt() 
 ```
 
 ### Monthly Trends Overview
@@ -561,9 +581,9 @@ scorecard |>
   )
 ```
 
-## Key Insights and Recommendations
+## Key Insights
 
-Based on your dashboard analysis, complete these insights:
+Based on your analysis, complete these insights:
 
 1. **Revenue Performance**: Revenue has grown from $_____ to $_____ over the 24-month period, representing _____% growth.
 
@@ -579,7 +599,3 @@ Based on your dashboard analysis, complete these insights:
    - Days Sales Outstanding averages _____ days
    - Cash conversion cycle is _____ days (DSO - DPO)
 
-5. **Recommendations for CFO**:
-   - Focus area 1: _____
-   - Focus area 2: _____
-   - Key metric to monitor: _____

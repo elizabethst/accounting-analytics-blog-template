@@ -9,9 +9,7 @@ execute:
 
 ## Executive Summary
 
-*Write a 2-3 sentence summary of your regression analysis findings, including the most important predictors identified and the accuracy of your models. Complete this section after finishing the assignment.*
-
----
+The revenue forecasting model explains _______% of revenue variance (R²) with a Mean Absolute Percentage Error of just _______%, identifying marketing spend as the primary driver where each $1,000 investment generates $_______ in additional revenue, providing management with a reliable tool for budgeting and resource allocation decisions. The expense analysis reveals a cost structure with $50,365 in fixed costs and $_______ variable cost per production unit, enabling the creation of flexible budgets ranging from $_______ to $_______ depending on activity levels, which supports more accurate variance analysis and cost control. Applying these regression models as analytical procedures for audit purposes identified _______ periods with sales deviations exceeding the 5% materiality threshold, including Month 30 with a _______% negative variance, flagging $_______ in total transactions requiring substantive investigation to determine whether the differences represent estimation error, changed business conditions, or potential misstatement.
 
 ## Introduction
 
@@ -325,6 +323,13 @@ exceptions |>
   tab_header(title = "Sales Requiring Investigation") |>
   fmt_currency(columns = c(reported_sales, .pred)) |>
   fmt_percent(columns = pct_difference)
+
+# Total sales requiring investigation
+exceptions |> 
+  summarize(total = sum(reported_sales)) |> 
+  gt() |> 
+  tab_header(title = "Total Sales Requiring Investigation") |>
+  fmt_currency(columns = total) 
 ```
 
 ### Step 3: Visualize Analytical Review
@@ -372,10 +377,4 @@ Based on the regression analysis, complete these insights:
 4. **Audit Findings**:
    - _____ periods showed significant deviations (>5%)
    - Largest exception was in _____ with _____% difference
-   - Total value of transactions requiring investigation: $_____
 
-5. **Recommendations**:
-   - Use revenue model for _____-month ahead forecasts
-   - Update expense model quarterly to reflect changing cost structure
-   - Investigate all sales deviations greater than _____% or $_____
-   - Consider additional predictors such as _____ to improve model accuracy. 

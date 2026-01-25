@@ -9,6 +9,9 @@ _site/
 # Draft/temporary posts (files starting with _ in posts folder)
 posts/_*.qmd
 
+# Solution files (files with "sol" in name)
+posts/*sol*.qmd
+
 # R data and history files
 *.RData
 *.Rds
@@ -54,3 +57,5 @@ node_modules/
 
 # Netlify specific
 .netlify/.DS_Store
+
+**/*.quarto_ipynb

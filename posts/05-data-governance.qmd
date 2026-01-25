@@ -9,9 +9,7 @@ execute:
 
 ## Executive Summary
 
-*Write a 2-3 sentence summary of your data governance implementations and key insights here after completing the assignment.*
-
----
+This data governance implementation identified critical control deficiencies in the accounting system, including _______ invalid account codes (failing the 4-digit format standard), _______ invalid transaction dates (including an impossible date of "2025-03-32"), and _______ orphaned transaction referencing non-existent account ID 99—issues that if undetected could result in misstated financial reports and audit failures. The referential integrity check revealed _______ unbalanced transaction days with a combined $_______ discrepancy ($_______ on March 20 and -$_______ on the invalid date), violating the fundamental accounting equation that debits must equal credits; implementing these automated validations would prevent such errors before they enter the general ledger. The comprehensive AR data dictionary documents _______ fields with _______ designated as mandatory, establishing clear business rules (e.g., due_date ≥ invoice_date, invoice amounts must be positive) that align with SOX compliance requirements and provide auditors with documented evidence of internal controls over financial reporting.
 
 ## Introduction
 

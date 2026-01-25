@@ -1,6 +1,5 @@
 ---
 title: "4: Data Visualization for Accounting"
-date: today
 execute: 
   eval: false #set to true
   message: false
@@ -9,9 +8,8 @@ execute:
 
 ## Executive Summary
 
-*Write a 2-3 sentence summary of your visualizations and key insights here after completing the assignment.*
+This financial analysis demonstrates exceptional company performance in FY2027, with revenue growing ______% from $_______ in January to $_______ in December, resulting in total annual revenue of $_______ million and net income of $_______ (_______% profit margin). The quarterly trend visualization reveals accelerating profitability, with Q4 net income ($_______) and Q1 net income ($_______), suggesting strong seasonal performance or successful strategic initiatives. Budget variance analysis identifies Marketing (+_______%, $_______ over) and Finance (+_______%, $_______ over) as departments requiring cost management attention, while Sales (-______%) and Operations (-_______%) demonstrate effective budget discipline that partially offset unfavorable variances elsewhere.
 
----
 
 ## Introduction
 
