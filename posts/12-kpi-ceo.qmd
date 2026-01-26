@@ -1,6 +1,5 @@
 ---
 title: "12: CEO Strategic Dashboard"
-date: today
 format: dashboard
 execute:
   eval: false # change to true
@@ -34,6 +33,11 @@ company_colors <- list(
 ```
 
 # Executive Summary
+
+## Row 
+
+Revenue of $_______M exceeded target by _______% (+_______% YoY) and stock price up _______% to $_______, yet _______ of five strategic KPIs trail targets—EBITDA margin at _______% (-0.8pp vs target), market share slipping to _______% (-0.2pp YoY) as Competitor A maintains its _______% lead, and NPS stalled at _______ despite 5.9% improvement—revealing a growth-profitability tension where top-line momentum is outpacing operational efficiency gains. The Enterprise segment ($425M, _______% growth, _______% margin) continues to drive disproportionate value creation, while two critical digital initiatives are faltering: _______ at 35% completion (At Risk, Critical Impact) and _______ at 45% (Behind, High Impact), threatening the operational leverage needed to close the margin gap. The 5-year forecast projects revenue reaching $_______B by 2028 with EBITDA margins expanding to _______% in the base case.
+
 
 ## Key Metrics
 
@@ -393,7 +397,7 @@ share_plot <- market_data |>
   )
 
 # Convert to interactive plotly chart with hover tooltips
-ggplotly(share_plot, tooltip = c("x", "y"))  
+_______(share_plot, tooltip = c("x", "y"))  
 ```
 
 ## Competitive Analysis
@@ -457,7 +461,7 @@ customer_metrics <- tribble(
     ),
     
     # Categorize performance status based on achievement percentage
-    status = case_when(
+    status = _______(
       performance >= 1.0 ~ "On Target",         # 100%+ of target achieved
       performance >= 0.9 ~ "Near Target",      # 90-99% of target achieved  
       TRUE ~ "Below Target"                     # Less than 90% of target achieved
@@ -466,7 +470,7 @@ customer_metrics <- tribble(
 
 # Create horizontal bar chart to visualize customer health metrics
 customer_plot <- customer_metrics |>
-  ggplot(aes(x = performance, y = metric, fill = status)) +
+  ggplot(_______(x = performance, y = metric, fill = status)) +
   
   # Add horizontal bars showing performance ratio for each metric
   geom_col() +
@@ -716,7 +720,7 @@ pipeline_data <- tribble(
   "Testing", 18, 120,           # Testing stage: 18 projects in trials/validation, $120M potential
   "Launch Ready", 8, 85         # Launch ready: 8 projects ready for market, $85M near-term value
 ) |>
-  mutate(
+  _______(
     # Set stage order from top to bottom (reverse order for funnel visualization)
     stage = factor(stage, levels = rev(c("Research", "Development", 
                                         "Testing", "Launch Ready"))),
@@ -742,7 +746,7 @@ pipeline_plot <- pipeline_data |>
           high = company_colors$success) +  # Green for advanced stages (launch ready)
                     
   # Set chart title and axis labels
-  labs(
+  _______(
     title = "Innovation Pipeline: Projects and potential value by stage",
     x = NULL,              # Remove x-axis 
     y = NULL                                 # Remove y-axis label (stage names are self-explanatory)
@@ -765,7 +769,7 @@ digital_projects <- tribble(
   "Process Automation", 65, "High", "On Track",
   "Data Analytics", 35, "Critical", "At Risk"
 ) |>
-  mutate(
+  _______(
     initiative = factor(initiative, levels = rev(initiative)),
     # Order impact levels
     impact = factor(impact, levels = c("Medium", "High", "Critical"))
@@ -858,7 +862,7 @@ forecast_plot <- forecast_data |>
   )) +
   
   # Set chart title and remove axis labels (panel titles are self-explanatory)
-  labs(
+  _______(
     title = "5-Year Strategic Forecast",
     x = NULL,    # Remove x-axis label (years are obvious)
     y = NULL     # Remove y-axis label (units shown in panel titles)
@@ -899,7 +903,7 @@ scenarios <- tribble(
 # Transform scenario data for visualization
 # Select key metrics and convert from wide to long format for charting
 scenario_data <- scenarios |>
-  select(scenario, revenue_2028, ebitda_2028) |>
+  _______(scenario, revenue_2028, ebitda_2028) |>
   
   # Pivot to long format: one row per scenario-metric combination
   pivot_longer(cols = -scenario, names_to = "metric", values_to = "value") |>
@@ -943,71 +947,5 @@ scenario_plot <- scenario_data |>
   theme(legend.position = "none")
 
 # Convert to interactive plotly chart with hover functionality
-ggplotly(scenario_plot)
+_______(scenario_plot)
 ```
-
-# Insights & Actions
-
-## Key Strategic Findings
-
-Based on your dashboard analysis, identify the following:
-
-**Financial Performance**:
-
-- Revenue growth rate: _____% 
-- EBITDA margin vs. target: _____ bps
-- Free cash flow growth: _____%
-
-**Market Position**:
-
-- Market share change: _____ pp
-- Competitive advantage in: _____
-- Key competitor threats: _____
-
-**Customer Health**:
-
-- Net Promoter Score: _____
-- Customer retention rate: _____%
-- Lifetime value to CAC ratio: _____:1
-
-**Operational Excellence**:
-
-- Revenue per employee: $_____
-- Quality metrics trending: ↑/↓/→
-- Digital transformation progress: _____%
-
-## Strategic Priorities
-
-Complete these action items based on your analysis:
-
-**Immediate Actions** (This Quarter):
-
-- Address margin gap by: _____
-- Launch initiative to improve: _____
-- Accelerate progress on: _____
-
-**Short-term Focus** (Next 6 Months):
-
-- Capture market share through: _____
-- Improve customer NPS by implementing: _____
-- Complete digital transformation of: _____
-
-**Long-term Strategy** (Next Year):
-
-- Achieve revenue target of $_____ by: _____
-- Expand into new markets: _____
-- Build competitive moat through: _____
-
-## Risk Mitigation
-
-**Identified Risks**:
-
-- Primary competitive threat: _____
-- Operational bottleneck: _____
-- Customer satisfaction gap: _____
-
-**Mitigation Strategies**:
-
-- Invest $_____ in: _____
-- Hire _____ resources for: _____
-- Partner with _____ to address: _____

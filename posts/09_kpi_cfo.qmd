@@ -1,6 +1,5 @@
 ---
 title: "9: KPI Dashboard for CFO"
-date: today
 execute: 
   eval: false # change to true
   message: false

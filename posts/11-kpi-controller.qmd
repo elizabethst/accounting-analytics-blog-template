@@ -1,6 +1,5 @@
 ---
 title: "11: Controller Dashboard"
-date: today
 format: dashboard
 execute: 
   eval: false # change to true
@@ -200,14 +199,14 @@ filing_calendar <- tribble(
   "SOX Certification", "2027-03-31",
   "Proxy Statement", "2027-04-30"
 ) |>
-  mutate(
+  _______(
     due_date = ymd(due_date),
     days_remaining = as.numeric(due_date - today)
   )
 
 # Display calendar
 filing_calendar |>
-  select(filing, due_date, days_remaining) |>
+  _______(filing, due_date, days_remaining) |>
   _____() |>
   tab_header(title = "Regulatory Calendar") |>
   fmt_date(columns = due_date, date_style = 3) |>
@@ -223,7 +222,6 @@ filing_calendar |>
 
 ## Row
 
-### Column {width="50%"}
 
 #### Variance Analysis
 
@@ -231,7 +229,7 @@ filing_calendar |>
 #| label: variance-analysis
 # Create variance table
 variance_analysis |>
-  _____(is_material) |>
+  filter(is_material) |>
   select(account, current_month, budget, budget_variance, budget_variance_pct) |>
   gt() |>
   tab_header(
@@ -247,14 +245,22 @@ variance_analysis |>
     decimals = 1
   ) |>
   tab_style(
-    style = cell_fill(color = control_colors["high_risk"]),
+    style = cell_fill(color = control_colors["effective"]),
     locations = cells_body(
-      rows = abs(budget_variance_pct) > 0.10
+      columns = c(budget_variance, budget_variance_pct),
+      rows = budget_variance > 0
+    )
+  ) |>
+  tab_style(
+    style = cell_fill(color = control_colors["ineffective"]),
+    locations = cells_body(
+      columns = c(budget_variance, budget_variance_pct),
+      rows = budget_variance < 0
     )
   )
 ```
 
-### Column {width="50%"}
+## Row
 
 #### Financial Trends
 
@@ -314,7 +320,7 @@ _____(trend_plot) |>
 # Merge close tasks with progress
 close_status <- close_tasks |>
   left_join(close_progress, by = "task_id") |>
-  mutate(
+  _______(
     status = case_when(
       !is.na(end_time) ~ "Complete",
       !is.na(start_time) ~ "In Progress",
@@ -332,7 +338,7 @@ close_status <- close_tasks |>
 
 # Create Gantt chart
 gantt_plot <- close_status |>
-  ggplot(aes(y = fct_rev(factor(task_id)))) +
+  ggplot(_______(y = fct_rev(factor(task_id)))) +
   geom_segment(
     aes(x = planned_start - 0.4, xend = planned_end + 0.4,
         yend = fct_rev(factor(task_id)),
@@ -470,9 +476,8 @@ ggplotly(control_plot) |>
   layout(hovermode = "y unified")
 ```
 
-## Row {height="60%"}
+## Row 
 
-### Column {width="50%"}
 
 #### Exception Report
 
@@ -552,8 +557,7 @@ high_risk_je |>
   )
 ```
 
-### Column {width="50%"}
-
+## Row
 #### Anomaly Alerts
 
 ```{r}
@@ -620,48 +624,7 @@ ggplotly(anomaly_plot) |>
   layout(hovermode = "y unified")
 ```
 
-# Insights & Actions
+# Summary
 
-## Key Control Findings
 
-Based on your dashboard analysis, identify the following:
-
-**Compliance Status**:
-
-- SOX control effectiveness: _____% 
-- Controls requiring remediation: _____
-- Days until next regulatory filing: _____
-
-**Financial Reporting Quality**:
-
-- Reporting accuracy rate: _____%
-- Material variances identified: _____
-- Average days to close: _____
-
-**Risk Assessment**:
-
-- High-risk journal entries: _____
-- Expense anomalies detected: _____
-- Unreconciled items aging > 30 days: _____
-
-## Recommended Actions
-
-Complete these action items based on your analysis:
-
-**Immediate Actions** (Today):
-
-- Review all journal entries with risk score > _____
-- Investigate expense anomalies in: _____
-- Address control failures in: _____
-
-**This Week**:
-
-- Complete testing for _____ controls
-- Clear reconciling items for accounts: _____
-- Document variance explanations for: _____
-
-**This Month**:
-
-- Implement process improvements to reduce close time to _____ days
-- Update control procedures for: _____
-- Schedule training for: _____
+The December 2026 close identifies $_______ in high-risk journal entries (JE006, _______, _______) concentrated in admin-posted revenue and reserve adjustments near month-end, coinciding with an Access Controls effectiveness rate of _______% that falls below the _______% SOX threshold—a pattern suggesting systemic control gaps that require immediate remediation before the 10-Q filing in _______ days. Despite these risks, the organization demonstrates strong financial discipline with operating expenses running 2.8% favorable to budget and cash exceeding plan by $_______ (+_______%), while maintaining _______% overall SOX control effectiveness. Priority actions include investigating the $_______ consultant expense anomaly, completing the remaining SOX control test, and implementing automated flagging for after-hours entries exceeding $50,000 to prevent recurrence.

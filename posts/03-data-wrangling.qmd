@@ -1,6 +1,5 @@
 ---
 title: "3: Data Wrangling"
-# date: "Feb 18, 2026" 
 execute: 
   eval: false  #set to true
   warning: false

@@ -1,6 +1,5 @@
 ---
 title: "7: Regression Analysis for Financial Forecasting"
-date: today
 execute: 
   eval: false # set to true 
   message: false

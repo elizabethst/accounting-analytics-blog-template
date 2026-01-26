@@ -1,6 +1,5 @@
 ---
 title: "5: Data Governance and Management"
-date: today
 execute: 
   eval: false #set to true
   message: false

@@ -32,58 +32,14 @@ ar_colors <- c(
   negative = "#C62828"      # Red for negative indicators
 )
 
-set.seed(123)
+# Load the AR data
+ar_date  <- read_rds("https://estanny.org/data/10-assignment-ar_data.rds")
 
-# Create customer data
-customers <- tribble(
-  ~customer_id, ~customer_name, ~credit_limit, ~industry, ~risk_category,
-  "C001", "TechCorp Solutions", 100000, "Technology", "Low",
-  "C002", "Global Manufacturing", 150000, "Manufacturing", "Medium",
-  "C003", "Retail Express", 75000, "Retail", "High",
-  "C004", "Healthcare Plus", 200000, "Healthcare", "Low",
-  "C005", "Finance Partners", 125000, "Financial Services", "Medium",
-  "C006", "Energy Systems", 175000, "Energy", "Low",
-  "C007", "Consumer Goods Co", 80000, "Consumer Goods", "High",
-  "C008", "Logistics Network", 90000, "Transportation", "Medium",
-  "C009", "Education Services", 60000, "Education", "Low",
-  "C010", "Real Estate Group", 110000, "Real Estate", "Medium"
-)
-
-# Create invoice data
-n_invoices <- 150
-invoice_dates <- seq(from = today() - days(180), to = today() - days(1), by = "day")
-
-ar_data <- tibble(
-  invoice_id = paste0("INV-", str_pad(1:n_invoices, 5, pad = "0")),
-  customer_id = sample(customers$customer_id, n_invoices, replace = TRUE, 
-                      prob = c(0.15, 0.12, 0.08, 0.13, 0.10, 0.12, 0.07, 0.08, 0.08, 0.07)),
-  invoice_date = sample(invoice_dates, n_invoices, replace = TRUE),
-  amount = round(runif(n_invoices, min = 5000, max = 50000), -2),
-  terms_days = sample(c(30, 45, 60), n_invoices, replace = TRUE, prob = c(0.7, 0.2, 0.1))
-) |>
-  mutate(
-    due_date = invoice_date + days(terms_days),
-    # 70% paid, 30% open
-    status = sample(c("Paid", "Open"), n_invoices, replace = TRUE, prob = c(0.7, 0.3)),
-    # For paid invoices, create payment dates
-    payment_date = if_else(
-      status == "Paid",
-      invoice_date + days(round(rnorm(n(), mean = terms_days + 5, sd = 15))),
-      as.Date(NA)
-    ),
-    # Ensure payment date is not in the future
-    payment_date = if_else(payment_date > today(), as.Date(NA), payment_date),
-    status = if_else(is.na(payment_date) & status == "Paid", "Open", status)
-  ) |>
-  left_join(customers, by = "customer_id")
-
-# Save for student use
-# write_rds(ar_data, "data/10-assignment-ar_data.rds")
 ```
 
 # Executive Summary {.tabset}
 
-As of January 31, 2026, the company faces significant collection risk with $1.13M (59%) of the $1.9M total accounts receivable past due, including $485,700 severely delinquent beyond 90 days concentrated primarily in the Technology and Transportation sectors. Nine of ten major customers are classified as high-risk, with credit utilization rates ranging from 134% to 279% above their limits—most notably TechCorp Solutions and Retail Express—signaling an urgent need to reassess credit policies and enforce collection protocols on these accounts. 
+As of January 31, 2026, the company faces significant collection risk with $_______M (_______%) of the $_______M total accounts receivable past due, including $_______ severely delinquent beyond 90 days concentrated primarily in the _______ and _______ sectors. _______ of ten major customers are classified as high-risk, with credit utilization rates ranging from _______% to _______% above their limits—most notably the customers, _______ and _______—signaling an urgent need to reassess credit policies and enforce collection protocols on these accounts. Collection trends reveal an average days-to-pay of _______ days against standard 30-day terms, with DSO of _______ days indicating deteriorating collection efficiency that requires immediate intervention to prevent further aging. Based on historical collection patterns and current aging the cash collection forecast projects approximately $_______M in expected receipts and $_______K is at write-off risk.
 
 ## Key Metrics
 
@@ -105,15 +61,15 @@ current_date <- ymd("2026-01-31")
 
 # Total AR balance
 total_ar <- ar_data |>
-  filter(status == "Open") |>
-  summarise(total = sum(amount)) |>
+  _______(status == "Open") |>
+  summarise(total = sum(_______)) |>
   pull(total)
 
 # Calculate Days Sales Outstanding (DSO)
 # Calculate average daily sales from last 90 days of paid invoices
 avg_daily_sales <- ar_data |>
   filter(status == "Paid" & payment_date >= today() - days(90)) |>
-  summarise(daily_sales = sum(amount) / 90) |>
+  _______(daily_sales = sum(amount) / 90) |>
   pull(daily_sales)
 
 current_dso <- round(total_ar / avg_daily_sales, 1)
@@ -124,7 +80,7 @@ past_due_amount <- ar_data |>
   summarise(total = sum(amount)) |>
   pull(total)
 
-past_due_percentage <- past_due_amount / total_ar
+past_due_percentage <- _______ / total_ar
 
 # Count of overdue invoices
 overdue_count <- ar_data |>
@@ -133,9 +89,9 @@ overdue_count <- ar_data |>
 
 # Average days to pay (for paid invoices)
 avg_days_to_pay <- ar_data |>
-  filter(status == "Paid" & !is.na(payment_date)) |>
-  mutate(days_to_pay = as.numeric(payment_date - invoice_date)) |>
-  summarise(avg_days = mean(days_to_pay, na.rm = TRUE)) |>
+  _______(status == "Paid" & !is.na(payment_date)) |>
+  _______(days_to_pay = as.numeric(payment_date - invoice_date)) |>
+  _______(avg_days = mean(days_to_pay, na.rm = TRUE)) |>
   pull(avg_days)
 ```
 
@@ -145,45 +101,84 @@ avg_days_to_pay <- ar_data |>
 
 ```{r}
 #| label: summary-table
-# Create comprehensive AR summary statistics
-summary_stats <- ar_data |>
-  filter(status == "Open") |>
-  summarise(
-    `Total Outstanding AR` = sum(amount),
-    `Number of Open Invoices` = n(),
-    `Average Invoice Amount` = mean(amount),
-    `Median Invoice Amount` = median(amount),
-    `Largest Invoice` = max(amount),
-    `Smallest Invoice` = min(amount),
-    `Total Past Due` = sum(amount[due_date < current_date]),
-    `Current (Not Due)` = sum(amount[due_date >= current_date])
-  )
+# Create comprehensive AR summary statistics with Key Metrics
+summary_stats <- tibble(
+  Metric = c(
+    "Days Sales Outstanding (DSO)",
+    "Past Due %",
+    "Overdue Invoice Count",
+    "Avg Days to Pay",
+    "Total Outstanding AR",
+    "Number of Open Invoices",
+    "Average Invoice Amount",
+    "Median Invoice Amount",
+    "Largest Invoice",
+    "Smallest Invoice",
+    "Total Past Due",
+    "Current (Not Due)"
+  ),
+  Value = c(
+    current_dso,
+    past_due_percentage,
+    overdue_count,
+    avg_days_to_pay,
+    total_ar,
+    ar_data |> filter(status == "Open") |> nrow(),
+    ar_data |> filter(status == "Open") |> summarise(mean(amount)) |> pull(),
+    ar_data |> filter(status == "Open") |> summarise(median(amount)) |> pull(),
+    ar_data |> filter(status == "Open") |> summarise(max(amount)) |> pull(),
+    ar_data |> filter(status == "Open") |> summarise(min(amount)) |> pull(),
+    past_due_amount,
+    total_ar - past_due_amount
+  ),
+  Format = c("days", "percent", "number", "days",
+             "currency", "number", "currency", "currency",
+             "currency", "currency", "currency", "currency")
+)
 
 # Create summary table using gt
 summary_stats |>
-  pivot_longer(everything(), names_to = "Metric", values_to = "Value") |>
+  select(Metric, Value) |>
   gt() |>
-  tab_header(
+  _______(
     title = "Accounts Receivable Summary",
     subtitle = paste("As of", format(current_date, "%B %d, %Y"))
   ) |>
+  tab_row_group(
+    label = "Key Performance Indicators",
+    rows = 1:4
+  ) |>
+  tab_row_group(
+    label = "AR Details",
+    rows = 5:12
+  ) |>
   fmt_currency(
     columns = Value,
-    rows = c(1, 3:8),
+    rows = c(5, 7:12),
     decimals = 0
   ) |>
   fmt_number(
     columns = Value,
-    rows = 2,
-    decimals = 0
+    rows = c(1, 4, 6),
+    decimals = 1
   ) |>
-  cols_label(
-    Metric = "Metric",
-    Value = "Value"
+  fmt_percent(
+    columns = Value,
+    rows = 2,
+    decimals = 1
+  ) |>
+  fmt_number(
+    columns = Value,
+    rows = 3,
+    decimals = 0
   ) |>
   tab_style(
     style = cell_fill(color = "#E3F2FD"),
-    locations = cells_body(rows = c(1, 7))
+    locations = cells_body(rows = c(1:4))
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#FFEBEE"),
+    locations = cells_body(rows = 11)
   )
 ```
 
@@ -197,8 +192,8 @@ summary_stats |>
 #| label: create-aging-buckets
 # Create aging buckets for AR analysis
 ar_aging <- ar_data |>
-  filter(status == "Open") |>
-  mutate(
+  _______status == "Open") |>
+  _______(
     # Calculate days outstanding
     days_outstanding = as.numeric(current_date - invoice_date),
     # Calculate days overdue
@@ -270,13 +265,13 @@ aging_summary |>
 ## Row {height="35%"}
 
 
-#### Aging Distribution 
+#### Aging Distribution
 
 ```{r}
 #| label: aging-distribution-plot
 # Create aging distribution bar chart
 aging_plot <- ar_aging |>
-  group_by(aging_bucket) |>
+  _______(aging_bucket) |>
   summarise(total = sum(amount), .groups = "drop") |>
   ggplot(aes(x = aging_bucket, y = total, fill = aging_bucket)) +
   geom_col() +
@@ -301,7 +296,7 @@ aging_plot <- ar_aging |>
   )
 
 # Convert to interactive plot
-ggplotly(aging_plot, tooltip = c("x", "y")) |>
+_______(aging_plot, tooltip = c("x", "y")) |>
   layout(hovermode = "x unified")
 ```
 
@@ -313,10 +308,10 @@ ggplotly(aging_plot, tooltip = c("x", "y")) |>
 #| label: aging-by-customer-type
 # Create aging analysis by customer industry/type
 industry_aging <- ar_aging |>
-  group_by(industry, aging_bucket) |>
+  _______(industry, aging_bucket) |>
   summarise(total = sum(amount), .groups = "drop")
 
-# Create stacked bar chart - HORIZONTAL VERSION
+# Create stacked bar chart 
 industry_plot <- industry_aging |>
   ggplot(aes(y = reorder(industry, total, sum), x = total, fill = aging_bucket)) +  # Swapped x and y, added sum function
   geom_col(position = "stack") +
@@ -338,7 +333,7 @@ industry_plot <- industry_aging |>
   )
 
 # Convert to interactive
-ggplotly(industry_plot) |>
+ggplotly(_______) |>
   layout(hovermode = "y unified")  # Changed to y unified
 ```
 
@@ -353,7 +348,7 @@ ggplotly(industry_plot) |>
 # Calculate customer exposure metrics
 customer_summary <- ar_aging |>
   group_by(customer_id, customer_name, credit_limit) |>
-  summarise(
+  _______(
     total_ar = sum(amount),
     invoice_count = n(),
     oldest_invoice = min(invoice_date),
@@ -369,7 +364,7 @@ customer_summary <- ar_aging |>
       TRUE ~ "Low"
     )
   ) |>
-  arrange(desc(total_ar)) 
+  _______(desc(total_ar)) 
 
 # Create interactive customer table
 datatable(
@@ -384,7 +379,6 @@ datatable(
       `Risk` = risk_score
     ),
   options = list(
-    pageLength = 10,
     dom = 'ftip',
     order = list(list(1, 'desc'))
   ),
@@ -403,17 +397,13 @@ datatable(
 
 ## Row
 
-### Column {width="50%"}
-
 #### Customer Risk Matrix
 
 ```{r}
 #| label: customer-risk-matrix
 # Create risk matrix scatter plot
-risk_data <- customer_summary |>
-  slice_head(n = 20)
 
-risk_plot <- risk_data |>
+risk_plot <- customer_summary|>
   ggplot(aes(
     x = avg_days_overdue, 
     y = total_ar,
@@ -449,7 +439,7 @@ ggplotly(risk_plot, tooltip = "text") |>
   layout(hovermode = "closest")
 ```
 
-### Column {width="50%"}
+## Row
 
 #### Credit Utilization Analysis
 
@@ -472,7 +462,7 @@ utilization_data <- customer_summary |>
   )
 
 utilization_plot <- utilization_data |>
-  ggplot(aes(y = utilization_category)) +
+  _______(aes(y = utilization_category)) +
   geom_bar(fill = ar_colors["positive"]) +
   scale_x_continuous(breaks = seq(0, 20, 2)) +
   labs(
@@ -522,7 +512,7 @@ collection_plot <- monthly_collections |>
     sec.axis = sec_axis(~ . / 5000, name = "Avg Days to Collect")
   ) +
   scale_x_date(date_labels = "%b %Y") +
-  labs(
+  _______(
     title = "Monthly Collections and Average Days to Collect",
     x = NULL,
     y = "Amount Collected"
@@ -540,7 +530,7 @@ ggplotly(collection_plot) |>
 #| label: payment-behavior
 # Analyze payment patterns
 payment_patterns <- ar_data |>
-  filter(status == "Paid" & !is.na(payment_date)) |>
+  _______(status == "Paid" & !is.na(payment_date)) |>
   mutate(
     days_to_pay = as.numeric(payment_date - invoice_date),
     payment_timing = case_when(
@@ -558,7 +548,7 @@ payment_patterns <- ar_data |>
 # Create payment timing distribution
 timing_plot <- payment_patterns |>
   count(payment_timing) |>
-  ggplot(aes(x = payment_timing, y = n, fill = payment_timing)) +
+  ggplot(_______(x = payment_timing, y = n, fill = payment_timing)) +
   geom_col() +
   scale_fill_manual(
     values = c(
@@ -576,7 +566,7 @@ timing_plot <- payment_patterns |>
   ) 
 
 # Convert to interactive
-ggplotly(timing_plot) |>
+_______(timing_plot) |>
   layout(hovermode = "x")
 ```
 
@@ -590,7 +580,7 @@ ggplotly(timing_plot) |>
 #| label: collection-forecast
 # Create collection forecast based on aging and historical patterns
 forecast_data <- ar_aging |>
-  mutate(
+  _______(
     # Assign collection probability based on aging
     collection_probability = case_when(
       aging_bucket == "Current" ~ 0.95,
@@ -614,7 +604,7 @@ forecast_data <- ar_aging |>
 
 # Aggregate by week
 weekly_forecast <- forecast_data |>
-  filter(expected_collection_week <= current_date + weeks(8)) |>
+  _______(expected_collection_week <= current_date + weeks(8)) |>
   group_by(expected_collection_week) |>
   summarise(
     expected_collections = sum(expected_amount),
@@ -625,7 +615,7 @@ weekly_forecast <- forecast_data |>
 
 # Create forecast visualization (static plot - ribbon doesn't convert well to plotly)
 weekly_forecast |>
-  ggplot(aes(x = expected_collection_week)) +
+  _______(aes(x = expected_collection_week)) +
   geom_ribbon(
     aes(ymin = worst_case, ymax = best_case),
     fill = ar_colors["positive"],
@@ -659,13 +649,13 @@ weekly_forecast |>
 #| label: collection-probability-table
 # Create collection probability analysis
 probability_summary <- ar_aging |>
-  group_by(aging_bucket) |>
-  summarise(
+  _______(aging_bucket) |>
+  _______(
     outstanding_amount = sum(amount),
     invoice_count = n(),
     .groups = "drop"
   ) |>
-  mutate(
+  _______(
     collection_probability = case_when(
       aging_bucket == "Current" ~ 95,
       aging_bucket == "1-30 Days" ~ 85,
@@ -679,7 +669,7 @@ probability_summary <- ar_aging |>
 
 # Display probability table
 probability_summary |>
-  gt() |>
+  _______() |>
   tab_header(
     title = "Collection Probability Analysis",
     subtitle = "Expected collections based on historical patterns"
