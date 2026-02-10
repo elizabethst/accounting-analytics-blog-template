@@ -1,6 +1,5 @@
 ---
 title: "6: Clustering Analysis for Audit Risk Detection"
-date: today
 execute: 
   eval: false #set to true
   message: false
