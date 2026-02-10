@@ -1,8 +1,8 @@
 ---
-title: "10: Accounts Receivable Dashboard - Solution"
+title: "10: Accounts Receivable Dashboard" 
 format: dashboard
 execute: 
-  eval: true
+  eval: false
   message: false
   warning: false
 ---
