@@ -1,4 +1,5 @@
 ---
+
 title: "5: Data Governance and Management"
 execute: 
   eval: false #set to true
@@ -169,7 +170,7 @@ check_referential_integrity <- function(transactions_df, chart_of_accounts_df) {
       total_credits = sum(_____),
       difference = round(total_debits - _____ , 2)
     ) |>
-    filer(difference != 0)
+    filter(difference != 0)
   
   # Return results
   return(list(
