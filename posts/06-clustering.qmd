@@ -345,7 +345,6 @@ high_risk_expenses |>
 Use clustering results to create an audit plan.
 
 ```{r}
-#| eval: false
 
 # Analyze high-risk cluster for audit planning
 audit_focus <- expense_reports_clustered |>
