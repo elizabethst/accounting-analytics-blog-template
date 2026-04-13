@@ -33,7 +33,7 @@ ar_colors <- c(
 )
 
 # Load the AR data
-ar_date  <- read_rds("https://estanny.org/data/10-assignment-ar_data.rds")
+ar_data  <- read_rds("https://estanny.org/data/10-assignment-ar_data.rds")
 
 ```
 
