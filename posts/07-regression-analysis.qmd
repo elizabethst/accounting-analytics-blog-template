@@ -1,14 +1,19 @@
 ---
 title: "7: Regression Analysis for Financial Forecasting"
-execute: 
-  eval: false # set to true 
+date: today
+execute:
+  eval: false
   message: false
   warning: false
 ---
 
+
+
 ## Executive Summary
 
-The revenue forecasting model explains _______% of revenue variance (R²) with a Mean Absolute Percentage Error of just _______%, identifying marketing spend as the primary driver where each $1,000 investment generates $_______ in additional revenue, providing management with a reliable tool for budgeting and resource allocation decisions. The expense analysis reveals a cost structure with $50,365 in fixed costs and $_______ variable cost per production unit, enabling the creation of flexible budgets ranging from $_______ to $_______ depending on activity levels, which supports more accurate variance analysis and cost control. Applying these regression models as analytical procedures for audit purposes identified _______ periods with sales deviations exceeding the 5% materiality threshold, including Month 30 with a _______% negative variance, flagging $_______ in total transactions requiring substantive investigation to determine whether the differences represent estimation error, changed business conditions, or potential misstatement.
+*Write a 2-3 sentence summary of your regression analysis findings, including the most important predictors identified and the accuracy of your models. Complete this section after finishing the assignment.*
+
+---
 
 ## Introduction
 
@@ -43,13 +48,15 @@ library(patchwork)    # For combining plots
 theme_set(theme_minimal())  # Clean plots
 tidymodels_prefer()        # Prefer tidymodels functions
 options(scipen = 999)      # No scientific notation
-set.seed(2027)             # Reproducible results
+set.seed(2026107)         # Reproducible results
 ```
 
 ### Load and Explore the Data
+
 ```{r}
+#| label: load-data
 # Load the financial data
-financial_data <- read_csv("https://estanny.org/data/07_company_financial_data.csv")
+financial_data <- read_csv("https://estanny.org/data/2026-fall/07_company_financial_data.csv")
 
 # Display structure of the data
 glimpse(financial_data)
@@ -63,6 +70,7 @@ summary(financial_data)
 ### Revenue and Expense Trends
 
 ```{r}
+#| label: revenue-trend
 # Visualize revenue over time
 financial_data |>
   ggplot(aes(x = month_date, y = revenue)) +
@@ -71,7 +79,7 @@ financial_data |>
   scale_y_continuous(labels = dollar_format()) +
   labs(
     title = "Monthly Revenue Trend",
-    subtitle = "_____", #Identify patterns and potential seasonality
+    subtitle = "_____",  # Identify patterns and potential seasonality
     x = "Month",
     y = "Revenue"
   )
@@ -81,6 +89,7 @@ financial_data |>
 ### Relationship Analysis
 
 ```{r}
+#| label: relationships
 # Explore relationships between variables
 # Example: Revenue vs Marketing Spend
 financial_data |>
@@ -101,18 +110,19 @@ financial_data |>
 ### Step 1: Prepare Data for Modeling
 
 ```{r}
+#| label: revenue-prep
 # Create features for revenue model
 revenue_data <- financial_data |>
   select(
     revenue,           # Target variable
-    _____,            # Predictor 1 (e.g., marketing_spend)
-    _____,            # Predictor 2 (e.g., customer_count)
-    month_num            # Month 
+    _____,  # Predictor 1 (e.g., marketing_spend)
+    _____,  # Predictor 2 (e.g., customer_count)
+    month_num            # Month
   ) |>
   drop_na()  # Remove any missing values
 
 # Split the data (following slides approach)
-set.seed(2027)
+set.seed(2026107)
 revenue_split <- initial_split(_____, prop = _____, strata = revenue)
 revenue_train <- training(_____)
 revenue_test <- testing(_____)
@@ -129,10 +139,11 @@ tibble(
 ### Step 2: Build and Fit Revenue Model
 
 ```{r}
+#| label: revenue-fit
 # Create model specification
 revenue_spec <- linear_reg() |>
-  set_engine("_____") |>      # Which engine?
-  set_mode("_____")           # Which mode?
+  set_engine("_____") |>  # Which engine?
+  set_mode("_____")  # Which mode?
 
 # Fit the model
 revenue_fit <- revenue_spec |>
@@ -150,6 +161,7 @@ revenue_fit |>
 ### Step 3: Evaluate Revenue Model
 
 ```{r}
+#| label: revenue-eval
 # Make predictions on test set
 revenue_results <- revenue_fit |>
   augment(_____)  # Which dataset?
@@ -159,7 +171,7 @@ revenue_metrics <- bind_rows(
   revenue_results |>
     metrics(truth = _____, estimate = _____),  # Fill in columns
   revenue_results |>
-    mape(truth = _____, estimate = _____)      # Fill in columns
+    mape(truth = _____, estimate = _____)  # Fill in columns
 )
 
 # Display metrics with interpretation
@@ -179,12 +191,12 @@ revenue_metrics |>
 ### Step 4: Revenue Predictions
 
 ```{r}
+#| label: revenue-scenarios
 # Create scenarios for prediction
 revenue_scenarios <- tibble(
   scenario = c("Conservative", "Base Case", "Optimistic"),
-  marketing_spend = c(_____, _____, _____),    # Fill in values
-  customer_count = c(_____, _____, _____),     # Fill in values
-  # Add other predictors as needed
+  marketing_spend = c(_____, _____, _____),  # Fill in values
+  customer_count = c(_____, _____, _____)  # Fill in values
 )
 
 # Make predictions
@@ -203,18 +215,19 @@ revenue_predictions
 ### Step 1: Prepare Expense Data
 
 ```{r}
+#| label: expense-prep
 # Create expense analysis dataset
 expense_data <- financial_data |>
   select(
     operating_expenses,    # Target variable
-    _____,                # Predictor 1 (e.g., production_volume)
-    _____,                # Predictor 2 (e.g., employee_count)
+    _____,  # Predictor 1 (e.g., production_volume)
+    _____,  # Predictor 2 (e.g., employee_count)
     month_num                # Month
   ) |>
   drop_na()
 
 # Split the data
-set.seed(2027)
+set.seed(2026107)
 expense_split <- initial_split(_____, prop = _____, strata = operating_expenses)
 expense_train <- training(_____)
 expense_test <- testing(_____)
@@ -223,6 +236,7 @@ expense_test <- testing(_____)
 ### Step 2: Build Expense Model
 
 ```{r}
+#| label: expense-fit
 # Fit expense model
 expense_fit <- linear_reg() |>
   set_engine("lm") |>
@@ -247,11 +261,12 @@ expense_fit |>
 ### Step 3: Create Flexible Budget
 
 ```{r}
+#| label: flexible-budget
 # Create flexible budget for different activity levels
 activity_levels <- tibble(
   activity_level = c("Low (70%)", "Normal (100%)", "High (130%)"),
   production_volume = c(_____, _____, _____),  # Fill in values
-  # Add other relevant drivers
+  employee_count = round(mean(expense_data$employee_count))
 )
 
 # Generate flexible budget
@@ -277,6 +292,7 @@ flexible_budget |>
 ### Step 1: Build Expected Values Model
 
 ```{r}
+#| label: audit-model
 # Create model for expected sales based on economic indicators
 audit_data <- financial_data |>
   select(
@@ -301,6 +317,7 @@ audit_model <- linear_reg() |>
 ### Step 2: Identify Exceptions
 
 ```{r}
+#| label: exceptions
 # Generate expectations for all periods
 audit_analysis <- audit_model |>
   augment(_____) |>  # Use full dataset
@@ -322,18 +339,12 @@ exceptions |>
   tab_header(title = "Sales Requiring Investigation") |>
   fmt_currency(columns = c(reported_sales, .pred)) |>
   fmt_percent(columns = pct_difference)
-
-# Total sales requiring investigation
-exceptions |> 
-  summarize(total = sum(reported_sales)) |> 
-  gt() |> 
-  tab_header(title = "Total Sales Requiring Investigation") |>
-  fmt_currency(columns = total) 
 ```
 
 ### Step 3: Visualize Analytical Review
 
 ```{r}
+#| label: audit-viz
 # Create visualization of actual vs expected
 audit_analysis |>
   ggplot(aes(x = month_num)) +
@@ -364,16 +375,23 @@ Based on the regression analysis, complete these insights:
 1. **Revenue Model Performance**: The model explained _____% of revenue variance, with _____ being the strongest predictor (coefficient = $_____).
 
 2. **Key Revenue Drivers**:
-   - Every $1,000 increase in _____ leads to $_____ increase in revenue
+   - Every $1,000 increase in _____ leads to _____ increase in revenue
    - _____ shows a _____ relationship with revenue
-   - Model MAPE of _____% suggests predictions are within $_____ on average
+   - Model MAPE of _____% suggests predictions are within _____ on average
 
 3. **Expense Insights**:
-   - Fixed costs are estimated at $_____
-   - Variable cost per _____ is $_____
-   - The flexible budget shows expenses ranging from $_____ to $_____ 
+   - Fixed costs are estimated at _____
+   - Variable cost per _____ is _____
+   - The flexible budget shows expenses ranging from _____ to _____
 
 4. **Audit Findings**:
    - _____ periods showed significant deviations (>5%)
    - Largest exception was in _____ with _____% difference
+   - Total value of transactions requiring investigation: _____
+
+5. **Recommendations**:
+   - Use revenue model for _____-month ahead forecasts
+   - Update expense model quarterly to reflect changing cost structure
+   - Investigate all sales deviations greater than _____ or _____
+   - Consider additional predictors such as _____ to improve model accuracy.
 

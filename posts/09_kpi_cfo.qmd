@@ -1,14 +1,19 @@
 ---
 title: "9: KPI Dashboard for CFO"
-execute: 
-  eval: false # change to true
+date: today
+execute:
+  eval: false
   message: false
   warning: false
 ---
 
+
+
 ## Executive Summary
 
-The company achieved exceptional growth over the 24-month analysis period, with monthly revenue increasing _______% from $_______K to $_______K while operating margin improved from _______% to _______%, demonstrating that the business has successfully scaled revenue while simultaneously improving operational efficiency. Liquidity remains exceptionally strong with cash growing over 7x from $_______K to $_______M and a current ratio of _______ (nearly 5x the industry benchmark of _______), positioning the company well for strategic investments or economic uncertainty. The sole area requiring management attention is accounts receivable collection, where Days Sales Outstanding of _______ days exceeds the _______-day target.
+*Write a 2-3 sentence summary of the financial performance and key insights from your KPI dashboard. Complete this section after finishing the assignment.*
+
+---
 
 ## Introduction
 
@@ -54,8 +59,9 @@ fin_colors <- c(
 ### Load and Explore the Data
 
 ```{r}
+#| label: load-data
 # Load the financial data
-financial_data <- read_rds("https://estanny.org/data/09-assignment-financial_data.rds")
+financial_data <- read_rds("https://estanny.org/data/2026-fall/09-assignment-financial_data.rds")
 
 # Display structure of the data
 glimpse(financial_data)
@@ -70,50 +76,30 @@ financial_data |>
 ### Financial Performance Overview
 
 ```{r}
+#| label: performance-overview
 # Calculate summary statistics for key metrics
 performance_summary <- financial_data |>
   summarize(
     months_of_data = n(),
     avg_revenue = mean(_____),
-    beginning_revenue = first(revenue),
-    ending_revenue = last(revenue),
     revenue_growth = (last(_____) - first(_____)) / first(_____),
     avg_gross_margin = mean(_____),
     avg_operating_margin = mean(_____),
-    beginning_cash = first(_______),
     ending_cash = last(_____)
   )
 
-# Display summary as long table
-
+# Display summary
 performance_summary |>
-  pivot_longer(everything(), names_to = "Metric", values_to = "Value") |>
-  mutate(
-    Metric = case_when(
-      Metric == "months_of_data" ~ "Months of Data",
-      Metric == "avg_revenue" ~ "Average Revenue",
-      Metric == "beginning_revenue" ~ "Beginning Revenue",
-      Metric == "ending_revenue" ~ "Ending Revenue",
-      Metric == "revenue_growth" ~ "Revenue Growth",
-      Metric == "avg_gross_margin" ~ "Average Gross Margin",
-      Metric == "avg_operating_margin" ~ "Average Operating Margin",
-      Metric == "beginning_cash" ~ "Beginning Cash",
-      Metric == "ending_cash" ~ "Ending Cash"
-    ),
-    Value = case_when(
-      Metric %in% c("Average Revenue", "Beginning Revenue", "Ending Revenue",
-                    "Beginning Cash", "Ending Cash") ~ dollar(Value, accuracy = 1),
-      Metric %in% c("Revenue Growth", "Average Gross Margin",
-                    "Average Operating Margin") ~ percent(Value, accuracy = .1),
-      TRUE ~ as.character(round(Value, 0))
-    )
-  ) |>
-  gt() 
+  gt() |>
+  fmt_currency(columns = c(_____, _____), decimals = 0) |>
+  fmt_percent(columns = c(_____, _____, _____), decimals = 1) |>
+  fmt_number(columns = months_of_data, decimals = 0)
 ```
 
 ### Monthly Trends Overview
 
 ```{r}
+#| label: recent-trends
 # Create a trend summary for the last 6 months
 recent_trends <- financial_data |>
   slice_tail(n = 6) |>
@@ -135,6 +121,7 @@ recent_trends
 ### Current vs Prior Month Comparison
 
 ```{r}
+#| label: kpi-comparison
 # Get current and prior month data
 current_month <- financial_data |>
   filter(date == _____(date))
@@ -145,22 +132,22 @@ prior_month <- financial_data |>
 # Create KPI comparison with more metrics
 kpi_comparison <- tribble(
   ~Metric, ~Current, ~Prior, ~Change, ~Status,
-  "Revenue", current_month$_____, prior_month$_____, 
+  "Revenue", current_month$_____, prior_month$_____,
     (current_month$_____ - prior_month$_____) / prior_month$_____,
     ifelse(current_month$_____ > prior_month$_____, "positive", "negative"),
-  
+
   "Gross Margin", current_month$_____, prior_month$_____,
     current_month$_____ - prior_month$_____,
     ifelse(current_month$_____ > prior_month$_____, "positive", "negative"),
-  
+
   "Operating Margin", current_month$_____, prior_month$_____,
     current_month$_____ - prior_month$_____,
     ifelse(current_month$_____ > prior_month$_____, "positive", "negative"),
-  
+
   "Cash Balance", current_month$_____, prior_month$_____,
     (current_month$_____ - prior_month$_____) / prior_month$_____,
     ifelse(current_month$_____ > prior_month$_____, "positive", "negative"),
-    
+
   "Current Ratio", current_month$_____, prior_month$_____,
     current_month$_____ - prior_month$_____,
     ifelse(current_month$_____ > prior_month$_____, "positive", "negative")
@@ -223,6 +210,7 @@ kpi_comparison |>
 ### Calculate and Display Liquidity Ratios
 
 ```{r}
+#| label: liquidity
 # Calculate liquidity metrics for the latest month
 liquidity_metrics <- financial_data |>
   filter(date == max(date)) |>
@@ -231,7 +219,7 @@ liquidity_metrics <- financial_data |>
   mutate(
     Ratio = case_when(
       ratio_type == "current_ratio" ~ "Current Ratio",
-      ratio_type == "quick_ratio" ~ "Quick Ratio", 
+      ratio_type == "quick_ratio" ~ "Quick Ratio",
       ratio_type == "cash_ratio" ~ "Cash Ratio"
     ),
     Benchmark = c(2.0, 1.0, 0.5),  # Industry benchmarks
@@ -295,12 +283,13 @@ liquidity_metrics |>
 ### Revenue and Profitability Trends
 
 ```{r}
+#| label: revenue-profit-plot
 # Create revenue trend plot with profit overlay
 revenue_profit_plot <- financial_data |>
   ggplot(aes(x = date)) +
-  geom_col(aes(y = _____), fill = fin_colors["neutral"], alpha = 0.7) + # revenue
-  geom_line(aes(y = _____), color = fin_colors["positive"], size = 2) + # operating_profit
-  geom_point(aes(y = _____), color = fin_colors["positive"], size = 3) + # operating_profit
+  geom_col(aes(y = _____), fill = fin_colors["neutral"], alpha = 0.7) +  # revenue
+  geom_line(aes(y = _____), color = fin_colors["positive"], size = 2) +  # operating_profit
+  geom_point(aes(y = _____), color = fin_colors["positive"], size = 3) +  # operating_profit
   scale_y_continuous(
     labels = dollar_format(scale = 1e-6, suffix = "M")) +
   scale_x_date(date_labels = "%b %Y") +
@@ -309,7 +298,7 @@ revenue_profit_plot <- financial_data |>
     subtitle = "Monthly Performance Over Time",
     x = NULL,
     y = NULL
-  ) 
+  )
 
 # Convert to interactive
 ggplotly(revenue_profit_plot) |>
@@ -321,6 +310,7 @@ layout(
 ### Margin Analysis
 
 ```{r}
+#| label: margin-analysis
 # Create margin comparison over time
 margin_data <- financial_data |>
   select(date, gross_margin, operating_margin) |>
@@ -350,7 +340,7 @@ margin_plot <- margin_data |>
     x = NULL,
     y = NULL,
     color = NULL
-  ) 
+  )
 
 # Make interactive
 ggplotly(_____) |>
@@ -364,6 +354,7 @@ ggplotly(_____) |>
 ### Days Sales Outstanding and Days Payable Outstanding
 
 ```{r}
+#| label: working-capital
 # Create working capital efficiency metrics plot
 wc_metrics <- financial_data |>
   select(date, days_sales_outstanding, days_payable_outstanding) |>
@@ -389,7 +380,7 @@ wc_plot <- wc_metrics |>
     x = NULL,
     y = "Days",
     fill = NULL
-  ) 
+  )
 
 # Convert to interactive
 ggplotly(wc_plot) |>
@@ -399,12 +390,13 @@ ggplotly(wc_plot) |>
 ### Cash Balance and Cash Flow Analysis
 
 ```{r}
+#| label: cash-flow
 # Calculate monthly cash flow (simplified)
 cash_flow_data <- financial_data |>
   mutate(
     monthly_cash_change = cash_balance - lag(cash_balance),
-    cash_from_operations = operating_profit + 
-      (lag(accounts_receivable) - accounts_receivable) - 
+    cash_from_operations = operating_profit +
+      (lag(accounts_receivable) - accounts_receivable) -
       (lag(accounts_payable) - accounts_payable)
   ) |>
   filter(!is.na(monthly_cash_change))
@@ -414,9 +406,9 @@ cash_plot <- cash_flow_data |>
   ggplot(aes(x = date)) +
   geom_area(aes(y = _____), fill = fin_colors["neutral"], alpha = 0.3) +
   geom_line(aes(y = _____), color = fin_colors["neutral"], size = 1.5) +
-  geom_col(aes(y = _____), 
-           fill = ifelse(cash_flow_data$_____ > 0, 
-                        fin_colors["positive"], 
+  geom_col(aes(y = _____),
+           fill = ifelse(cash_flow_data$_____ > 0,
+                        fin_colors["positive"],
                         fin_colors["negative"]),
            alpha = 0.7) +
   scale_y_continuous(labels = dollar_format(scale = 1e-3, suffix = "K")) +
@@ -438,6 +430,7 @@ ggplotly(cash_plot) |>
 ### Comprehensive Performance Summary
 
 ```{r}
+#| label: exec-dashboard
 # Create executive summary for last 6 months
 exec_summary <- financial_data |>
   slice_tail(n = 6) |>
@@ -449,7 +442,7 @@ exec_summary <- financial_data |>
 
 # Create comprehensive summary table
 exec_summary |>
-  select(month_name, revenue, gross_margin, operating_margin, 
+  select(month_name, revenue, gross_margin, operating_margin,
          cash_balance, current_ratio, revenue_growth_rate) |>
   gt() |>
   # Format monetary columns
@@ -489,12 +482,13 @@ exec_summary |>
       cell_text(weight = "bold")
     ),
     locations = cells_body(rows = _____)
-  ) 
+  )
 ```
 
 ### Key Metrics Scorecard
 
 ```{r}
+#| label: scorecard
 # Create a metrics scorecard for the latest month
 latest_metrics <- financial_data |>
   filter(date == max(date))
@@ -502,18 +496,18 @@ latest_metrics <- financial_data |>
 # Define targets and create scorecard
 scorecard <- tribble(
   ~Category, ~Metric, ~Value, ~Target, ~Performance,
-  "Growth", "Monthly Revenue", latest_metrics$revenue, 850000, 
+  "Growth", "Monthly Revenue", latest_metrics$revenue, 850000,
     ifelse(latest_metrics$revenue >= 850000, "Above Target", "Below Target"),
-  
+
   "Profitability", "Operating Margin", latest_metrics$operating_margin, 0.15,
     ifelse(latest_metrics$operating_margin >= 0.15, "Above Target", "Below Target"),
-  
+
   "Liquidity", "Current Ratio", latest_metrics$current_ratio, 2.0,
     ifelse(latest_metrics$current_ratio >= 2.0, "Above Target", "Below Target"),
-  
+
   "Efficiency", "Days Sales Outstanding", latest_metrics$days_sales_outstanding, 50,
     ifelse(latest_metrics$days_sales_outstanding <= 50, "Above Target", "Below Target"),
-  
+
   "Cash Management", "Cash Balance", latest_metrics$cash_balance, 1000000,
     ifelse(latest_metrics$cash_balance >= 1000000, "Above Target", "Below Target")
 )
@@ -580,21 +574,26 @@ scorecard |>
   )
 ```
 
-## Key Insights
+## Key Insights and Recommendations
 
-Based on your analysis, complete these insights:
+Based on your dashboard analysis, complete these insights:
 
-1. **Revenue Performance**: Revenue has grown from $_____ to $_____ over the 24-month period, representing _____% growth.
+1. **Revenue Performance**: Revenue has grown from _____ to _____ over the 24-month period, representing _____ growth.
 
-2. **Profitability Trends**: 
-   - Gross margin has averaged _____% and is currently at _____%
-   - Operating margin has improved from _____% to _____%, showing _____
+2. **Profitability Trends**:
+   - Gross margin has averaged _____ and is currently at _____
+   - Operating margin has moved from _____ to _____, showing _____
 
 3. **Liquidity Position**:
    - Current ratio of _____ is above/below industry benchmark of 2.0
-   - Cash position has grown/declined from $_____ to $_____
+   - Cash position has grown/declined from _____ to _____
 
 4. **Working Capital Management**:
    - Days Sales Outstanding averages _____ days
    - Cash conversion cycle is _____ days (DSO - DPO)
+
+5. **Recommendations for CFO**:
+   - Focus area 1: _____
+   - Focus area 2: _____
+   - Key metric to monitor: _____
 

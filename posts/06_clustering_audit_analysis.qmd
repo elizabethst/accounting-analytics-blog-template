@@ -1,14 +1,19 @@
 ---
 title: "6: Clustering Analysis for Audit Risk Detection"
-execute: 
-  eval: false #set to true
+date: today
+execute:
+  eval: false
   message: false
   warning: false
 ---
 
+
+
 ## Executive Summary
 
-K-means clustering analysis of _______ expense transactions identified Cluster _______ as the highest audit risk, containing _______ transactions (28.6% of volume) totaling $_______ (approximately 53% of total expense value), with an average transaction of $_______ and a maximum single expense of $_______. This enables auditors to achieve substantial coverage through risk-based sampling rather than random selection. The high-risk cluster exhibits multiple fraud indicators warranting substantive testing: _______% round-dollar amounts (a common fabrication pattern), _______% same-day multiple submissions by the same employee (potential expense splitting to avoid approval thresholds), and _______% of transactions exceeding the high-amount threshold, with the Sales and Operations departments contributing the majority of flagged expenses. Based on these findings, the audit plan should prioritize detailed vouching of all Cluster 2 expenses over $5,000 and implement analytical procedures for employees with same day submissions and recommend management strengthen controls, particularly in the Sales department where the combination of high transaction volumes and elevated risk indicators suggests potential policy circumvention or inadequate supervisory review.
+*Write a 2-3 sentence summary of your clustering analysis and the highest-risk expense patterns identified. Complete this section after finishing the assignment.*
+
+---
 
 ## Introduction
 
@@ -43,17 +48,19 @@ library(patchwork)    # For combining multiple plots
 # Set preferences
 theme_set(theme_minimal())  # Clean plots
 options(scipen = 999)       # No scientific notation
-set.seed(2027)              # Reproducible results
+set.seed(2026106)          # Reproducible results
 ```
 
 ### Load and Explore the Data
 
 ```{r}
+#| label: load-data
 # Load the expense report data
-expense_reports <- read_csv("https://estanny.org/data/06_expense_reports.csv")
+expense_reports <- read_csv("https://estanny.org/data/2026-fall/06_expense_reports.csv")
 
 # Display structure of the data
 glimpse(expense_reports)
+
 
 # Basic summary statistics
 summary(expense_reports)
@@ -64,6 +71,7 @@ summary(expense_reports)
 ### Expense Distribution Analysis
 
 ```{r}
+#| label: explore-distribution
 # Visualize expense amount distribution
 expense_reports |>
   ggplot(aes(x = amount)) +
@@ -81,9 +89,9 @@ red_flags_summary <- expense_reports |>
   summarize(
     total_expenses = n(),
     weekend_expenses = sum(_____),  # Count weekend expenses
-    round_amounts = sum(_____),     # Count round amounts
-    high_amounts = sum(_____),      # Count high amounts
-    delayed_submissions = sum(_____) # Count delayed submissions
+    round_amounts = sum(_____),  # Count round amounts
+    high_amounts = sum(_____),  # Count high amounts
+    delayed_submissions = sum(_____)  # Count delayed submissions
   )
 
 # Display red flags summary using gt
@@ -96,6 +104,7 @@ red_flags_summary |>
 ### Expense Patterns by Department
 
 ```{r}
+#| label: dept-patterns
 # Summarize by department
 dept_summary <- expense_reports |>
   group_by(_____) |>  # Group by department
@@ -104,7 +113,7 @@ dept_summary <- expense_reports |>
     total_amount = sum(_____),
     avg_amount = mean(_____),
     weekend_pct = mean(_____),
-    round_amount_pct = mean(_____) 
+    round_amount_pct = mean(_____)
   ) |>
   arrange(desc(total_amount))
 
@@ -131,21 +140,22 @@ dept_summary |>
   )
 ```
 
-## Data Preparation 
+## Data Preparation
 
 Prepare the data for clustering by selecting and scaling variables (following the slides approach).
 
 ```{r}
+#| label: prepare-features
 # Select features for clustering
 # Document why you chose these features
 clustering_features <- expense_reports |>
   select(
-    _____,                    # Transaction amount - consider log transform
-    _____,                    # Days to submit
-    _____,                    # Weekend indicator (0/1)
-    _____,                    # Round amount flag (0/1)
-    _____,                    # Multiple expenses same day
-    _____                     # Employee's average expense
+    _____,  # Transaction amount - consider log transform
+    _____,  # Days to submit
+    _____,  # Weekend indicator (0/1)
+    _____,  # Round amount flag (0/1)
+    _____,  # Multiple expenses same day
+    _____  # Employee's average expense
   )
 
 # Add log transformation for amount if needed
@@ -158,8 +168,8 @@ clustering_data <- clustering_features |>
   mutate(
     log_amount_scaled = scale(log_amount)[,1],
     submission_delay_scaled = scale(_____)[,1],
-    is_weekend_scaled = _____,               # Binary - keep as is
-    is_round_amount_scaled = _____,          # Binary - keep as is
+    is_weekend_scaled = _____,  # Binary - keep as is
+    is_round_amount_scaled = _____,  # Binary - keep as is
     same_day_expense_count_scaled = scale(_____)[,1],
     employee_avg_amount_scaled = scale(_____)[,1]
   ) |>
@@ -174,6 +184,7 @@ clustering_data |> summary()
 ### Step 1: Set Up K-Means Model
 
 ```{r}
+#| label: kmeans-spec
 # Specify the k-means model with 3 clusters (following slides)
 kmeans_spec <- k_means(num_clusters = _____) |>  # Use 3 clusters
   set_engine("stats")
@@ -185,6 +196,7 @@ kmeans_spec
 ### Step 2: Fit the Model
 
 ```{r}
+#| label: kmeans-fit
 # Fit the model to our prepared data
 kmeans_fit <- kmeans_spec |>
   fit(~ ., data = _____)  # Fit to all variables in clustering_data
@@ -194,6 +206,7 @@ kmeans_fit <- kmeans_spec |>
 ### Step 3: Extract Cluster Assignments
 
 ```{r}
+#| label: cluster-assignments
 # Get cluster assignments
 cluster_assignments <- kmeans_fit |>
   extract_cluster_assignment()
@@ -216,6 +229,7 @@ expense_reports_clustered |>
 ### Visualization 1: Amount vs Submission Delay
 
 ```{r}
+#| label: viz-scatter
 # Create scatter plot colored by cluster
 expense_reports_clustered |>
   ggplot(aes(x = submission_delay, y = amount, color = .cluster)) +
@@ -228,13 +242,14 @@ expense_reports_clustered |>
     title = "Expense Clusters: Amount vs Submission Delay",
     x = "Days to Submit",
     y = "Expense Amount",
-    color = NULL 
+    color = NULL
   )
 ```
 
 ### Visualization 2: Box Plots by Cluster
 
 ```{r}
+#| label: viz-boxplot
 # Create box plots of amount by cluster
 expense_reports_clustered |>
   ggplot(aes(x = .cluster, y = amount, fill = .cluster)) +
@@ -256,6 +271,7 @@ expense_reports_clustered |>
 ### Step 4: Analyze Cluster Characteristics
 
 ```{r}
+#| label: cluster-profiles
 # Calculate detailed statistics for each cluster
 cluster_profiles <- expense_reports_clustered |>
   group_by(_____) |>  # Group by cluster
@@ -275,13 +291,12 @@ cluster_profiles <- expense_reports_clustered |>
 # Display cluster profiles using gt
 cluster_profiles |>
   mutate(
-    avg_amount = dollar(avg_amount, accuracy = 0.1),
-    max_amount = dollar(max_amount, accuracy = 0.1),
-    avg_submission_delay = round(avg_submission_delay, 1),
-    weekend_pct = percent(weekend_pct, accuracy = 0.1),
-    round_amount_pct = percent(round_amount_pct, accuracy = 0.1),
-    high_amount_pct = percent(high_amount_pct, accuracy = 0.1),
-    multiple_same_day_pct = percent(multiple_same_day_pct, accuracy = 0.1)
+    avg_amount = dollar(avg_amount),
+    max_amount = dollar(max_amount),
+    weekend_pct = percent(weekend_pct),
+    round_amount_pct = percent(round_amount_pct),
+    high_amount_pct = percent(high_amount_pct),
+    multiple_same_day_pct = percent(multiple_same_day_pct)
   ) |>
   gt() |>
   tab_header(title = "Cluster Characteristics Analysis")
@@ -290,13 +305,14 @@ cluster_profiles |>
 ### Step 5: Identify High-Risk Cluster
 
 ```{r}
+#| label: risk-scoring
 # Add risk scoring (following slides approach)
 cluster_profiles <- cluster_profiles |>
   mutate(
-    risk_score = (avg_amount / max(avg_amount)) * _____ +     # Amount (40% weight)
-                 ((50 - avg_submission_delay) / 50) * _____ + # Speed (30% weight)  
-                 weekend_pct * _____ +                        # Weekend (20% weight)
-                 round_amount_pct * _____                     # Round amounts (10% weight)
+    risk_score = (avg_amount / max(avg_amount)) * _____ +  # Amount (40% weight)
+                 ((50 - avg_submission_delay) / 50) * _____ +  # Speed (30% weight)
+                 weekend_pct * _____ +  # Weekend (20% weight)
+                 round_amount_pct * _____  # Round amounts (10% weight)
   ) |>
   arrange(desc(risk_score)) |>
   mutate(risk_level = c("High Risk", "Medium Risk", "Low Risk"))
@@ -317,6 +333,7 @@ high_risk_cluster <- cluster_profiles |>
 ### Step 6: Apply Risk Classifications
 
 ```{r}
+#| label: apply-risk
 # Create risk mapping
 cluster_risk_mapping <- cluster_profiles |>
   select(.cluster, risk_level)
@@ -332,20 +349,20 @@ high_risk_expenses <- expense_reports_clustered |>
 
 # Display top 10 high-risk expenses
 high_risk_expenses |>
-  select(expense_id, employee_id, department, vendor, amount, 
-        expense_date, is_weekend, is_round_amount) |>
+  select(expense_id, employee_id, department, vendor, amount,
+         expense_date, is_weekend, is_round_amount) |>
   head(10) |>
   mutate(amount = dollar(amount)) |>
   gt() |>
   tab_header(title = "Top 10 High-Risk Expenses")
 ```
 
-## Audit Planning 
+## Audit Planning 📝
 
 Use clustering results to create an audit plan.
 
 ```{r}
-
+#| label: audit-planning
 # Analyze high-risk cluster for audit planning
 audit_focus <- expense_reports_clustered |>
   filter(.cluster == _____) |>  # Use high_risk_cluster
@@ -369,12 +386,12 @@ audit_focus |>
 # Create audit recommendations
 audit_recommendations <- tribble(
   ~Area, ~Finding, ~Recommendation,
-  "Scope", paste(_____, "high-risk transactions identified"), 
-  "Perform detailed testing on all high-risk transactions",
+  "Scope", paste(_____, "high-risk transactions identified"),
+           "Perform detailed testing on all high-risk transactions",
   "Materiality", paste("Total value:", dollar(_____)),
-  "Focus on transactions over $_____",
+                 paste("Focus on transactions over", dollar(_____)),
   "Vendors", paste(_____, "vendors in high-risk cluster"),
-  "Review vendor approval and payment processes"
+             "Review vendor approval and payment processes"
 )
 
 audit_recommendations |>
@@ -385,17 +402,18 @@ audit_recommendations |>
 ## Visualization Summary Dashboard
 
 ```{r}
+#| label: summary-dashboard
 # Create summary metrics following slides approach
 library(patchwork)
 
-# Risk indicators by cluster  
+# Risk indicators by cluster
 p1 <- cluster_profiles |>
   select(.cluster, weekend_pct, round_amount_pct, high_amount_pct) |>
   pivot_longer(-.cluster, names_to = "indicator", values_to = "percentage") |>
   mutate(
     indicator = case_when(
       indicator == "weekend_pct" ~ "Weekend",
-      indicator == "round_amount_pct" ~ "Round Amount", 
+      indicator == "round_amount_pct" ~ "Round Amount",
       indicator == "high_amount_pct" ~ "High Amount"
     )
   ) |>
@@ -433,22 +451,21 @@ p1 / p2
 
 Based on the clustering analysis, complete these insights:
 
-1. **Cluster Identification**: Cluster _____ was identified as the highest risk with _____ expenses totaling $_____.
+1. **Cluster Identification**: Cluster _____ was identified as the highest risk with _____ expenses totaling _____.
 
 2. **Risk Indicators**: This cluster showed:
-
-- _____% weekend expenses (vs. _____% overall average)
-- _____% round dollar amounts (potential red flag)
-- Average submission delay of _____ days
-- _____% of expenses from same-day multiple submissions
+   - _____ weekend expenses (vs. _____ overall average)
+   - _____ round dollar amounts (potential red flag)
+   - Average submission delay of _____ days
+   - _____ of expenses from same-day multiple submissions
 
 3. **Department Focus**: The _____ and _____ departments had the most high-risk expenses.
 
 4. **Audit Recommendations**:
+   - Perform detailed review of all expenses over _____ in the high-risk cluster
+   - Investigate employees with multiple same-day expenses
+   - Review weekend expense policies, especially for _____ department
+   - Implement controls for expenses with submission delays over _____ days
 
-- Perform detailed review of all expenses over $_____ in the high-risk cluster
-- Perform detailed testing on all _______ high-risk transactions
-- Review vendor approval and payment processes for _______ vendors in high-risk cluster
-
-5. **Estimated Audit Coverage**: By focusing on the high-risk cluster, auditors can review _____% of expenses by count while covering _____% of total expense value. (Hint: total high risk expenses / total expenses; total expenses = number of expenses x mean expense)
+5. **Estimated Audit Coverage**: By focusing on the high-risk cluster, auditors can review _____ of expenses by count while covering _____ of total expense value.
 

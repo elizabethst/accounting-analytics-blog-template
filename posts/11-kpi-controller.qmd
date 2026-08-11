@@ -1,11 +1,13 @@
 ---
 title: "11: Controller Dashboard"
+date: today
 format: dashboard
-execute: 
-  eval: false # change to true
+execute:
+  eval: false
   message: false
   warning: false
 ---
+
 
 ```{r}
 #| label: setup
@@ -33,7 +35,7 @@ control_colors <- c(
 )
 
 # Generate sample data for the dashboard
-set.seed(123)
+set.seed(2026111)
 
 # SOX Controls data
 sox_controls <- tribble(
@@ -48,26 +50,27 @@ sox_controls <- tribble(
 
 # Control testing results
 control_tests <- tribble(
-  ~control_id, ~test_date, ~sample_size, ~failures, ~status,
-  "SOX-001", "2026-11-01", 25, 0, "Pass",
-  "SOX-001", "2026-11-15", 25, 2, "Fail",
-  "SOX-002", "2026-11-20", 10, 0, "Pass",
-  "SOX-003", "2026-11-10", 15, 1, "Review",
-  "SOX-004", "2026-11-25", 20, 0, "Pass",
-  "SOX-005", "2026-11-30", 5, 0, "Pass"
-) |>
+  ~control_id, ~test_date,   ~sample_size, ~failures, ~status,
+  "SOX-001",   "2026-11-23", 15,           0,         "Pass",
+  "SOX-001",   "2026-11-28", 15,           2,         "Fail",
+  "SOX-002",   "2026-11-03", 5,            0,         "Pass",
+  "SOX-003",   "2026-11-25", 10,           0,         "Pass",
+  "SOX-004",   "2026-11-08", 20,           0,         "Pass",
+  "SOX-005",   "2026-11-24", 10,           0,         "Pass"
+)
+control_tests <- control_tests |>
   mutate(test_date = ymd(test_date))
 
 # Financial data
 financial_data <- tribble(
-  ~account, ~category, ~current_month, ~prior_month, ~prior_year, ~budget,
-  "Revenue", "P&L", 1250000, 1180000, 1150000, 1200000,
-  "COGS", "P&L", -750000, -708000, -690000, -720000,
-  "Operating Expenses", "P&L", -350000, -340000, -330000, -360000,
-  "Cash", "BS", 450000, 425000, 380000, 400000,
-  "Accounts Receivable", "BS", 380000, 360000, 350000, 375000,
-  "Inventory", "BS", 290000, 310000, 280000, 300000,
-  "Accounts Payable", "BS", -220000, -210000, -200000, -225000
+  ~account,              ~category, ~current_month, ~prior_month, ~prior_year, ~budget,
+  "Revenue",             "P&L",     1280000,        1256000,      1139000,     1175000,
+  "COGS",                "P&L",     -726000,        -721000,      -680000,     -770000,
+  "Operating Expenses",  "P&L",     -352000,        -334000,      -335000,     -345000,
+  "Cash",                "BS",      374000,         345000,       332000,      395000,
+  "Accounts Receivable", "BS",      400000,         368000,       389000,      360000,
+  "Inventory",           "BS",      268000,         272000,       259000,      275000,
+  "Accounts Payable",    "BS",      -186000,        -176000,      -165000,     -205000
 )
 
 # Close tasks
@@ -85,13 +88,14 @@ close_tasks <- tribble(
 
 # Close progress
 close_progress <- tribble(
-  ~task_id, ~start_time, ~end_time, ~status, ~issues,
-  1, "2026-12-01 08:00", "2026-12-01 13:00", "Complete", "None",
-  2, "2026-12-02 09:00", "2026-12-02 11:30", "Complete", "Bank feed delay",
-  3, "2026-12-01 07:00", "2026-12-01 14:00", "Complete", "Overtime required",
-  4, "2026-12-03 08:00", NA, "In Progress", "Waiting for invoices",
-  5, "2026-12-03 10:00", NA, "In Progress", "System reconciling"
-) |>
+  ~task_id, ~start_time,        ~end_time,          ~status,       ~issues,
+  1,        "2026-12-01 08:00", "2026-12-01 13:00", "Complete",    "None",
+  2,        "2026-12-02 09:00", "2026-12-02 11:30", "Complete",    "Bank feed delay",
+  3,        "2026-12-01 07:00", "2026-12-01 14:00", "Complete",    "Overtime required",
+  4,        "2026-12-03 08:00", NA,                 "In Progress", "Waiting for invoices",
+  5,        "2026-12-03 10:00", NA,                 "In Progress", "System reconciling"
+)
+close_progress <- close_progress |>
   mutate(
     start_time = ymd_hm(start_time),
     end_time = ymd_hm(end_time),
@@ -100,16 +104,17 @@ close_progress <- tribble(
 
 # Journal entries
 journal_entries <- tribble(
-  ~entry_id, ~entry_date, ~entry_time, ~user_id, ~amount, ~description, ~account_type,
-  "JE001", "2026-11-29", "14:30:00", "jsmith", 25000, "Monthly depreciation", "Asset",
-  "JE002", "2026-11-30", "22:15:00", "admin", 75000, "Adjust revenue recognition", "Revenue",
-  "JE003", "2026-11-28", "09:00:00", "mjones", 15000, "Record payroll accrual", "Expense",
-  "JE004", "2026-11-30", "23:45:00", "temp001", 100000, "Correct inventory error", "Asset",
-  "JE005", "2026-11-27", "10:30:00", "kwilson", 5000, "Office supplies", "Expense",
-  "JE006", "2026-11-29", "03:00:00", "admin", 50000, "Reverse accrual", "Reserve",
-  "JE007", "2026-11-30", "16:00:00", "jsmith", 30000, "Book depreciation", "Asset",
-  "JE008", "2026-11-28", "21:00:00", "mjones", 80000, "Adjust reserve balance", "Reserve"
-) |>
+  ~entry_id, ~entry_date,  ~entry_time, ~user_id,  ~amount, ~description,                 ~account_type,
+  "JE001",   "2026-11-28", "14:06:00",  "jsmith",  85000,   "Monthly depreciation",       "Asset",
+  "JE002",   "2026-11-27", "21:09:00",  "kwilson", 75000,   "Adjust revenue recognition", "Revenue",
+  "JE003",   "2026-11-28", "16:10:00",  "temp001", 120000,  "Record payroll accrual",     "Expense",
+  "JE004",   "2026-11-30", "23:38:00",  "mjones",  45000,   "Correct inventory error",    "Asset",
+  "JE005",   "2026-11-29", "09:36:00",  "temp001", 55000,   "Office supplies",            "Expense",
+  "JE006",   "2026-11-28", "03:03:00",  "kwilson", 30000,   "Reverse accrual",            "Reserve",
+  "JE007",   "2026-11-28", "10:23:00",  "admin",   15000,   "Book depreciation",          "Asset",
+  "JE008",   "2026-11-29", "22:54:00",  "jsmith",  35000,   "Adjust reserve balance",     "Reserve"
+)
+journal_entries <- journal_entries |>
   mutate(
     entry_date = ymd(entry_date),
     entry_time = hms(entry_time),
@@ -118,14 +123,15 @@ journal_entries <- tribble(
 
 # Historical expense data
 historical_expenses <- tribble(
-  ~month, ~travel, ~supplies, ~utilities, ~consultants,
-  "2026-07", 45000, 12000, 18000, 25000,
-  "2026-08", 42000, 13000, 19000, 27000,
-  "2026-09", 47000, 11500, 17500, 24000,
-  "2026-10", 44000, 12500, 18500, 26000,
-  "2026-11", 46000, 11000, 19500, 25500,
-  "2026-12", 48000, 11800, 18200, 45000  # Current month with anomaly
-) |>
+  ~month,    ~travel, ~supplies, ~utilities, ~consultants,
+  "2026-06", 45700,   12700,     20000,      27700,
+  "2026-07", 48100,   12300,     19200,      29200,
+  "2026-08", 49000,   12600,     20700,      26700,
+  "2026-09", 45300,   13100,     20200,      27300,
+  "2026-10", 49000,   12500,     21400,      29200,
+  "2026-11", 47200,   12400,     19700,      51200         # Current month with anomaly
+)
+historical_expenses <- historical_expenses |>
   mutate(month = ym(month)) |>
   pivot_longer(cols = -month, names_to = "category", values_to = "amount")
 
@@ -165,8 +171,8 @@ open_findings <- control_tests |>
   nrow()
 
 # Days to next filing
-next_filing <- as_date("2027-02-15")
-today = as_date("2026-12-15")
+next_filing <- as_date("2026-11-30") + days(77)
+today = as_date("2026-11-30") + days(15)
 days_to_filing <- as.numeric(next_filing - today)
 
 # Create compliance summary metrics
@@ -193,20 +199,21 @@ compliance_summary |>
 #| label: filing-calendar
 # Create regulatory filing calendar
 filing_calendar <- tribble(
-  ~filing, ~due_date,
-  "10-Q Q4", "2027-02-15",
-  "10-K Annual", "2027-03-31",
+  ~filing,             ~due_date,
+  "10-Q Q4",           "2027-02-15",
+  "10-K Annual",       "2027-03-31",
   "SOX Certification", "2027-03-31",
-  "Proxy Statement", "2027-04-30"
-) |>
-  _______(
+  "Proxy Statement",   "2027-04-30"
+)
+filing_calendar <- filing_calendar |>
+  mutate(
     due_date = ymd(due_date),
     days_remaining = as.numeric(due_date - today)
   )
 
 # Display calendar
 filing_calendar |>
-  _______(filing, due_date, days_remaining) |>
+  select(filing, due_date, days_remaining) |>
   _____() |>
   tab_header(title = "Regulatory Calendar") |>
   fmt_date(columns = due_date, date_style = 3) |>
@@ -222,6 +229,7 @@ filing_calendar |>
 
 ## Row
 
+### Column {width="50%"}
 
 #### Variance Analysis
 
@@ -229,7 +237,7 @@ filing_calendar |>
 #| label: variance-analysis
 # Create variance table
 variance_analysis |>
-  filter(is_material) |>
+  _____(is_material) |>
   select(account, current_month, budget, budget_variance, budget_variance_pct) |>
   gt() |>
   tab_header(
@@ -245,30 +253,22 @@ variance_analysis |>
     decimals = 1
   ) |>
   tab_style(
-    style = cell_fill(color = control_colors["effective"]),
+    style = cell_fill(color = control_colors["high_risk"]),
     locations = cells_body(
-      columns = c(budget_variance, budget_variance_pct),
-      rows = budget_variance > 0
-    )
-  ) |>
-  tab_style(
-    style = cell_fill(color = control_colors["ineffective"]),
-    locations = cells_body(
-      columns = c(budget_variance, budget_variance_pct),
-      rows = budget_variance < 0
+      rows = abs(budget_variance_pct) > 0.10
     )
   )
 ```
 
-## Row
+### Column {width="50%"}
 
 #### Financial Trends
 
 ```{r}
 #| label: financial-trends
 # Create monthly trend data (simulated for past 6 months)
-months <- seq(floor_date(today - months(5), "month"), 
-              floor_date(today, "month"), 
+months <- seq(floor_date(today - months(5), "month"),
+              floor_date(today, "month"),
               by = "month")
 
 monthly_trends <- expand_grid(
@@ -302,7 +302,7 @@ trend_plot <- monthly_trends |>
     x = NULL,
     y = NULL,
     color = NULL
-  ) 
+  )
 
 # Convert to interactive
 _____(trend_plot) |>
@@ -320,7 +320,7 @@ _____(trend_plot) |>
 # Merge close tasks with progress
 close_status <- close_tasks |>
   left_join(close_progress, by = "task_id") |>
-  _______(
+  mutate(
     status = case_when(
       !is.na(end_time) ~ "Complete",
       !is.na(start_time) ~ "In Progress",
@@ -338,7 +338,7 @@ close_status <- close_tasks |>
 
 # Create Gantt chart
 gantt_plot <- close_status |>
-  ggplot(_______(y = fct_rev(factor(task_id)))) +
+  ggplot(aes(y = fct_rev(factor(task_id)))) +
   geom_segment(
     aes(x = planned_start - 0.4, xend = planned_end + 0.4,
         yend = fct_rev(factor(task_id)),
@@ -476,8 +476,9 @@ ggplotly(control_plot) |>
   layout(hovermode = "y unified")
 ```
 
-## Row 
+## Row {height="60%"}
 
+### Column {width="50%"}
 
 #### Exception Report
 
@@ -486,7 +487,7 @@ ggplotly(control_plot) |>
 # Identify high-risk entries
 high_risk_je <- journal_entries |>
   _____(
-    days_until_period_end = as.numeric(ymd("2026-11-30") - entry_date)
+    days_until_period_end = as.numeric(as_date("2026-11-30") - entry_date)
   ) |>
   _____(
     amount > 50000 |                          # Large amounts
@@ -529,7 +530,7 @@ high_risk_je <- journal_entries |>
       TRUE ~ "Low"
     )
   ) |>
-  arrange(desc(risk_score)) 
+  arrange(desc(risk_score))
 
 # Display exception table
 high_risk_je |>
@@ -557,7 +558,8 @@ high_risk_je |>
   )
 ```
 
-## Row
+### Column {width="50%"}
+
 #### Anomaly Alerts
 
 ```{r}
@@ -565,7 +567,7 @@ high_risk_je |>
 # Calculate historical baselines (excluding current month)
 normal_ranges <- historical_expenses |>
   # Filter out current month to establish historical baseline
-  filter(month < ym("2026-12")) |>
+  filter(month < floor_date(as_date("2026-11-30"), "month")) |>
   # Calculate statistical measures for each expense category
   group_by(category) |>
   summarise(
@@ -579,7 +581,7 @@ normal_ranges <- historical_expenses |>
 # Check current month for anomalies
 current_expenses <- historical_expenses |>
   # Get current month data only
-  _____(month == ym("2026-12")) |>
+  _____(month == floor_date(as_date("2026-11-30"), "month")) |>
   # Join with historical ranges for comparison
   _____(normal_ranges, by = "category") |>
   mutate(
@@ -603,8 +605,8 @@ anomaly_plot <- current_expenses |>
   geom_point(aes(color = is_anomaly), size = 5) +
   # Set colors for normal vs anomalous values
   scale_color_manual(
-    values = c("FALSE" = control_colors[["effective"]], 
-              "TRUE" = control_colors[["ineffective"]]),
+    values = c("FALSE" = control_colors[["effective"]],
+               "TRUE" = control_colors[["ineffective"]]),
     labels = c("Normal", "Anomaly")
   ) +
   # Format y-axis as currency
@@ -624,7 +626,43 @@ ggplotly(anomaly_plot) |>
   layout(hovermode = "y unified")
 ```
 
-# Summary
+# Insights & Actions
 
+## Key Control Findings
 
-The December 2026 close identifies $_______ in high-risk journal entries (JE006, _______, _______) concentrated in admin-posted revenue and reserve adjustments near month-end, coinciding with an Access Controls effectiveness rate of _______% that falls below the _______% SOX threshold—a pattern suggesting systemic control gaps that require immediate remediation before the 10-Q filing in _______ days. Despite these risks, the organization demonstrates strong financial discipline with operating expenses running 2.8% favorable to budget and cash exceeding plan by $_______ (+_______%), while maintaining _______% overall SOX control effectiveness. Priority actions include investigating the $_______ consultant expense anomaly, completing the remaining SOX control test, and implementing automated flagging for after-hours entries exceeding $50,000 to prevent recurrence.
+Based on your dashboard analysis, identify the following:
+
+1. **Compliance Status**:
+   - SOX control effectiveness: _____
+   - Controls requiring remediation: _____
+   - Days until next regulatory filing: _____
+
+2. **Financial Reporting Quality**:
+   - Reporting accuracy rate: _____
+   - Material variances identified: _____
+   - Average days to close: _____
+
+3. **Risk Assessment**:
+   - High-risk journal entries: _____
+   - Expense anomalies detected: _____
+   - Unreconciled items aging > 30 days: _____
+
+## Recommended Actions
+
+Complete these action items based on your analysis:
+
+1. **Immediate Actions** (Today):
+   - Review all journal entries with risk score > _____
+   - Investigate expense anomalies in: _____
+   - Address control failures in: _____
+
+2. **This Week**:
+   - Complete testing for _____ controls
+   - Clear reconciling items for accounts: _____
+   - Document variance explanations for: _____
+
+3. **This Month**:
+   - Implement process improvements to reduce close time to _____ days
+   - Update control procedures for: _____
+   - Schedule training for: _____
+

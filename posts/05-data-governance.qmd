@@ -1,15 +1,19 @@
 ---
-
 title: "5: Data Governance and Management"
-execute: 
-  eval: false #set to true
+date: today
+execute:
+  eval: false
   message: false
   warning: false
 ---
 
+
+
 ## Executive Summary
 
-This data governance implementation identified critical control deficiencies in the accounting system, including _______ invalid account codes (failing the 4-digit format standard), _______ invalid transaction dates (including an impossible date of "2025-03-32"), and _______ orphaned transaction referencing non-existent account ID 99—issues that if undetected could result in misstated financial reports and audit failures. The referential integrity check revealed _______ unbalanced transaction days with a combined $_______ discrepancy ($_______ on March 20 and -$_______ on the invalid date), violating the fundamental accounting equation that debits must equal credits; implementing these automated validations would prevent such errors before they enter the general ledger. The comprehensive AR data dictionary documents _______ fields with _______ designated as mandatory, establishing clear business rules (e.g., due_date ≥ invoice_date, invoice amounts must be positive) that align with SOX compliance requirements and provide auditors with documented evidence of internal controls over financial reporting.
+*Write a 2-3 sentence summary of your data governance implementations and key insights here after completing the assignment.*
+
+---
 
 ## Introduction
 
@@ -45,6 +49,7 @@ Let's create sample data representing accounting records:
 **Chart of Accounts Master Data**
 
 ```{r}
+#| label: coa-data
 # Create chart of accounts
 chart_of_accounts <- tribble(
   ~account_id, ~account_code, ~account_name,        ~account_type, ~active,
@@ -64,15 +69,18 @@ chart_of_accounts
 **Sample Transactions**
 
 ```{r}
+#| label: transactions-data
 # Create sample transactions (some with errors)
 transactions <- tribble(
-  ~trans_id, ~trans_date,    ~account_id, ~debit,  ~credit, ~description,
-  "T001",    "2025-03-15",   1,           5000,    0,       "Customer payment",
-  "T002",    "2025-03-15",   5,           0,       5000,    "Sales revenue",
-  "T003",    "03/20/2025",   6,           1200,    0,       "Rent payment",
-  "T004",    "2025-03-32",   3,           0,       1200,    "Rent payable",
-  "T005",    "2025-03-25",   99,          500,     0,       "Office supplies",
-  "T006",    "2025-03-25",   2,           0,       500,     "Customer invoice"
+  ~trans_id, ~trans_date,  ~account_id, ~debit, ~credit, ~description,
+  "T001",    "2025-03-15", 1,           6300,   0,       "Customer payment",
+  "T002",    "2025-03-15", 5,           0,      6300,    "Sales revenue",
+  "T003",    "03/20/2025", 6,           2100,   0,       "Rent payment",
+  "T004",    "2025-03-32", 3,           0,      2100,    "Rent payable",
+  "T005",    "2025-03-25", 83,          800,    0,       "Office supplies",  # Invalid account
+  "T006",    "2025-03-25", 2,           0,      800,     "Customer invoice",
+  "T007",    "2025-03-28", 91,          800,    0,       "Misc expense",     # Invalid account
+  "T008",    "2025-03-28", 1,           0,      800,     "Misc accrual"
 )
 
 # View the data
@@ -84,11 +92,12 @@ transactions
 ### Create Account Code Validation Function
 
 ```{r}
+#| label: account-code-validation
 # Function to validate account codes
 validate_account_code <- function(account_code) {
   # Check if account code is exactly 4 digits
   is_valid <- str_detect(account_code, "^\\d{_____}$")
-  
+
   return(is_valid)
 }
 
@@ -108,30 +117,31 @@ validation_results
 ### Create Date Validation Function
 
 ```{r}
+#| label: date-validation
 # Function to validate transaction dates
 validate_date <- function(date_string) {
   # Try to parse the date
   parsed_date <- suppressWarnings(as_date(date_string))
-  
+
   # Check if parsing was successful
   if (is.na(parsed_date)) {
     return(list(valid = FALSE, reason = "Invalid date format"))
   }
-  
+
   # Check if date is not in the future
   if (parsed_date > _____) {  # Compare to today's date
     return(list(valid = _____, reason = "Date cannot be in the future"))
   }
-  
+
   # Check if date is reasonable (not before 2020)
   if (parsed_date < as_date("_____")) {
     return(list(valid = FALSE, reason = "Date too far in the past"))
   }
-  
+
   return(list(valid = TRUE, reason = "Valid date"))
 }
 # Test dates
-test_dates <- c("2025-03-15", "03/20/2025", "2025-03-32", "2028-01-01", "2019-01-01")
+test_dates <- c("03/20/2025", "2023-06-30", "2028-01-01", "2027-13-01", "2019-01-01")
 
 # Validate each date
 date_validation <- tibble(
@@ -140,7 +150,7 @@ date_validation <- tibble(
 ) |>
   mutate(
     is_valid = map_lgl(validation, ~ .$valid),
-    reason = map_chr(validation, ~ ._____) 
+    reason = map_chr(validation, ~ .$_____)
   ) |>
   select(-validation)
 
@@ -153,25 +163,26 @@ date_validation
 ### Create Referential Integrity Function
 
 ```{r}
+#| label: referential-integrity
 # Function to check if all account IDs exist in chart of accounts
 check_referential_integrity <- function(transactions_df, chart_of_accounts_df) {
   # Get valid account IDs from chart of accounts
   valid_account_ids <- chart_of_accounts_df$_____
-  
+
   # Find transactions with invalid account IDs
   invalid_transactions <- transactions_df |>
     filter(!_____ %in% valid_account_ids)
-  
+
   # Check if debits equal credits by date
   daily_balance <- transactions_df |>
     group_by(_____) |>
     summarize(
       total_debits = sum(debit),
       total_credits = sum(_____),
-      difference = round(total_debits - _____ , 2)
+      difference = round(total_debits - _____, 2)
     ) |>
     filter(difference != 0)
-  
+
   # Return results
   return(list(
     has_invalid_accounts = nrow(invalid_transactions) > 0,
@@ -204,17 +215,18 @@ if (integrity_check$_____) {
 Create a comprehensive data dictionary for an accounts receivable system with the following structure:
 
 ```{r}
+#| label: data-dictionary
 # Create AR data dictionary
 ar_data_dictionary <- tribble(
   ~field_name,        ~data_type,     ~max_length, ~required, ~description,                          ~valid_values,                    ~business_rules,
   "customer_id",      "VARCHAR",      10,          "Yes",     "Unique customer identifier",          "C0001-C9999",                   "System generated, sequential",
-  "customer_name",    "VARCHAR",      100,         "Yes",     "_____",                              "Any valid business name",        "Must match legal entity name",
-  "invoice_number",   "_____",        20,          "Yes",     "Unique invoice identifier",           "INV-YYYY-NNNNN",                "Year + sequential number",
+  "customer_name",    "VARCHAR",      100,         "Yes",     "_____",     "Any valid business name",        "Must match legal entity name",
+  "invoice_number",   "_____",      20,          "Yes",     "Unique invoice identifier",           "INV-YYYY-NNNNN",                "Year + sequential number",
   "invoice_date",     "DATE",         NA,          "Yes",     "Date invoice was issued",             "Valid date",                    "_____",
-  "due_date",         "DATE",         NA,          "Yes",     "_____",                              "Valid date",                    "Must be >= invoice_date",
+  "due_date",         "DATE",         NA,          "Yes",     "_____",                    "Valid date",                    "Must be >= invoice_date",
   "invoice_amount",   "DECIMAL(10,2)", NA,         "Yes",     "Total invoice amount",                "> 0",                          "Must be positive",
-  "payment_status",   "VARCHAR",      20,          "_____",   "Current payment status",              "Open, Partial, Paid, Overdue",  "Updated based on payments",
-  "days_outstanding", "INTEGER",      NA,          "No",      "_____",                              ">= 0",                          "Calculated: Today - Invoice Date"
+  "payment_status",   "VARCHAR",      20,          "_____",     "Current payment status",              "Open, Partial, Paid, Overdue",  "Updated based on payments",
+  "days_outstanding", "INTEGER",      NA,          "No",      "_____",             ">= 0",                          "Calculated: Today - Invoice Date"
 )
 
 # Display the data dictionary
@@ -239,12 +251,13 @@ ar_data_dictionary |>
 ### Key Validation Rules Implemented
 
 ```{r}
+#| label: validation-summary
 # Summarize validation rules
 validation_summary <- tribble(
   ~validation_type,        ~rule_description,                               ~purpose,
-  "Account Code Format",   "_____",                                         "Ensures consistent account identification",
+  "Account Code Format",   "_____",                      "Ensures consistent account identification",
   "Date Validation",       "Valid format, not future, reasonable range",    "_____",
-  "Referential Integrity", "_____",                                         "Prevents orphaned transactions",
+  "Referential Integrity", "_____",             "Prevents orphaned transactions",
   "Balance Check",         "Daily debits must equal credits",               "_____",
   "Required Fields",       "Check for NULL in required fields",             "Data completeness"
 )
@@ -259,8 +272,8 @@ validation_summary |>
 
 Based on your data governance implementation, complete these insights:
 
-- **Data Quality Issues Found**: The sample transactions had _____ invalid account reference.
+- **Data Quality Issues Found**: The sample transactions had _____ invalid account reference(s).
 - **Date Validation**: There were _____ valid dates and _____ non-valid dates (out of 5).
-- **Referential Integrity**: _____ transactions referenced non-existent accounts and _____ transactions had unbalanced transaction days. 
+- **Referential Integrity**: _____ transaction(s) referenced non-existent accounts and _____ transaction day(s) were unbalanced.
 - **Data Dictionary Completeness**: The AR system requires _____ mandatory fields out of _____ total fields.
 

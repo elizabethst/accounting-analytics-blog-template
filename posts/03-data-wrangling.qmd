@@ -1,15 +1,19 @@
 ---
 title: "3: Data Wrangling"
-execute: 
-  eval: false  #set to true
+date: today
+execute:
+  eval: false
+  message: false
   warning: false
 ---
 
 
+
 ## Executive Summary
 
-This analysis cleaned and combined sales transaction data with customer master data, resolving issues including inconsistent date formats, mixed currency formatting, and non-standardized text. After data cleaning, ________ had the highest sales at $________ across ________ transactions, with Software products generating ________% of total revenue ($________). One transaction (________) was flagged for having an invalid customer ID (________), resulting in an ________% data quality rate that requires follow-up investigation.
+*Write a 2-3 sentence summary of your analysis and key findings here after completing the assignment.*
 
+---
 
 ## Introduction
 
@@ -46,17 +50,18 @@ Let's create sample data that shows common accounting data problems:
 **Sales Transaction Data**
 
 ```{r}
+#| label: sales-data
 # Sales data with typical formatting issues
 sales_raw <- tribble(
-  ~transaction_id, ~customer_id, ~sale_date,     ~amount,       ~product_category,
-  "TXN-001",      "CUST001",    "01/15/2027",   "$25,000.00",  "Software",
-  "TXN-002",      "CUST002",    "01/20/2027",   "15000",       "Hardware", 
-  "TXN-003",      "CUST003",    "2027-02-01",   "$8,750.50",   "Services",
-  "TXN-004",      "CUST001",    "02/15/2027",   "12000.00",    "software",
-  "TXN-005",      "CUST999",    "02/28/2027",   "$5,500",      "Hardware", # Bad customer
-  "TXN-006",      "CUST004",    "3/10/2027",    "18500",       "Services",
-  "TXN-007",      "CUST002",    "03/15/2027",   "$22,000",     "Software",
-  "TXN-008",      "CUST003",    "2027-03-20",   "9750.00",     "HARDWARE"
+  ~transaction_id, ~customer_id, ~sale_date,   ~amount,      ~product_category,
+  "TXN-001",       "CUST001",    "01/15/2027", "$11,250.00", "Software",
+  "TXN-002",       "CUST002",    "01/20/2027", "19750",      "Services",
+  "TXN-003",       "CUST003",    "2027-02-01", "$6,000.50",  "Software",
+  "TXN-004",       "CUST001",    "02/15/2027", "33000.00",   "services",
+  "TXN-005",       "CUST999",    "02/28/2027", "$4,750",     "Services",        # Bad customer
+  "TXN-006",       "CUST004",    "3/10/2027",  "5000",       "Hardware",
+  "TXN-007",       "CUST002",    "03/15/2027", "$14,000",    "Software",
+  "TXN-008",       "CUST003",    "2027-03-20", "26250.00",   "HARDWARE"
 )
 
 # View the raw data
@@ -67,14 +72,15 @@ sales_raw
 
 
 ```{r}
+#| label: customer-data
 # Customer data with inconsistent formatting
 customers_raw <- tribble(
   ~customer_id, ~customer_name,      ~region, ~segment,
-  "CUST001",   "acme corporation",   "North", "Enterprise",
-  "CUST002",   "GLOBEX INC",        "South", "Mid-Market",
-  "CUST003",   "umbrella corp",      "West",  "",           # Missing segment
-  "CUST004",   "Stark Industries",   "East",  "Enterprise",
-  "CUST005",   "wayne enterprises",  "North", "Enterprise"  # No sales in Q1
+  "CUST001",    "acme corporation",  "North", "Enterprise",
+  "CUST002",    "GLOBEX INC",        "South", "Mid-Market",
+  "CUST003",    "umbrella corp",     "West",  "",           # Missing segment
+  "CUST004",    "Stark Industries",  "East",  "Enterprise",
+  "CUST005",    "wayne enterprises", "North", "Enterprise"  # No sales in Q1
 )
 
 # View the raw customer data
@@ -88,9 +94,9 @@ Before cleaning, let's identify the problems:
 **Check Date Formats**
 
 ```{r}
-#| eval: false
+#| label: check-dates
 # Look at the different date formats
-sales_raw |> 
+sales_raw |>
   select(sale_date) |>
   distinct()
 ```
@@ -98,6 +104,7 @@ sales_raw |>
 **Check Amount Formats**
 
 ```{r}
+#| label: check-amounts
 # Look at the different amount formats
 sales_raw |>
   select(amount) |>
@@ -107,6 +114,7 @@ sales_raw |>
 **Check Customer Name Consistency**
 
 ```{r}
+#| label: check-names
 # Look at customer name formatting
 customers_raw |>
   select(customer_name)
@@ -118,6 +126,7 @@ customers_raw |>
 
 
 ```{r}
+#| label: check-missing
 # Check for blank segments
 customers_raw |>
   filter(segment == "")
@@ -128,20 +137,21 @@ customers_raw |>
 #### Step 1: Clean Sales Data
 
 ```{r}
+#| label: clean-sales
 # Clean the sales data
 sales_clean <- sales_raw |>
   mutate(
     # Fix dates: parse_date_time can handle multiple formats
-    sale_date = parse_date_time(sale_date, orders = c("mdy", "ymd")) |> 
+    sale_date = parse_date_time(_____, orders = c("mdy", "ymd")) |>
                 as_date(),
 
     # Fix amounts: remove $ and , then convert to number
-    amount = str_remove_all(amount, "[$,]") |>  # Remove $ and ,
-      as.numeric(),
+    amount = str_remove_all(amount, "[_____]") |>  # Remove $ and ,
+             as.numeric(),
 
     # Standardize text to Title Case
-    product_category = str_to_title(product_category),
-    
+    product_category = str_to_title(_____),
+
     # Add useful columns for reporting
     month_name = month(sale_date, label = TRUE, abbr = FALSE)
   )
@@ -153,12 +163,13 @@ sales_clean
 #### Step 2: Clean Customer Data
 
 ```{r}
+#| label: clean-customers
 # Clean the customer data
 customers_clean <- customers_raw |>
   mutate(
     # Standardize customer names to Title Case
     customer_name = str_to_title(_____),
-    
+
     # Replace blank segments with "Unclassified"
     segment = if_else(segment == "", "_____", segment)
   )
@@ -173,6 +184,7 @@ customers_clean
 #### Join Sales with Customer Information
 
 ```{r}
+#| label: join-data
 # Combine sales and customer data
 # Use left_join to keep all sales, even if customer not found
 sales_complete <- sales_clean |>
@@ -186,6 +198,7 @@ glimpse(sales_complete)
 #### Check for Data Quality Issues
 
 ```{r}
+#| label: problem-sales
 # Find sales without valid customer info
 problem_sales <- sales_complete |>
   filter(is.na(_____)) |>  # Check for missing customer_name
@@ -201,6 +214,7 @@ problem_sales
 #### Monthly Sales Summary
 
 ```{r}
+#| label: monthly-summary
 # Calculate monthly sales (excluding problem transactions)
 monthly_sales <- sales_complete |>
   filter(!is.na(customer_name)) |>  # Only valid customers
@@ -226,6 +240,7 @@ monthly_sales |>
 #### Sales by Product Category
 
 ```{r}
+#| label: product-summary
 # Analyze sales by product
 product_summary <- sales_complete |>
   filter(!is.na(customer_name)) |>
@@ -246,6 +261,7 @@ product_summary
 #### Customer Segment Analysis
 
 ```{r}
+#| label: segment-summary
 # Analyze by customer segment
 segment_summary <- sales_complete |>
   filter(!is.na(customer_name)) |>
@@ -269,6 +285,7 @@ segment_summary |>
 Data Quality Report
 
 ```{r}
+#| label: data-quality
 # Calculate data quality metrics
 total_transactions <- nrow(sales_complete)
 valid_transactions <- sum(!is.na(sales_complete$customer_name))
@@ -276,8 +293,8 @@ problem_transactions <- sum(is.na(sales_complete$customer_name))
 
 # Create summary
 data_quality <- tibble(
-  Metric = c("Total Transactions", 
-            "Valid Transactions", 
+  Metric = c("Total Transactions",
+            "Valid Transactions",
             "Problem Transactions",
             "Data Quality Rate"),
   Value = c(total_transactions,
@@ -296,6 +313,7 @@ data_quality
 Based on the analysis above, complete these insights:
 
 - **Monthly Trend**: Sales (increased/decreased) from January to March, with the highest sales in _____.
-- **Product Performance**: _____ generated the most revenue, accounting for _____% of total sales.
-- **Customer Segments**: The _____ segment had the highest average sale per customer at $_____.
+- **Product Performance**: _____ generated the most revenue, accounting for _____ of total sales.
+- **Customer Segments**: The _____ segment had the highest average sale per customer at _____.
 - **Data Quality**: We identified _____ transaction(s) with invalid customer IDs that need investigation.
+

@@ -1,15 +1,19 @@
 ---
 title: "4: Data Visualization for Accounting"
-execute: 
-  eval: false #set to true
+date: today
+execute:
+  eval: false
   message: false
   warning: false
 ---
 
+
+
 ## Executive Summary
 
-This financial analysis demonstrates exceptional company performance in FY2027, with revenue growing ______% from $_______ in January to $_______ in December, resulting in total annual revenue of $_______ million and net income of $_______ (_______% profit margin). The quarterly trend visualization reveals accelerating profitability, with Q4 net income ($_______) and Q1 net income ($_______), suggesting strong seasonal performance or successful strategic initiatives. Budget variance analysis identifies Marketing (+_______%, $_______ over) and Finance (+_______%, $_______ over) as departments requiring cost management attention, while Sales (-______%) and Operations (-_______%) demonstrate effective budget discipline that partially offset unfavorable variances elsewhere.
+*Write a 2-3 sentence summary of your visualizations and key insights here after completing the assignment.*
 
+---
 
 ## Introduction
 
@@ -46,22 +50,24 @@ Let's create sample data representing a company's financial performance:
 **Monthly Financial Performance**
 
 ```{r}
+#| label: monthly-data
 # Monthly financial data for 2027
 monthly_financials <- tribble(
-  ~month, ~revenue, ~expenses, ~net_income, ~quarter,
-  "2027-01-01", 125000, 95000, 30000, "Q1",
-  "2027-02-01", 135000, 98000, 37000, "Q1",
-  "2027-03-01", 142000, 102000, 40000, "Q1",
-  "2027-04-01", 155000, 110000, 45000, "Q2",
-  "2027-05-01", 148000, 108000, 40000, "Q2",
-  "2027-06-01", 162000, 115000, 47000, "Q2",
-  "2027-07-01", 158000, 112000, 46000, "Q3",
-  "2027-08-01", 171000, 120000, 51000, "Q3",
-  "2027-09-01", 166000, 118000, 48000, "Q3",
-  "2027-10-01", 180000, 125000, 55000, "Q4",
-  "2027-11-01", 195000, 135000, 60000, "Q4",
-  "2027-12-01", 210000, 145000, 65000, "Q4"
-) |>
+  ~month,       ~revenue, ~expenses, ~net_income, ~quarter,
+  "2027-01-01", 131000,   90000,     41000,       "Q1",
+  "2027-02-01", 135000,   100000,    35000,       "Q1",
+  "2027-03-01", 141000,   99000,     42000,       "Q1",
+  "2027-04-01", 148000,   105000,    43000,       "Q2",
+  "2027-05-01", 151000,   106000,    45000,       "Q2",
+  "2027-06-01", 165000,   120000,    45000,       "Q2",
+  "2027-07-01", 173000,   118000,    55000,       "Q3",
+  "2027-08-01", 186000,   141000,    45000,       "Q3",
+  "2027-09-01", 200000,   150000,    50000,       "Q3",
+  "2027-10-01", 211000,   152000,    59000,       "Q4",
+  "2027-11-01", 215000,   152000,    63000,       "Q4",
+  "2027-12-01", 225000,   168000,    57000,       "Q4"
+)
+monthly_financials <- monthly_financials |>
   mutate(month = as.Date(month))
 
 # View the data
@@ -71,21 +77,22 @@ monthly_financials
 **Department Expense Data**
 
 ```{r}
+#| label: dept-data
 # Department expense breakdown
 dept_expenses <- tribble(
-  ~department, ~expense_category, ~amount,
-  "Sales", "Salaries", 225236,
-  "Sales", "Travel", 75308,
-  "Sales", "Supplies", 34419,
-  "Marketing", "Salaries", 179800,
-  "Marketing", "Advertising", 134369,
-  "Marketing", "Supplies", 29876,
-  "Operations", "Salaries", 270664,
-  "Operations", "Equipment", 88937,
-  "Operations", "Supplies", 57135,
-  "Finance", "Salaries", 202516,
-  "Finance", "Software", 57135,
-  "Finance", "Supplies", 27605
+  ~department,  ~expense_category, ~amount,
+  "Sales",      "Salaries",        224548,
+  "Sales",      "Travel",          78573,
+  "Sales",      "Supplies",        32128,
+  "Marketing",  "Salaries",        149358,
+  "Marketing",  "Advertising",     122923,
+  "Marketing",  "Supplies",        25735,
+  "Operations", "Salaries",        324254,
+  "Operations", "Equipment",       106296,
+  "Operations", "Supplies",        68886,
+  "Finance",    "Salaries",        188399,
+  "Finance",    "Software",        47779,
+  "Finance",    "Supplies",        27768
 )
 
 # View the data
@@ -95,6 +102,7 @@ dept_expenses
 ### Setting Professional Defaults
 
 ```{r}
+#| label: defaults
 # Set a clean theme for all plots
 theme_set(theme_minimal())
 
@@ -107,6 +115,7 @@ options(scipen = 9999)
 ### Bar Chart: Department Total Expenses
 
 ```{r}
+#| label: dept-bar
 # Calculate total expenses by department
 dept_totals <- dept_expenses |>
   group_by(_____) |>  # Group by department
@@ -132,13 +141,14 @@ ggplot(dept_totals, aes(x = _____, y = reorder(department, _____))) +
 ### Line Chart: Revenue Trend Analysis
 
 ```{r}
+#| label: revenue-line
 # Create a line chart showing monthly revenue
 monthly_financials |>
   ggplot(aes(x = _____, y = _____)) +  # Map month to x, revenue to y
   geom_line(color = "dark green", size = 1.2) +
   geom_point(color = "dark green", size = 2.5) +
   scale_x_date(
-    labels = label_date_short(), 
+    labels = label_date_short(),
     breaks = breaks_width("1 months")) +
   scale_y_continuous(labels = _____) +  # Format as currency
   labs(
@@ -155,6 +165,7 @@ monthly_financials |>
 ### Comparing Revenue vs Expenses
 
 ```{r}
+#| label: multi-line
 # Transform data for multi-line plotting
 financial_trends <- monthly_financials |>
   select(month, revenue, expenses) |>
@@ -197,10 +208,11 @@ ggplot(financial_trends, aes(x = month, y = amount, color = _____)) +
 ### Stacked Bar Chart by Category
 
 ```{r}
+#| label: stacked-bar
 # Create stacked bar chart showing expense categories
 dept_expenses |>
   ggplot(aes(x = department, y = amount, fill = _____)) +  # Fill by expense_category
-  geom_col(position = "_____") +  # Use "stack" position
+  geom_col(position = "_____") +  # Use stack position
   scale_y_continuous(labels = dollar_format()) +
   scale_fill_brewer(palette = "Blues") +
   labs(
@@ -219,6 +231,7 @@ dept_expenses |>
 ### Panel 1: Net Income Trend
 
 ```{r}
+#| label: panel-net-income
 # Create net income visualization
 p1 <- monthly_financials |>
   ggplot(aes(x = month, y = _____)) +  # Plot net_income
@@ -238,6 +251,7 @@ _____
 ### Panel 2: Quarterly Performance
 
 ```{r}
+#| label: panel-quarterly
 # Summarize by quarter
 quarterly_summary <- monthly_financials |>
   group_by(_____) |>  # Group by quarter
@@ -274,6 +288,7 @@ p2
 ### Combine Dashboard Panels
 
 ```{r}
+#| label: dashboard
 # Combine panels using patchwork
 dashboard <- p1 / p2
 
@@ -289,14 +304,16 @@ dashboard +
 ## Advanced Visualization: Variance Analysis
 
 ```{r}
+#| label: variance
 # Create budget vs actual data
 budget_data <- tribble(
-  ~department, ~budget, ~actual,
-  "Sales", 350000, 334963,
-  "Marketing", 320000, 344045,
-  "Operations", 420000, 416736,
-  "Finance", 280000, 287256
-) |>
+  ~department,  ~budget, ~actual,
+  "Sales",      350000,  335249,
+  "Marketing",  320000,  298016,
+  "Operations", 480000,  499436,
+  "Finance",    240000,  263946
+)
+budget_data <- budget_data |>
   mutate(
     variance_amount = _____ - _____,  # Calculate variance
     variance_pct = (variance_amount / budget) * 100,
@@ -332,6 +349,7 @@ budget_data |>
 ### Data Visualization Ethics
 
 ```{r}
+#| label: ethics
 # Example of ethical vs misleading visualization
 # Create the same data with different y-axis scales
 
@@ -340,7 +358,8 @@ misleading <- monthly_financials |>
   ggplot(aes(x = month, y = revenue)) +
   geom_line(color = "dark green", size = 1.2) +
   scale_y_continuous(
-    limits = c(120000, 220000),  # Truncated axis
+    limits = c(min(monthly_financials$revenue) - 5000,
+               max(monthly_financials$revenue) + 10000),  # Truncated axis
     labels = dollar_format()
   ) +
   labs(title = "MASSIVE Revenue Growth!")
@@ -362,6 +381,7 @@ misleading | ethical
 ### Summary Metrics
 
 ```{r}
+#| label: summary-metrics
 # Calculate key performance metrics
 performance_summary <- monthly_financials |>
   summarize(
@@ -369,7 +389,7 @@ performance_summary <- monthly_financials |>
     total_expenses = sum(expenses),
     total_net_income = sum(net_income),
     profit_margin = (total_net_income / total_revenue),
-    revenue_growth = ((last(revenue) - first(revenue)) / first(revenue)) 
+    revenue_growth = ((last(revenue) - first(revenue)) / first(revenue))
   )
 
 
@@ -392,8 +412,9 @@ performance_summary |>
 
 Based on the visualizations above, complete these insights:
 
-- **Revenue Trend**: Revenue (increased/decreased) by _____% from January to December.
-- **Highest Spending Department**: _____ had the highest total expenses at $_____.
-- **Profit Margin**: The company achieved a _____% profit margin for the year.
-- **Best Performing Quarter**: Q_____ showed the highest net income at $_____.
+- **Revenue Trend**: Revenue (increased/decreased) by _____ from January to December.
+- **Highest Spending Department**: _____ had the highest total expenses at _____.
+- **Profit Margin**: The company achieved a _____ profit margin for the year.
+- **Best Performing Quarter**: _____ showed the highest net income at _____.
 - **Budget Performance**: The _____ and _____ departments were under budget (favorable variance).
+

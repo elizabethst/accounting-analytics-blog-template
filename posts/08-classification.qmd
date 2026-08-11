@@ -1,14 +1,19 @@
 ---
 title: "8: Classification Analysis for Fraud Detection"
-execute: 
-  eval: false # change to true
+date: today
+execute:
+  eval: false
   message: false
   warning: false
 ---
 
+
+
 ## Executive Summary
 
-The decision tree classification model achieves _______% overall accuracy with _______% sensitivity (fraud detection rate) and _______% specificity, enabling auditors to identify _______ of _______ fraudulent transactions in the test data while generating only _______ false positives (Prediction = Fraudulent; Truth = Legitimate), making it a reliable tool for risk-based audit sampling. Variable importance analysis reveals that transaction amount (importance score: _______) and documentation score (importance score: _______) are the strongest fraud predictors, supported by distinctive fraud patterns including _______% new vendor involvement versus _______% for legitimate transactions, _______% weekend processing versus _______%, and an average documentation score of _______ compared to 8.2 for legitimate transactions. Implementation of this model would require investigating only _______% of total transactions (12 high-risk cases) while capturing _______% of actual fraud, significantly improving audit efficiency compared to random sampling, with recommended control enhancements focusing on automated flags for transactions with poor documentation scores, new vendors under _______ days old, and after-hours or weekend processing where fraudulent activity rates are higher than legitimate transactions.
+*Write a 2-3 sentence summary of your classification analysis and the fraud detection model's performance. Complete this section after finishing the assignment.*
+
+---
 
 ## Introduction
 
@@ -38,30 +43,29 @@ library(tidymodels)   # For classification modeling
 library(scales)       # For formatting numbers
 library(gt)           # For nice tables
 library(rpart.plot)   # For visualizing decision trees
-library(vip)          # For variable importance
 
 # Set preferences
 theme_set(theme_minimal())  # Clean plots
 options(scipen = 999)       # No scientific notation
-set.seed(2027)              # Reproducible results
+set.seed(2026108)          # Reproducible results
 ```
 
 ### Load and Explore the Data
 
 ```{r}
+#| label: load-data
 # Load the fraud detection data
-fraud_data  <- read_rds("https://estanny.org/data/08-assignment-fraud_data.rds")
+fraud_data  <- read_rds("https://estanny.org/data/2026-fall/08-assignment-fraud_data.rds")
 
 # Display structure of the data
 glimpse(fraud_data)
-
 
 # Check the fraud rate
 fraud_data |>
   count(_____) |>  # Count by fraud status
   mutate(percentage = percent(n / sum(n))) |>
   gt() |>
-  tab_header(title = "Distribution of Fraud vs Legitimate Transactions") 
+  tab_header(title = "Distribution of Fraud vs Legitimate Transactions")
 ```
 
 ## Initial Data Exploration
@@ -69,6 +73,7 @@ fraud_data |>
 ### Transaction Amount Analysis
 
 ```{r}
+#| label: explore-amounts
 # Analyze amount patterns
 amount_summary <- fraud_data |>
   group_by(_____) |>  # Group by fraud status
@@ -81,14 +86,10 @@ amount_summary <- fraud_data |>
     .groups = "drop"
   )
 
-no_legit  <- amount_summary |>
-  filter(fraud == "Legitimate") |>
-  pull(count)
+no_legit  <- amount_summary |>filter(fraud == "Legitimate") |>pull(count)
+no_fraud  <- amount_summary |>filter(fraud == "Fraudulent") |>pull(count)
 
-no_fraud  <- amount_summary |>
-  filter(fraud == "Fraudulent") |>
-  pull(count)
-
+avg_fraud_amt  <- amount_summary |> filter(fraud == "Fraudulent") |> pull(avg_amount)
 
 # Display summary using gt
 amount_summary |>
@@ -111,6 +112,7 @@ ggplot(fraud_data, aes(x = _____, fill = _____)) +
 ### Risk Factor Analysis
 
 ```{r}
+#| label: risk-factors
 # Analyze risk factors
 risk_patterns <- fraud_data |>
   group_by(_____) |>  # Group by fraud status
@@ -118,16 +120,16 @@ risk_patterns <- fraud_data |>
     # Vendor patterns
     new_vendors = sum(vendor_type == "New"),
     avg_vendor_age = mean(_____),
-    
+
     # Timing patterns
     weekend_trans = sum(_____),
     after_hours = sum(_____),
     rushed_approvals = sum(is_rushed),
-    
+
     # Documentation
     poor_documentation = sum(_____),
     avg_doc_score = mean(_____),
-    
+
     .groups = "drop"
   ) |>
   # Calculate percentages
@@ -144,8 +146,6 @@ risk_patterns |>
   gt() |>
   tab_header(title = "Risk Factor Analysis by Fraud Status") |>
   fmt_number(columns = c(avg_vendor_age, avg_doc_score), decimals = 1)
-
-
 ```
 
 ## Data Preparation
@@ -153,6 +153,7 @@ risk_patterns |>
 ### Split Data for Training and Testing
 
 ```{r}
+#| label: split-data
 # Split data into training (75%) and testing (25%) sets
 fraud_split <- initial_split(fraud_data, prop = _____, strata = _____)
 
@@ -175,19 +176,20 @@ fraud_test |>
 ### Step 1: Create Recipe and Model Specification
 
 ```{r}
+#| label: recipe-spec
 # Create a recipe (preprocessing steps)
-fraud_recipe <- recipe(fraud ~ amount + vendor_type + is_weekend + is_after_hours + 
+fraud_recipe <- recipe(fraud ~ amount + vendor_type + is_weekend + is_after_hours +
                       documentation_score + is_rushed + vendor_age_days,
                       data = _____) |>
   step_normalize(_____, _____)  # Normalize numeric features
 
 # Specify the decision tree model
 tree_spec <- decision_tree(
-  tree_depth = _____,    # Maximum depth (try 4)
-  min_n = _____          # Minimum observations per node (try 10)
+  tree_depth = _____,  # Maximum depth (try 4)
+  min_n = _____  # Minimum observations per node (try 10)
 ) |>
   set_engine("rpart") |>
-  set_mode("_____")      # What are we predicting?
+  set_mode("_____")  # What are we predicting?
 
 # Create workflow
 tree_workflow <- workflow() |>
@@ -198,6 +200,7 @@ tree_workflow <- workflow() |>
 ### Step 2: Fit the Model
 
 ```{r}
+#| label: fit-model
 # Fit the model on training data
 fraud_tree_fit <- tree_workflow |>
   fit(data = _____)
@@ -209,6 +212,9 @@ fraud_tree_fit
 ### Step 3: Visualize the Decision Tree
 
 ```{r}
+#| label: plot-tree
+#| fig-height: 8
+#| fig-width: 12
 # Extract the decision tree for visualization
 tree_for_plot <- fraud_tree_fit |>
   extract_fit_engine()
@@ -226,6 +232,7 @@ rpart.plot(tree_for_plot,
 ### Step 4: Make Predictions and Create Confusion Matrix
 
 ```{r}
+#| label: confusion-matrix
 # Make predictions on test set
 test_predictions <- augment(_____, _____)
 
@@ -242,6 +249,7 @@ autoplot(conf_matrix, type = "heatmap") +
 ### Step 5: Calculate Performance Metrics
 
 ```{r}
+#| label: metrics
 # Define metrics we want
 fraud_metrics <- metric_set(accuracy, sensitivity, specificity, precision)
 
@@ -260,17 +268,21 @@ model_metrics |>
 ## Variable Importance Analysis
 
 ```{r}
-# Extract variable importance
+#| label: importance
+# Extract variable importance (rpart records it on the fitted engine)
 tree_importance <- fraud_tree_fit |>
-  extract_fit_parsnip() |>
-  vi() |>
+  extract_fit_engine() |>
+  pluck("variable.importance") |>
+  enframe(name = "Variable", value = "Importance") |>
   mutate(
     Variable = case_when(
       Variable == "amount" ~ "Transaction Amount",
       Variable == "vendor_type" ~ "Vendor Type",
       Variable == "is_weekend" ~ "Weekend Transaction",
+      Variable == "is_after_hours" ~ "After-Hours Transaction",
       Variable == "documentation_score" ~ "Documentation Score",
       Variable == "is_rushed" ~ "Rushed Approval",
+      Variable == "vendor_age_days" ~ "Vendor Age (days)",
       TRUE ~ Variable
     )
   )
@@ -296,6 +308,7 @@ tree_importance |>
 ## Business Impact Analysis
 
 ```{r}
+#| label: business-impact
 # Calculate business metrics
 business_impact <- test_predictions |>
   mutate(
@@ -311,11 +324,11 @@ business_impact <- test_predictions |>
     total_fraud = sum(fraud == "Fraudulent"),
     fraud_detected = sum(fraud == "Fraudulent" & .pred_class == "Fraudulent"),
     detection_rate = fraud_detected / total_fraud,
-    
+
     # False positive impact
     false_positives = sum(fraud == "Legitimate" & .pred_class == "Fraudulent"),
     false_positive_rate = false_positives / sum(fraud == "Legitimate"),
-    
+
     # Workload analysis
     high_risk_count = sum(risk_level == "High Risk"),
     investigation_rate = high_risk_count / n()
@@ -325,22 +338,28 @@ business_impact <- test_predictions |>
 business_impact |>
   pivot_longer(everything(), names_to = "Metric", values_to = "Value") |>
   gt() |>
-  tab_header(title = "Business Impact Metrics") 
+  tab_header(title = "Business Impact Metrics") |>
+  fmt_percent(columns = Value, rows = Metric %in% c("detection_rate", "false_positive_rate", "investigation_rate") , decimals = 0) |>
+  fmt_number(columns = Value, rows = Metric %in% c("total_fraud",
+  "fraud_detected", "false_positives", "high_risk_count"), decimals = 0)
 ```
 
 ## Implementation Recommendations
 
 Based on your analysis, complete these recommendations:
 
-1. **Model Performance**: The decision tree achieved _____% accuracy with _____% sensitivity (fraud detection rate).
+1. **Model Performance**: The decision tree achieved _____ accuracy with _____ sensitivity (fraud detection rate).
 
 2. **Key Fraud Indicators**: The top predictors of fraud were:
    - _____: (Importance score: _____)
    - _____: (Importance score: _____)
 
-3. **Investigation Strategy**: 
-   - Focus on transactions with fraud probability > _____% 
-   - This would require investigating _____% of transactions
-   - Expected to catch _____% of actual fraud
+3. **Investigation Strategy**:
+   - Focus on transactions with fraud probability > _____
+   - This would require investigating _____ of transactions
+   - Expected to catch _____ of actual fraud
 
+4. **Control Improvements**:
+   - Strengthen controls around _____ (highest importance variable)
+   - Implement automated flags for low _____ values
 
