@@ -4,20 +4,14 @@ project:
 website:
   title: "Your Name - Accounting Analytics"
   navbar:
-    left:
-      - href: index.qmd
-        text: Home
-      - about.qmd
-
-navbar:
     background: primary
     search: true
     left:
       - href: index.qmd
         text: Home
       - about.qmd
-      - href: posts.qmd
-        text: Blog
+    # Assignment 2 asks you to make these two links your own: your email
+    # address, and your LinkedIn profile.
     right:
       - icon: mail
         href: mailto:youraddress@sonoma.edu
